@@ -1,25 +1,27 @@
-import { useState, useEffect } from 'react';
+const fs = require('fs');
+const file = 'src/pages/admin/Products.tsx';
+let content = fs.readFileSync(file, 'utf8');
 
-import { services } from '../../services';
-import { Product, Category } from '../../domain/models';
+const importRegex = /import \{ Product \} from '\.\.\/\.\.\/domain\/models';/;
+content = content.replace(importRegex, "import { Product, Category } from '../../domain/models';");
 
-const Products: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+// Inside Products: React.FC = () => {
+// We need to add state for categories and the form.
+const stateReplacement = `const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
-    name: '', slug: '', description: '', categoryId: '', type: 'standard' as any, 
+    name: '', slug: '', description: '', categoryId: '', type: 'standard', 
     price: 0, images: '', stock: 0, featured: false, active: true
   });
-  const [formError, setFormError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);`;
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+content = content.replace(/const \[products, setProducts\].*?setIsModalOpen\(false\);/s, stateReplacement);
 
-  const fetchProducts = async () => {
+// We need to fetch categories too.
+const fetchReplacement = `const fetchProducts = async () => {
     setLoading(true);
     setError(null);
     try {
@@ -36,9 +38,12 @@ const Products: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  };`;
 
-  
+content = content.replace(/const fetchProducts = async \(\) => \{.*?\};/s, fetchReplacement);
+
+// We need a handleSubmit function.
+const handleSave = `
   const handleSave = async () => {
     setFormError(null);
     try {
@@ -60,65 +65,12 @@ const Products: React.FC = () => {
       setFormError(err.message || 'Validation error');
     }
   };
+`;
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this product?')) {
-      await services.products.deleteProduct(id);
-      fetchProducts();
-    }
-  };
+content = content.replace(/const handleDelete = async/, handleSave + '\n  const handleDelete = async');
 
-  return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Products</h1>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700"
-        >
-          Add Product
-        </button>
-      </div>
-
-      {loading ? (
-        <p>Loading...</p>
-      ) : error ? (
-        <p className="text-red-500">{error}</p>
-      ) : (
-        <div className="overflow-x-auto bg-white rounded-lg shadow">
-          <table className="min-w-full">
-            <thead className="bg-gray-50 border-b">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {products.map((product: any) => (
-                <tr key={product.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <img src={product.images[0]} alt={product.name} className="h-10 w-10 rounded object-cover" />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{product.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.price}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.stock}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
-                    <button onClick={() => handleDelete(product.id)} className="text-red-600 hover:text-red-900">Delete</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
-          <div className="bg-white p-6 rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+// Now the form.
+const modalForm = `<div className="bg-white p-6 rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
             <h2 className="text-lg font-bold mb-4">Add Product</h2>
             {formError && <p className="text-red-500 text-sm mb-4">{formError}</p>}
             <div className="space-y-4 mb-4">
@@ -139,11 +91,8 @@ const Products: React.FC = () => {
               <button onClick={() => setIsModalOpen(false)} className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50">Cancel</button>
               <button onClick={handleSave} className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Save</button>
             </div>
-          </div>
-          </div>
-      )}
-    </div>
-  );
-};
+          </div>`;
 
-export default Products;
+content = content.replace(/<div className="bg-white p-6 rounded-lg max-w-md w-full">.*?<\/div>/s, modalForm);
+
+fs.writeFileSync(file, content);

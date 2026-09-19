@@ -27,6 +27,7 @@ export class ApiProductService implements IProductService {
     try { return await apiClient<Product>(`/products/${slug}`); } 
     catch (err: any) { if (err.status === 404) return null; throw err; }
   }
+  
   async getFeaturedProducts(): Promise<Product[]> {
     return this.getProducts({ featured: true });
   }
