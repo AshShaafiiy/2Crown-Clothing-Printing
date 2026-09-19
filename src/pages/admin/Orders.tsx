@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { services } from '../../services/mock';
+import { services } from '../../services';
 import { Order } from '../../domain/models';
 
 const Orders: React.FC = () => {

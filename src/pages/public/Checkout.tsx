@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import { useCartStore } from '../../store/cartStore';
-import { services } from '../../services/mock';
+import { services } from '../../services';
 
 import { getWhatsAppLink, generateWhatsAppOrderMessage } from '../../utils/whatsapp';
 

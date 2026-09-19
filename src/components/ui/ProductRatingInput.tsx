@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Star } from 'lucide-react';
-import { services } from '../../services/mock';
+import { services } from '../../services';
 import { ID } from '../../domain/models';
 import toast from 'react-hot-toast';
 

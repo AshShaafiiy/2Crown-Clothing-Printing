@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ArrowRight, Star, CheckCircle2, ShoppingBag, ImageIcon, MessageSquare, Shirt } from 'lucide-react';
-import { services } from '../../services/mock';
+import { services } from '../../services';
 import { Category, Product, Promotion, GalleryItem } from '../../domain/models';
 import { ImageFallback } from '../../components/ui/ImageFallback';
 import { ProductCard } from '../../components/ui/ProductCard';

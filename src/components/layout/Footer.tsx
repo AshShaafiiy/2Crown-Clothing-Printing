@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Mail, Phone, MapPin } from 'lucide-react';
-import { services } from '../../services/mock';
+import { services } from '../../services';
 import { BusinessSettings } from '../../domain/models';
 
 export default function Footer() {

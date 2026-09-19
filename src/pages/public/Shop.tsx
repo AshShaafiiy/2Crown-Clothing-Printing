@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { services } from '../../services/mock';
+import { services } from '../../services';
 import { Product, Category } from '../../domain/models';
 import { ProductCard } from '../../components/ui/ProductCard';
 

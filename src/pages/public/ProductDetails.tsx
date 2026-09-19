@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { services } from '../../services/mock';
+import { services } from '../../services';
 import { useCartStore } from '../../store/cartStore';
 import { Product, ProductVariant, CustomizationField } from '../../domain/models';
 import { ImageFallback } from '../../components/ui/ImageFallback';

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Star } from 'lucide-react';
-import { services } from '../../services/mock';
+import { services } from '../../services';
 import { ID } from '../../domain/models';
 
 interface ProductRatingDisplayProps {

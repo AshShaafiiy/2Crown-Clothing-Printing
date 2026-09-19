@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { services } from '../../services/mock';
+import { services } from '../../services';
 import { GalleryItem } from '../../domain/models';
 
 const Gallery: React.FC = () => {

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 import { useParams, Link } from 'react-router-dom';
 import { CheckCircle, MessageCircle, Copy } from 'lucide-react';
-import { services } from '../../services/mock';
+import { services } from '../../services';
 import { Order } from '../../domain/models';
 import { generateWhatsAppOrderMessage, getWhatsAppLink } from '../../utils/whatsapp';
 

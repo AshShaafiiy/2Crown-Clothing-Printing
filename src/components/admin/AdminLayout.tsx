@@ -10,7 +10,7 @@ import {
   Tags,
   Image as ImageIcon
 } from 'lucide-react';
-import { services } from '../../services/mock';
+import { services } from '../../services';
 
 export default function AdminLayout() {
   const navigate = useNavigate();

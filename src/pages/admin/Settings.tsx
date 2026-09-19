@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { services } from '../../services/mock';
+import { services } from '../../services';
 
 const Settings: React.FC = () => {
   const [settings, setSettings] = useState({

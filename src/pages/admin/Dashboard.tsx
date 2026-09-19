@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { services } from '../../services/mock';
+import { services } from '../../services';
 import { Order } from '../../domain/models';
 
 export default function Dashboard() {
