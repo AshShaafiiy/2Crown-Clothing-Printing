@@ -30,7 +30,9 @@ Data fetching is strictly decoupled through an **Interface-based Service Layer**
 - **Custom Work & Delivery**: Tailored business rules for custom requests (handled directly via WhatsApp, zero website uploads) and localized delivery routing.
 
 ## Documentation
-Comprehensive documentation of the domain models, business rules, development setup, and phase roadmap can be found in the `docs/` directory. If you are an AI assistant, please refer to `AGENTS.md` before writing code.
+Comprehensive documentation of the domain models, business rules, development setup, and phase roadmap can be found in the `docs/` directory. 
+The strict API contract that the frontend expects is defined at `/openapi.yaml`. 
+If you are an AI assistant, please refer to `AGENTS.md` before writing code.
 
 ## Development Setup
 

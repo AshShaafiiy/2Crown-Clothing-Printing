@@ -1,0 +1,1052 @@
+openapi: 3.0.3
+info:
+  title: 2Crown Clothing & Printing API
+  version: 1.0.0
+  description: >
+    API contract for the 2Crown Clothing & Printing platform.
+    This contract describes the endpoints required by the current frontend application.
+    
+    IMPORTANT BUSINESS RULES:
+    - **Currency:** Nigerian Naira (NGN / ₦) is used for all monetary values.
+    - **Custom Work:** No custom work order submission or file uploads are processed via this API. All custom files (logos, reference designs) and inquiries are strictly handled over WhatsApp.
+    - **Delivery:** Delivery fees for local/nationwide delivery are NOT automatically calculated. They remain nullable (`null`) or undefined at the time of order creation, to be confirmed manually by admins over WhatsApp.
+    - **Ratings:** Only 1-5 star ratings are supported. Written reviews are disabled in the UI.
+    - **WhatsApp:** The central WhatsApp number is managed via the BusinessSettings API.
+tags:
+  - name: Public
+    description: Customer-facing endpoints
+  - name: Admin
+    description: Authenticated administrator endpoints
+paths:
+  /auth/login:
+    post:
+      tags: [Public]
+      summary: Admin login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/logout:
+    post:
+      tags: [Admin]
+      summary: Admin logout
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Successfully logged out
+
+  /auth/me:
+    get:
+      tags: [Admin]
+      summary: Get current user
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Current user info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /products:
+    get:
+      tags: [Public]
+      summary: List products
+      parameters:
+        - name: categoryId
+          in: query
+          schema:
+            type: string
+        - name: active
+          in: query
+          schema:
+            type: boolean
+        - name: featured
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: A list of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+    post:
+      tags: [Admin]
+      summary: Create a product
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+      responses:
+        '201':
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+
+  /products/{id}:
+    get:
+      tags: [Public]
+      summary: Get product by ID or Slug
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Product ID or slug
+      responses:
+        '200':
+          description: Product details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Admin]
+      summary: Update a product
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+      responses:
+        '200':
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+    delete:
+      tags: [Admin]
+      summary: Delete a product
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Product deleted
+
+  /categories:
+    get:
+      tags: [Public]
+      summary: List categories
+      responses:
+        '200':
+          description: A list of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+    post:
+      tags: [Admin]
+      summary: Create a category
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryInput'
+      responses:
+        '201':
+          description: Category created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+
+  /categories/{id}:
+    get:
+      tags: [Public]
+      summary: Get category by ID or Slug
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Category details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Admin]
+      summary: Update a category
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryInput'
+      responses:
+        '200':
+          description: Category updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+    delete:
+      tags: [Admin]
+      summary: Delete a category
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Category deleted
+
+  /promotions:
+    get:
+      tags: [Public]
+      summary: List promotions
+      parameters:
+        - name: activeOnly
+          in: query
+          schema:
+            type: boolean
+        - name: flashSalesOnly
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: A list of promotions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Promotion'
+
+  /orders:
+    get:
+      tags: [Admin]
+      summary: List orders
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: A list of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+    post:
+      tags: [Public]
+      summary: Create a new order
+      description: >
+        Creates a new product order payload. This payload generates the reference number and saves the initial state before the WhatsApp message is triggered by the frontend.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderInput'
+      responses:
+        '201':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+
+  /orders/{reference}:
+    get:
+      tags: [Public]
+      summary: Track an order by reference
+      parameters:
+        - name: reference
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /orders/{id}/status:
+    patch:
+      tags: [Admin]
+      summary: Update order status
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  $ref: '#/components/schemas/OrderStatus'
+      responses:
+        '200':
+          description: Order status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+
+  /gallery:
+    get:
+      tags: [Public]
+      summary: List gallery items
+      parameters:
+        - name: categoryId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of gallery items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GalleryItem'
+
+  /ratings/{productId}:
+    get:
+      tags: [Public]
+      summary: Get rating summary for a product
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Rating summary
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  average:
+                    type: number
+                    format: float
+                  count:
+                    type: integer
+    post:
+      tags: [Public]
+      summary: Submit a product rating
+      description: Submits a 1-5 star rating. Does NOT support written reviews.
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [rating, customerId, customerName]
+              properties:
+                rating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                customerId:
+                  type: string
+                customerName:
+                  type: string
+      responses:
+        '201':
+          description: Rating submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+
+  /settings:
+    get:
+      tags: [Public]
+      summary: Get business settings
+      description: Returns contact information, currency info, delivery settings, and the WhatsApp number.
+      responses:
+        '200':
+          description: Business settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessSettings'
+    put:
+      tags: [Admin]
+      summary: Update business settings
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BusinessSettingsInput'
+      responses:
+        '200':
+          description: Business settings updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessSettings'
+
+  /users:
+    get:
+      tags: [Admin]
+      summary: List users (Admins)
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: A list of admin users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      tags: [Admin]
+      summary: Create a user
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, name, role]
+              properties:
+                email:
+                  type: string
+                  format: email
+                name:
+                  type: string
+                role:
+                  $ref: '#/components/schemas/Role'
+                password:
+                  type: string
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /users/{id}:
+    delete:
+      tags: [Admin]
+      summary: Delete a user
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: User deleted
+
+  /users/{id}/role:
+    patch:
+      tags: [Admin]
+      summary: Update user role
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties:
+                role:
+                  $ref: '#/components/schemas/Role'
+      responses:
+        '200':
+          description: Role updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid authentication token
+    NotFound:
+      description: The specified resource was not found
+
+  schemas:
+    Role:
+      type: string
+      enum:
+        - root_super_admin
+        - super_admin
+        - admin
+        - customer
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        role:
+          $ref: '#/components/schemas/Role'
+        phone:
+          type: string
+        address:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        active:
+          type: boolean
+      required:
+        - id
+        - email
+        - name
+        - role
+
+    CategoryInput:
+      type: object
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        imageUrl:
+          type: string
+        parentId:
+          type: string
+        active:
+          type: boolean
+        order:
+          type: integer
+      required:
+        - name
+        - slug
+        - active
+        - order
+
+    Category:
+      allOf:
+        - $ref: '#/components/schemas/CategoryInput'
+        - type: object
+          properties:
+            id:
+              type: string
+          required:
+            - id
+
+    ProductVariant:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        attributes:
+          type: object
+          additionalProperties:
+            type: string
+        price:
+          type: number
+        stock:
+          type: integer
+        sku:
+          type: string
+      required:
+        - id
+        - name
+        - attributes
+        - price
+        - stock
+
+    CustomizationFieldType:
+      type: string
+      enum:
+        - text
+        - longtext
+        - number
+        - dropdown
+        - radio
+        - checkbox
+        - color
+        - size
+        - file
+
+    CustomizationField:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        label:
+          type: string
+        type:
+          $ref: '#/components/schemas/CustomizationFieldType'
+        required:
+          type: boolean
+        options:
+          type: array
+          items:
+            type: string
+      required:
+        - id
+        - name
+        - label
+        - type
+        - required
+
+    ProductInput:
+      type: object
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        categoryId:
+          type: string
+        type:
+          type: string
+          enum: [standard, variant, customizable, quote]
+        price:
+          type: number
+        previousPrice:
+          type: number
+        images:
+          type: array
+          items:
+            type: string
+        stock:
+          type: integer
+        featured:
+          type: boolean
+        active:
+          type: boolean
+        variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductVariant'
+        customizationFields:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomizationField'
+        specifications:
+          type: object
+          additionalProperties:
+            type: string
+        turnaroundTime:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        promotionalBadge:
+          type: string
+      required:
+        - name
+        - slug
+        - description
+        - categoryId
+        - type
+        - price
+        - images
+        - stock
+        - featured
+        - active
+
+    Product:
+      allOf:
+        - $ref: '#/components/schemas/ProductInput'
+        - type: object
+          properties:
+            id:
+              type: string
+          required:
+            - id
+
+    Promotion:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [flash_sale, percentage, fixed]
+        value:
+          type: number
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        active:
+          type: boolean
+        applicableProductIds:
+          type: array
+          items:
+            type: string
+        applicableCategoryIds:
+          type: array
+          items:
+            type: string
+      required:
+        - id
+        - title
+        - type
+        - value
+        - startDate
+        - endDate
+        - active
+
+    OrderItemInput:
+      type: object
+      properties:
+        productId:
+          type: string
+        productName:
+          type: string
+        quantity:
+          type: integer
+        price:
+          type: number
+        variantId:
+          type: string
+        variantName:
+          type: string
+        customization:
+          type: object
+          additionalProperties: {}
+      required:
+        - productId
+        - productName
+        - quantity
+        - price
+
+    OrderItem:
+      allOf:
+        - $ref: '#/components/schemas/OrderItemInput'
+        - type: object
+          properties:
+            id:
+              type: string
+          required:
+            - id
+
+    OrderStatus:
+      type: string
+      enum:
+        - WhatsApp Pending
+        - WhatsApp Opened
+        - Customer Contacted
+        - Quotation Sent
+        - Awaiting Confirmation
+        - Confirmed
+        - Processing
+        - Ready
+        - Completed
+        - Cancelled
+
+    OrderInput:
+      type: object
+      properties:
+        customerId:
+          type: string
+        customerName:
+          type: string
+        customerPhone:
+          type: string
+        customerEmail:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItemInput'
+        subtotal:
+          type: number
+        discount:
+          type: number
+        total:
+          type: number
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        deliveryMethod:
+          type: string
+          enum: [pickup, local, nationwide]
+        deliveryAddress:
+          type: string
+        deliveryFee:
+          type: number
+          nullable: true
+          description: Nullable. Calculated manually over WhatsApp for local delivery.
+      required:
+        - customerName
+        - customerPhone
+        - items
+        - subtotal
+        - discount
+        - total
+        - status
+        - deliveryMethod
+
+    Order:
+      allOf:
+        - $ref: '#/components/schemas/OrderInput'
+        - type: object
+          properties:
+            id:
+              type: string
+            reference:
+              type: string
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/OrderItem'
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+          required:
+            - id
+            - reference
+            - createdAt
+            - updatedAt
+
+    GalleryItem:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        imageUrl:
+          type: string
+        categoryId:
+          type: string
+      required:
+        - id
+        - title
+        - imageUrl
+        - categoryId
+
+    Review:
+      type: object
+      properties:
+        id:
+          type: string
+        productId:
+          type: string
+        customerId:
+          type: string
+        customerName:
+          type: string
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        createdAt:
+          type: string
+          format: date-time
+        approved:
+          type: boolean
+      required:
+        - id
+        - productId
+        - customerId
+        - customerName
+        - rating
+        - createdAt
+        - approved
+
+    DeliverySettings:
+      type: object
+      properties:
+        pickupEnabled:
+          type: boolean
+        pickupAddress:
+          type: string
+        localDeliveryEnabled:
+          type: boolean
+        localDeliveryFee:
+          type: number
+          nullable: true
+        nationwideDeliveryEnabled:
+          type: boolean
+        nationwideDeliveryBaseFee:
+          type: number
+          nullable: true
+        freeDeliveryThreshold:
+          type: number
+          nullable: true
+      required:
+        - pickupEnabled
+        - pickupAddress
+        - localDeliveryEnabled
+        - nationwideDeliveryEnabled
+
+    BusinessSettingsInput:
+      type: object
+      properties:
+        storeName:
+          type: string
+        contactEmail:
+          type: string
+        contactPhone:
+          type: string
+        whatsappNumber:
+          type: string
+        address:
+          type: string
+        currency:
+          type: string
+        currencySymbol:
+          type: string
+        vatPercentage:
+          type: number
+        deliverySettings:
+          $ref: '#/components/schemas/DeliverySettings'
+      required:
+        - storeName
+        - contactEmail
+        - contactPhone
+        - whatsappNumber
+        - address
+        - currency
+        - currencySymbol
+        - vatPercentage
+        - deliverySettings
+
+    BusinessSettings:
+      allOf:
+        - $ref: '#/components/schemas/BusinessSettingsInput'
+        - type: object
+          properties:
+            id:
+              type: string
+          required:
+            - id
