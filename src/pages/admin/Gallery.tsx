@@ -5,11 +5,16 @@ import { GalleryItem } from '../../domain/models';
 const Gallery: React.FC = () => {
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // @ts-ignore
     services.gallery.getGalleryItems().then((data: GalleryItem[]) => {
       setItems(data);
+      setLoading(false);
+    }).catch(err => {
+      console.error(err);
+      setError(err.message || "An error occurred");
       setLoading(false);
     });
   }, []);

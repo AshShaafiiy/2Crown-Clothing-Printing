@@ -11,27 +11,34 @@ export default function Dashboard() {
     estimatedSales: 0,
   });
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      const orders = await services.orders.getOrders();
-      const products = await services.products.getProducts();
-      
-      setStats({
-        totalOrders: orders.length,
-        pendingOrders: orders.filter(o => o.status === 'WhatsApp Pending' || o.status === 'Awaiting Confirmation').length,
-        totalProducts: products.length,
-        estimatedSales: orders.reduce((sum, order) => sum + order.total, 0)
-      });
-      
-      // Get 5 most recent
-      setRecentOrders(orders.slice(-5).reverse());
+      try {
+        const orders = await services.orders.getOrders();
+        const products = await services.products.getProducts();
+        
+        setStats({
+          totalOrders: orders.length,
+          pendingOrders: orders.filter(o => o.status === 'WhatsApp Pending' || o.status === 'Awaiting Confirmation').length,
+          totalProducts: products.length,
+          estimatedSales: orders.reduce((sum, order) => sum + order.total, 0)
+        });
+        
+        // Get 5 most recent
+        setRecentOrders(orders.slice(-5).reverse());
+      } catch (err: any) {
+        console.error('Dashboard fetch error:', err);
+        setError(err.message || 'An error occurred');
+      }
     };
     fetchData();
   }, []);
 
   return (
     <div className="space-y-6">
+      {error && <div className="bg-red-50 p-4 text-red-500 rounded">{error}</div>}
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">

@@ -9,12 +9,17 @@ const Settings: React.FC = () => {
     contactPhone: ''
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    // @ts-ignore
-    services.settings.getSettings().then(data => {
+    
+    services.settings.getBusinessSettings().then(data => {
       setSettings(data);
+      setLoading(false);
+    }).catch(err => {
+      console.error(err);
+      setError(err.message || "An error occurred");
       setLoading(false);
     });
   }, []);
@@ -39,6 +44,8 @@ const Settings: React.FC = () => {
       <h1 className="text-2xl font-bold mb-6">Business Settings</h1>
       {loading ? (
         <p>Loading...</p>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
       ) : (
         <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow space-y-6">
           <div>

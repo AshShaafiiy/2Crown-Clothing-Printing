@@ -5,10 +5,15 @@ import { Category } from '../../domain/models';
 const Categories: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     services.categories.getCategories().then(data => {
       setCategories(data);
+      setLoading(false);
+    }).catch(err => {
+      console.error(err);
+      setError(err.message || "An error occurred");
       setLoading(false);
     });
   }, []);
@@ -23,6 +28,8 @@ const Categories: React.FC = () => {
       </div>
       {loading ? (
         <p>Loading...</p>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
       ) : (
         <div className="overflow-x-auto bg-white rounded-lg shadow">
           <table className="min-w-full">

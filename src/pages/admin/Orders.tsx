@@ -5,6 +5,7 @@ import { Order } from '../../domain/models';
 const Orders: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -12,6 +13,10 @@ const Orders: React.FC = () => {
       // Sort newest first
       const sorted = [...data].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       setOrders(sorted);
+      setLoading(false);
+    }).catch(err => {
+      console.error(err);
+      setError(err.message || "An error occurred");
       setLoading(false);
     });
   }, []);
@@ -25,6 +30,8 @@ const Orders: React.FC = () => {
       <h1 className="text-2xl font-bold mb-6">Orders & Custom Requests</h1>
       {loading ? (
         <p>Loading...</p>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
       ) : (
         <div className="overflow-x-auto bg-white rounded-lg shadow">
           <table className="min-w-full">

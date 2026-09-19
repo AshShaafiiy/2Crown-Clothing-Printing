@@ -6,6 +6,7 @@ import { Product } from '../../domain/models';
 const Products: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -14,9 +15,16 @@ const Products: React.FC = () => {
 
   const fetchProducts = async () => {
     setLoading(true);
-    const data = await services.products.getProducts();
-    setProducts(data);
-    setLoading(false);
+    setError(null);
+    try {
+      const data = await services.products.getProducts();
+      setProducts(data);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -40,6 +48,8 @@ const Products: React.FC = () => {
 
       {loading ? (
         <p>Loading...</p>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
       ) : (
         <div className="overflow-x-auto bg-white rounded-lg shadow">
           <table className="min-w-full">

@@ -5,11 +5,16 @@ import { User } from '../../domain/models';
 const Customers: React.FC = () => {
   const [customers, setCustomers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // @ts-ignore
-    services.customers.getCustomers().then((data: User[]) => {
+    
+    services.rbac.getUsers().then((data: User[]) => {
       setCustomers(data);
+      setLoading(false);
+    }).catch(err => {
+      console.error(err);
+      setError(err.message || "An error occurred");
       setLoading(false);
     });
   }, []);
@@ -19,6 +24,8 @@ const Customers: React.FC = () => {
       <h1 className="text-2xl font-bold mb-6">Customers</h1>
       {loading ? (
         <p>Loading...</p>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
       ) : (
         <div className="overflow-x-auto bg-white rounded-lg shadow">
           <table className="min-w-full">
