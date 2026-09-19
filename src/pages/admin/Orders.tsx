@@ -27,7 +27,7 @@ const Orders: React.FC = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Orders & Custom Requests</h1>
+      <h1 className="text-2xl font-bold mb-6">Customer Orders</h1>
       {loading ? (
         <p>Loading...</p>
       ) : error ? (
@@ -81,7 +81,7 @@ const Orders: React.FC = () => {
                             </div>
                             
                             <div className="md:col-span-2 mt-4">
-                              <h4 className="font-bold text-gray-700 mb-2">Order Items / Custom Request</h4>
+                              <h4 className="font-bold text-gray-700 mb-2">Order Items</h4>
                               <ul className="list-disc pl-5">
                                 {order.items.map((item, idx) => (
                                   <li key={idx} className="mb-2">

@@ -8,7 +8,6 @@ const Gallery: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // @ts-ignore
     services.gallery.getGalleryItems().then((data: GalleryItem[]) => {
       setItems(data);
       setLoading(false);
@@ -30,6 +29,8 @@ const Gallery: React.FC = () => {
 
       {loading ? (
         <p>Loading...</p>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
       ) : items.length === 0 ? (
         <p className="text-gray-500">No images in gallery.</p>
       ) : (
