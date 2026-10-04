@@ -24,7 +24,10 @@ export function generateWhatsAppOrderMessage(order: Order): string {
 
   if (order.deliveryMethod === 'pickup') {
     message += `Delivery Fee: ₦0 (Store Pickup)\n`;
-    message += `Estimated Total: ₦${(order.subtotal - order.discount).toLocaleString()}\n`;
+    message += `Total: ₦${(order.subtotal - order.discount).toLocaleString()}\n`;
+  } else if (order.deliveryFee != null) {
+    message += `Delivery Fee: ₦${order.deliveryFee.toLocaleString()}\n`;
+    message += `Total: ₦${order.total.toLocaleString()}\n`;
   } else {
     message += `Delivery Fee: To be confirmed\n`;
     message += `Estimated Total: ₦${(order.subtotal - order.discount).toLocaleString()} + delivery\n`;

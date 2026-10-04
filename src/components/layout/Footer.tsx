@@ -1,13 +1,16 @@
+"use client";
 import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+
 import { Mail, Phone, MapPin } from 'lucide-react';
 import { services } from '../../services';
 import { BusinessSettings } from '../../domain/models';
 
 export default function Footer() {
   const [settings, setSettings] = useState<BusinessSettings | null>(null);
-  const location = useLocation();
-  const navigate = useNavigate();
+  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     services.settings.getBusinessSettings().then(setSettings).catch(console.error);
@@ -15,10 +18,17 @@ export default function Footer() {
 
   const handleCustomWorkClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (location.pathname === '/') {
+    if (pathname === '/') {
       document.getElementById('custom-work')?.scrollIntoView({ behavior: 'smooth' });
     } else {
-      navigate('/#custom-work');
+      router.push('/#custom-work');
+    }
+  };
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
+    if (pathname === path) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -28,8 +38,8 @@ export default function Footer() {
         
         {/* Brand Section */}
         <div className="col-span-1 md:col-span-2 lg:col-span-1">
-          <Link to="/" className="text-2xl font-bold text-primary mb-4 block">
-            2Crown
+          <Link href="/" onClick={(e) => handleNavClick(e, '/')} className="inline-block mb-4 hover:opacity-90 transition-opacity duration-200">
+            <img src="/2Crown-logo.jpeg" alt="2Crown Clothing & Printing" className="h-12 w-auto object-contain rounded-sm" />
           </Link>
           <p className="text-sm text-gray-400 mb-6">
             Your premium destination for high-quality clothing, professional printing, and bespoke customized items in Nigeria.
@@ -40,40 +50,40 @@ export default function Footer() {
         <div>
           <h3 className="text-lg font-semibold text-white mb-4">Quick Links</h3>
           <ul className="space-y-2 text-sm text-gray-400">
-            <li><Link to="/shop" className="hover:text-primary transition-colors">Shop</Link></li>
+            <li><Link href="/shop" onClick={(e) => handleNavClick(e, '/shop')} className="hover:text-primary transition-colors">Shop</Link></li>
             <li><button onClick={handleCustomWorkClick} className="hover:text-primary transition-colors bg-transparent border-none p-0 text-left cursor-pointer">Custom Work</button></li>
-            <li><Link to="/track-order" className="hover:text-primary transition-colors">Track Order</Link></li>
+            <li><Link href="/track-order" onClick={(e) => handleNavClick(e, '/track-order')} className="hover:text-primary transition-colors">Track Order</Link></li>
           </ul>
         </div>
         
         <div>
           <h3 className="text-lg font-semibold text-white mb-4">Support</h3>
           <ul className="space-y-2 text-sm text-gray-400">
-            <li><Link to="/track-order" className="hover:text-primary transition-colors">Track Your Order</Link></li>
+            <li><Link href="/track-order" onClick={(e) => handleNavClick(e, '/track-order')} className="hover:text-primary transition-colors">Track Your Order</Link></li>
           </ul>
         </div>
 
         <div>
           <h3 className="text-lg font-semibold text-white mb-4">Contact Us</h3>
           <ul className="space-y-3 text-sm text-gray-400">
-            <li className="flex items-center gap-3">
-              <Phone size={18} className="text-primary" />
-              <span>{settings?.contactPhone || '09061747646'}</span>
+            <li className="flex items-start gap-3">
+              <Phone size={18} className="text-primary flex-shrink-0 mt-0.5" />
+              <span>{settings?.contactPhone || '+234 906 174 7646'}</span>
             </li>
-            <li className="flex items-center gap-3">
-              <Mail size={18} className="text-primary" />
+            <li className="flex items-start gap-3">
+              <Mail size={18} className="text-primary flex-shrink-0 mt-0.5" />
               <span>{settings?.contactEmail || 'info@2crown.com'}</span>
             </li>
-            <li className="flex items-center gap-3">
-              <MapPin size={18} className="text-primary" />
-              <span>{settings?.address || 'Lagos, Nigeria'}</span>
+            <li className="flex items-start gap-3">
+              <MapPin size={18} className="text-primary flex-shrink-0 mt-0.5" />
+              <span className="leading-tight">{settings?.address || 'Lagos, Nigeria'}</span>
             </li>
           </ul>
         </div>
       </div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-gray-800 text-center text-sm text-gray-500">
-        <p>&copy; {new Date().getFullYear()} 2Crown Clothing & Printing. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} {settings?.storeName || '2Crown Clothing & Printing'}. All rights reserved.</p>
       </div>
     </footer>
   );

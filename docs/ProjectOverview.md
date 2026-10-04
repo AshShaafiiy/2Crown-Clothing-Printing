@@ -4,10 +4,10 @@
 2Crown Clothing & Printing is a custom clothing, printing, and branding business operating in Nigeria. The brand positions itself as a premium service, utilizing a distinct Black, Gold, and White visual identity. 
 
 ## Platform Purpose
-This repository houses the frontend platform designed to modernize 2Crown's customer interactions. The platform serves as an e-commerce storefront, a custom order inquiry portal, and a business management dashboard. The ultimate goal is to provide a seamless, premium web experience while offloading heavy file interactions (custom designs, reference images) directly to the business's WhatsApp channel.
+This repository houses the React storefront and Express backend designed to modernize 2Crown's customer interactions. The platform serves as an e-commerce storefront, a custom order inquiry portal, and a business management dashboard. The ultimate goal is to provide a seamless, premium web experience while offloading heavy file interactions (custom designs, reference images) directly to the business's WhatsApp channel.
 
 ## Target Infrastructure
-A critical requirement for this project is a **Zero-Cost ($0/month)** infrastructure architecture (excluding the custom domain). The platform must be designed to eventually deploy on free-tier services (e.g., GitHub Pages, Cloudflare Pages) and utilize serverless/free-tier backend solutions.
+A critical requirement for this project is a **Zero-Cost ($0/month)** infrastructure architecture (excluding the custom domain). The current production-like stack is Docker Compose with Caddy, Express, and persistent SQLite. Public hosting, tunnel, HTTPS domain, and free-tier suitability remain unverified deployment decisions; the site is **NOT PUBLICLY DEPLOYED**.
 
 ## Customer-Facing Functionality
 - **Storefront (Shop)**: Customers can browse normal, predefined products, select variations (size, color, text customizations), and add them to a shopping cart.
@@ -20,5 +20,4 @@ A critical requirement for this project is a **Zero-Cost ($0/month)** infrastruc
 - **Dashboard**: High-level metrics on orders, revenue, and active customers.
 - **Order Management**: Viewing customer orders, delivery methods, and custom requirements.
 - **Product & Category Management**: Creating and updating storefront items, variations, and active statuses.
-- **Gallery & Content Management**: Managing images for the "Our Work" gallery.
 - **Business Settings**: Centralized control over the business WhatsApp number, contact information, and operating hours.

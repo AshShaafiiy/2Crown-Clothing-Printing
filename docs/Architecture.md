@@ -2,24 +2,21 @@
 
 ## Current Frontend Architecture
 The application is a Single Page Application (SPA) built with:
-- **React 18**
+- **React 19**
 - **TypeScript**
 - **Vite**
-- **React Router v6**
+- **React Router v7**
 - **Tailwind CSS** (Styling framework)
 - **Zustand** (Global state management)
 
 ## The Service Interface Pattern
-To ensure the frontend is completely decoupled from the future backend implementation, the application uses an **Interface-Based Service Pattern**.
+The frontend uses an **Interface-Based Service Pattern** to keep components independent of the active API or test mock implementation.
 All data operations (fetching products, placing orders, reading business settings) are defined as strict TypeScript interfaces inside `src/services/interfaces/index.ts`.
 
 Components and hooks do **not** make direct `fetch()` or `axios` calls to external APIs. Instead, they interact entirely with the central `services` export object.
 
-## Mock Implementation Pattern
-Because the project is currently in **Phase 1 & 2**, the `services` object is wired to a Mock Implementation layer located in `src/services/mock/`. 
-This layer uses localized memory, `localStorage`, and deliberate artificial delays to perfectly simulate a live backend environment. 
-
-When Phase 6 (Frontend/Backend Integration) arrives, a new `src/services/api/` layer will be built, and the central `services` export will simply be swapped to point to the new API classes. The React components will not require any changes.
+## API and mock implementations
+`src/services/index.ts` selects `src/services/api` for development and production. Tests use `src/services/mock` by default, and `VITE_USE_MOCK_SERVICES=true` opts into mocks deliberately. The API client sends bearer tokens to the Express routes; repositories use Knex with persistent SQLite. The production-like stack builds React assets and serves them through Caddy, which proxies API routes to Express. The site is not publicly deployed.
 
 ## Data Flow & State Management
 - **Local Component State**: Handled natively via `useState` and `useEffect`.

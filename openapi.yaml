@@ -1,4 +1,6 @@
 openapi: 3.0.3
+servers:
+  - url: /
 info:
   title: 2Crown Clothing & Printing API
   version: 1.0.0
@@ -22,6 +24,7 @@ paths:
     post:
       tags: [Public]
       summary: Admin login
+      security: []
       requestBody:
         required: true
         content:
@@ -73,6 +76,7 @@ paths:
     get:
       tags: [Public]
       summary: List products
+      security: []
       parameters:
         - name: categoryId
           in: query
@@ -118,6 +122,7 @@ paths:
     get:
       tags: [Public]
       summary: Get product by ID or Slug
+      security: []
       parameters:
         - name: id
           in: path
@@ -177,6 +182,7 @@ paths:
     get:
       tags: [Public]
       summary: List categories
+      security: []
       responses:
         '200':
           description: A list of categories
@@ -209,6 +215,7 @@ paths:
     get:
       tags: [Public]
       summary: Get category by ID or Slug
+      security: []
       parameters:
         - name: id
           in: path
@@ -267,6 +274,7 @@ paths:
     get:
       tags: [Public]
       summary: List promotions
+      security: []
       parameters:
         - name: activeOnly
           in: query
@@ -304,6 +312,7 @@ paths:
     post:
       tags: [Public]
       summary: Create a new order
+      security: []
       description: >
         Creates a new product order payload. This payload generates the reference number and saves the initial state before the WhatsApp message is triggered by the frontend.
       requestBody:
@@ -318,27 +327,95 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/PublicOrder'
 
   /orders/{reference}:
     get:
       tags: [Public]
-      summary: Track an order by reference
+      summary: Track an order by cryptographic reference
+      security: []
+      description: 128-bit uppercase grouped hexadecimal references; lowercase input is canonicalized. Legacy short references require POST /orders/track. Dedicated 30 requests per 15 minutes; current local Caddy uses a shared conservative IP bucket with trust proxy disabled. Revalidate proxy trust before Cloudflare deployment.
       parameters:
         - name: reference
           in: path
           required: true
           schema:
             type: string
+            pattern: '^2[Cc]-[A-Fa-f0-9]{8}(-[A-Fa-f0-9]{8}){3}$'
       responses:
         '200':
           description: Order details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/PublicOrder'
         '404':
-          $ref: '#/components/responses/NotFound'
+          description: Identical safe Order not found response for malformed and unknown references
+        '429':
+          description: Too many tracking requests; safe JSON retry message
+        '500':
+          description: Generic Internal Server Error
+
+  /orders/track:
+    post:
+      tags: [Public]
+      summary: Verify a legacy order reference with its original phone number
+      security: []
+      description: Shares the tracking limiter with GET tracking. Exact server-side phone match is required before a safe DTO is returned. Phone is sent only in JSON; responses are no-store. Malformed, unknown, and mismatched details produce the same 404.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reference, phone]
+              properties:
+                reference:
+                  type: string
+                  pattern: '^2[Cc]-[0-9]{5,6}$'
+                phone:
+                  type: string
+                  minLength: 1
+                  maxLength: 32
+      responses:
+        '200':
+          description: Safe public tracking details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicOrder'
+        '404':
+          description: Order not found
+        '429':
+          description: Too many tracking requests
+        '500':
+          description: Generic Internal Server Error
+
+  /orders/id/{id}:
+    get:
+      tags: [Admin]
+      summary: Retrieve a full order by internal ID (Root, Super Admin, Admin only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Full staff order record, including legacy orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '401':
+          description: Authentication required
+        '403':
+          description: Staff role required
+        '404':
+          description: Not found
 
   /orders/{id}/status:
     patch:
@@ -370,29 +447,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Order'
 
-  /gallery:
-    get:
-      tags: [Public]
-      summary: List gallery items
-      parameters:
-        - name: categoryId
-          in: query
-          schema:
-            type: string
-      responses:
-        '200':
-          description: A list of gallery items
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/GalleryItem'
-
   /ratings/{productId}:
     get:
       tags: [Public]
       summary: Get rating summary for a product
+      security: []
       parameters:
         - name: productId
           in: path
@@ -415,6 +474,7 @@ paths:
     post:
       tags: [Public]
       summary: Submit a product rating
+      security: []
       description: Submits a 1-5 star rating. Does NOT support written reviews.
       parameters:
         - name: productId
@@ -450,6 +510,7 @@ paths:
     get:
       tags: [Public]
       summary: Get business settings
+      security: []
       description: Returns contact information, currency info, delivery settings, and the WhatsApp number.
       responses:
         '200':
@@ -663,8 +724,6 @@ components:
             type: string
         price:
           type: number
-        stock:
-          type: integer
         sku:
           type: string
       required:
@@ -672,7 +731,6 @@ components:
         - name
         - attributes
         - price
-        - stock
 
     CustomizationFieldType:
       type: string
@@ -733,8 +791,6 @@ components:
           type: array
           items:
             type: string
-        stock:
-          type: integer
         featured:
           type: boolean
         active:
@@ -767,7 +823,6 @@ components:
         - type
         - price
         - images
-        - stock
         - featured
         - active
 
@@ -910,6 +965,58 @@ components:
         - status
         - deliveryMethod
 
+    PublicOrder:
+      type: object
+      additionalProperties: false
+      required: [reference, status, deliveryMethod, subtotal, discount, total, createdAt, updatedAt, items, history]
+      properties:
+        reference:
+          type: string
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        deliveryMethod:
+          type: string
+          enum: [pickup, local, nationwide]
+        subtotal:
+          type: number
+        discount:
+          type: number
+        total:
+          type: number
+        deliveryFee:
+          type: number
+          nullable: true
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              productName:
+                type: string
+              quantity:
+                type: number
+              price:
+                type: number
+              variantName:
+                type: string
+        history:
+          description: Customer-facing fulfillment transitions only, once per status. Internal communication states and same-status audit events are excluded; legacy internal current states display Awaiting Confirmation.
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [newStatus, timestamp]
+            properties:
+              newStatus:
+                $ref: '#/components/schemas/OrderStatus'
+              timestamp:
+                type: string
+
     Order:
       allOf:
         - $ref: '#/components/schemas/OrderInput'
@@ -934,25 +1041,6 @@ components:
             - reference
             - createdAt
             - updatedAt
-
-    GalleryItem:
-      type: object
-      properties:
-        id:
-          type: string
-        title:
-          type: string
-        description:
-          type: string
-        imageUrl:
-          type: string
-        categoryId:
-          type: string
-      required:
-        - id
-        - title
-        - imageUrl
-        - categoryId
 
     Review:
       type: object

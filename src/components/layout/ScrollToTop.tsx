@@ -1,8 +1,10 @@
+"use client";
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { usePathname } from 'next/navigation';
+
 
 export default function ScrollToTop() {
-  const { pathname, hash } = useLocation();
+  const { pathname, hash } = usePathname();
 
   useEffect(() => {
     // Custom Work is the ONLY exception, which uses #custom-work

@@ -1,6 +1,6 @@
 import { 
-  Product, Category, Promotion, Order, 
-  GalleryItem, User, ID, OrderStatus, Review, 
+  Product, Category, Promotion, Order, PublicOrder,
+  User, ID, OrderStatus, Review,
   Testimonial, BusinessSettings, Role 
 } from '../../domain/models';
 
@@ -32,16 +32,13 @@ export interface IPromotionService {
 export interface IOrderService {
   getOrders(filters?: any): Promise<Order[]>;
   getOrderById(id: ID): Promise<Order | null>;
-  getOrderByReference(reference: string): Promise<Order | null>;
+  getOrderByReference(reference: string, phone?: string): Promise<PublicOrder | null>;
   createOrder(order: Omit<Order, 'id' | 'reference' | 'createdAt' | 'updatedAt'>): Promise<Order>;
   updateOrderStatus(id: ID, status: OrderStatus): Promise<Order>;
+  updateOrderDeliveryFee(id: ID, fee: number): Promise<Order>;
 }
 
 
-
-export interface IGalleryService {
-  getGalleryItems(categoryId?: ID): Promise<GalleryItem[]>;
-}
 
 export interface IReviewService {
   getReviewsByProductId(productId: ID): Promise<Review[]>;
@@ -55,6 +52,17 @@ export interface ITestimonialService {
   getFeaturedTestimonials(): Promise<Testimonial[]>;
 }
 
+export interface DashboardStats {
+  totalOrders: number;
+  pendingOrders: number;
+  totalProducts: number;
+  totalSales: number;
+}
+
+export interface IDashboardService {
+  getStats(): Promise<DashboardStats>;
+}
+
 export interface ISettingsService {
   getBusinessSettings(): Promise<BusinessSettings>;
   updateBusinessSettings(settings: Partial<BusinessSettings>): Promise<BusinessSettings>;
@@ -64,11 +72,14 @@ export interface IAuthService {
   getCurrentUser(): Promise<User | null>;
   login(email: string, password: string): Promise<User>;
   logout(): Promise<void>;
+  updateProfile(data: { name: string; email: string; phone?: string }): Promise<User>;
+  changePassword(currentPassword: string, newPassword: string): Promise<void>;
 }
 
 export interface IRBACService {
   getUsers(): Promise<User[]>;
   createUser(user: Omit<User, 'id'>, currentUser: User): Promise<User>;
   updateUserRole(targetUserId: ID, newRole: Role, currentUser: User): Promise<User>;
+  updateUserStatus(targetUserId: ID, active: boolean, currentUser: User): Promise<User>;
   deleteUser(targetUserId: ID, currentUser: User): Promise<void>;
 }

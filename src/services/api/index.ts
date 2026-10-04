@@ -1,11 +1,12 @@
+import { rememberSubmittedOrder } from '../../utils/publicOrder';
 import {
-  Product, Category, Promotion, Order, GalleryItem,
+  Product, Category, Promotion, Order, PublicOrder,
   User, ID, OrderStatus, Review, Testimonial, BusinessSettings, Role
 } from '../../domain/models';
 import {
   IProductService, ICategoryService, IPromotionService, IOrderService,
-  IGalleryService, IReviewService, ITestimonialService, ISettingsService,
-  IAuthService, IRBACService
+   IReviewService, ITestimonialService, ISettingsService,
+  IAuthService, IRBACService, IDashboardService, DashboardStats
 } from '../interfaces';
 import { apiClient, setTokenProvider } from './client';
 
@@ -82,26 +83,29 @@ export class ApiOrderService implements IOrderService {
   async getOrders(_filters?: any): Promise<Order[]> {
     return apiClient<Order[]>('/orders');
   }
-  async getOrderById(_id: ID): Promise<Order | null> {
-    // API only has getOrderByReference based on OpenAPI spec
-    // We'll throw or simulate if needed, but normally frontend tracks by reference
-    throw new Error('getOrderById not supported in API. Use reference.');
+  async getOrderById(id: ID): Promise<Order | null> {
+    try { return await apiClient<Order>(`/orders/id/${encodeURIComponent(id)}`); }
+    catch (err: any) { if (err.status === 404) return null; throw err; }
   }
-  async getOrderByReference(reference: string): Promise<Order | null> {
-    try { return await apiClient<Order>(`/orders/${reference}`); } 
+  async getOrderByReference(reference: string, phone?: string): Promise<PublicOrder | null> {
+    try {
+      if (/^2C-\d{5,6}$/i.test(reference.trim())) return await apiClient<PublicOrder>('/orders/track', { method: 'POST', body: JSON.stringify({ reference, phone }) });
+      return await apiClient<PublicOrder>(`/orders/${encodeURIComponent(reference.trim().toUpperCase())}`);
+    }
     catch (err: any) { if (err.status === 404) return null; throw err; }
   }
   async createOrder(order: Omit<Order, 'id' | 'reference' | 'createdAt' | 'updatedAt'>): Promise<Order> {
-    return apiClient<Order>('/orders', { method: 'POST', body: JSON.stringify(order) });
+    const saved = await apiClient<PublicOrder>('/orders', { method: 'POST', body: JSON.stringify(order) });
+    // Preserve only this customer's submitted details for the WhatsApp handoff.
+    const ownOrder: Order = { ...order, ...saved, id: '', items: order.items, history: [] };
+    rememberSubmittedOrder(ownOrder);
+    return ownOrder;
   }
   async updateOrderStatus(id: ID, status: OrderStatus): Promise<Order> {
     return apiClient<Order>(`/orders/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
   }
-}
-
-export class ApiGalleryService implements IGalleryService {
-  async getGalleryItems(categoryId?: ID): Promise<GalleryItem[]> {
-    return apiClient<GalleryItem[]>(categoryId ? `/gallery?categoryId=${categoryId}` : '/gallery');
+  async updateOrderDeliveryFee(id: ID, fee: number): Promise<Order> {
+    return apiClient<Order>(`/orders/${id}/delivery-fee`, { method: 'PATCH', body: JSON.stringify({ deliveryFee: fee }) });
   }
 }
 
@@ -152,7 +156,7 @@ export class ApiAuthService implements IAuthService {
   private token: string | null = null;
 
   constructor() {
-    this.token = localStorage.getItem('2crown_admin_token');
+    this.token = typeof window !== 'undefined' ? localStorage.getItem('2crown_admin_token') : null;
     setTokenProvider(() => this.token);
   }
 
@@ -198,20 +202,45 @@ export class ApiAuthService implements IAuthService {
     this.currentUser = null;
     localStorage.removeItem('2crown_admin_token');
   }
+
+  async updateProfile(data: { name: string; email: string; phone?: string }): Promise<User> {
+    const user = await apiClient<User>('/admins/me/profile', {
+      method: 'PATCH',
+      body: JSON.stringify(data)
+    });
+    this.currentUser = user;
+    return user;
+  }
+
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    await apiClient('/admins/me/password', {
+      method: 'POST',
+      body: JSON.stringify({ currentPassword, newPassword })
+    });
+  }
 }
 
 export class ApiRBACService implements IRBACService {
   async getUsers(): Promise<User[]> {
-    return apiClient<User[]>('/users');
+    return apiClient<User[]>('/admins');
   }
   async createUser(user: Omit<User, 'id'>, _currentUser: User): Promise<User> {
-    return apiClient<User>('/users', { method: 'POST', body: JSON.stringify(user) });
+    return apiClient<User>('/admins', { method: 'POST', body: JSON.stringify(user) });
   }
   async updateUserRole(targetUserId: ID, newRole: Role, _currentUser: User): Promise<User> {
-    return apiClient<User>(`/users/${targetUserId}/role`, { method: 'PATCH', body: JSON.stringify({ role: newRole }) });
+    return apiClient<User>(`/admins/${targetUserId}/role`, { method: 'PATCH', body: JSON.stringify({ role: newRole }) });
+  }
+  async updateUserStatus(targetUserId: ID, active: boolean, _currentUser: User): Promise<User> {
+    return apiClient<User>(`/admins/${targetUserId}/status`, { method: 'PATCH', body: JSON.stringify({ active }) });
   }
   async deleteUser(targetUserId: ID, _currentUser: User): Promise<void> {
-    await apiClient(`/users/${targetUserId}`, { method: 'DELETE' });
+    await apiClient(`/admins/${targetUserId}`, { method: 'DELETE' });
+  }
+}
+
+export class ApiDashboardService implements IDashboardService {
+  async getStats(): Promise<DashboardStats> {
+    return apiClient<DashboardStats>('/dashboard/stats');
   }
 }
 
@@ -220,10 +249,10 @@ export const apiServices = {
   categories: new ApiCategoryService(),
   promotions: new ApiPromotionService(),
   orders: new ApiOrderService(),
-  gallery: new ApiGalleryService(),
   reviews: new ApiReviewService(),
   testimonials: new ApiTestimonialService(),
   settings: new ApiSettingsService(),
   auth: new ApiAuthService(),
   rbac: new ApiRBACService(),
+  dashboard: new ApiDashboardService(),
 };

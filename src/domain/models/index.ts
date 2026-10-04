@@ -3,6 +3,7 @@ export type ID = string;
 export type Role = 'root_super_admin' | 'super_admin' | 'admin' | 'customer';
 
 export interface Category {
+  createdAt?: string;
   id: ID;
   name: string;
   slug: string;
@@ -13,14 +14,11 @@ export interface Category {
   order: number;
 }
 
-export type ProductType = 'standard' | 'variant' | 'customizable' | 'quote';
-
 export interface ProductVariant {
   id: ID;
   name: string; 
   attributes: Record<string, string>; 
   price: number;
-  stock: number;
   sku?: string;
 }
 
@@ -41,11 +39,9 @@ export interface Product {
   slug: string;
   description: string;
   categoryId: ID;
-  type: ProductType;
   price: number; // in NGN ₦
   previousPrice?: number;
-  images: string[];
-  stock: number;
+  imageUrl: string;
   featured: boolean;
   active: boolean;
   variants?: ProductVariant[];
@@ -53,7 +49,7 @@ export interface Product {
   specifications?: Record<string, string>;
   turnaroundTime?: string;
   tags?: string[];
-  promotionalBadge?: string;
+  createdAt?: string;
 }
 
 export interface Promotion {
@@ -78,19 +74,32 @@ export interface User {
   address?: string;
   createdAt?: string;
   active?: boolean;
+  lastLogin?: string;
 }
 
-export type OrderStatus = 'WhatsApp Pending' | 'WhatsApp Opened' | 'Customer Contacted' | 'Quotation Sent' | 'Awaiting Confirmation' | 'Confirmed' | 'Processing' | 'Ready' | 'Completed' | 'Cancelled';
+export type OrderStatus = 'Awaiting Confirmation' | 'Confirmed' | 'Processing' | 'Ready for Delivery' | 'Out for Delivery' | 'Delivered' | 'Ready for Pickup' | 'Picked Up' | 'Cancelled';
 
 export interface OrderItem {
   id: ID;
   productId: ID;
+  productSlug?: string;
   productName: string;
   quantity: number;
   price: number;
+  imageUrl?: string;
   variantId?: ID;
   variantName?: string;
   customization?: Record<string, any>;
+}
+
+export interface OrderHistoryEntry {
+  id: ID;
+  previousStatus?: OrderStatus;
+  newStatus: OrderStatus;
+  timestamp: string;
+  actorId?: ID;
+  actorName: string;
+  note?: string;
 }
 
 export interface Order {
@@ -107,19 +116,12 @@ export interface Order {
   status: OrderStatus;
   deliveryMethod: 'pickup' | 'local' | 'nationwide';
   deliveryAddress?: string;
-  deliveryFee?: number;
+  deliveryFee?: number | null;
   createdAt: string;
   updatedAt: string;
+  history?: OrderHistoryEntry[];
 }
 
-
-export interface GalleryItem {
-  id: ID;
-  title: string;
-  description?: string;
-  imageUrl: string;
-  categoryId: ID;
-}
 
 export interface Review {
   id: ID;
@@ -164,4 +166,19 @@ export interface BusinessSettings {
   currencySymbol: string; // "₦"
   vatPercentage: number; // 7.5
   deliverySettings: DeliverySettings;
+}
+
+/** Public tracking deliberately omits customer details and internal identifiers. */
+export interface PublicOrder {
+  reference: string;
+  status: OrderStatus;
+  deliveryMethod: Order['deliveryMethod'];
+  subtotal: number;
+  discount: number;
+  total: number;
+  deliveryFee?: number | null;
+  createdAt: string;
+  updatedAt: string;
+  items: Pick<OrderItem, 'productName' | 'quantity' | 'price' | 'variantName'>[];
+  history: { newStatus: OrderStatus; timestamp: string }[];
 }

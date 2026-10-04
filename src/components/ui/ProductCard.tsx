@@ -1,6 +1,9 @@
+"use client";
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
+
 import { Product } from '../../domain/models';
+import { computeProductBadges } from '../../domain/badges';
 import { ImageFallback } from './ImageFallback';
 import { ProductRatingDisplay } from './ProductRatingDisplay';
 
@@ -10,12 +13,12 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
-    <div className="flex flex-col bg-white border border-gray-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow h-full group">
+    <div className="flex flex-col bg-white border border-gray-100 rounded-lg overflow-hidden shadow-sm h-full group product-card-premium">
       {/* Product Image */}
-      <Link to={`/product/${product.slug}`} className="relative block aspect-[4/5] bg-gray-50 overflow-hidden">
-        {product.images && product.images.length > 0 ? (
+      <Link href={`/product/${product.slug}`} className="relative block aspect-[4/5] bg-gray-50 overflow-hidden">
+        {product.imageUrl ? (
           <img 
-            src={product.images[0]} 
+            src={product.imageUrl}
             alt={product.name} 
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
@@ -25,32 +28,27 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-2">
-          {product.promotionalBadge && (
-            <span className="bg-primary text-secondary text-xs font-bold px-2 py-1 rounded shadow-sm">
-              {product.promotionalBadge}
-            </span>
-          )}
-          {product.featured && !product.promotionalBadge && (
-            <span className="bg-secondary text-white text-xs font-bold px-2 py-1 rounded shadow-sm">
-              FEATURED
-            </span>
-          )}
-          {!product.stock && (
-            <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded shadow-sm">
-              OUT OF STOCK
-            </span>
-          )}
-          {product.stock > 0 && product.stock <= 10 && (
-            <span className="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded shadow-sm">
-              FEW LEFT
-            </span>
-          )}
+          {computeProductBadges(product).map((badge, idx) => {
+            // Apply different styles based on badge type
+            let badgeClass = "bg-primary text-secondary";
+            if (badge.type === 'status' && badge.label === 'NEW') {
+               badgeClass = "bg-blue-500 text-white";
+            } else if (badge.label === 'FEATURED') {
+               badgeClass = "bg-secondary text-white";
+            }
+
+            return (
+              <span key={idx} className={`${badgeClass} text-[10px] sm:text-xs font-bold px-2 py-1 rounded shadow-sm`}>
+                {badge.label}
+              </span>
+            );
+          })}
         </div>
       </Link>
 
       {/* Product Details */}
       <div className="flex flex-col flex-grow p-4">
-        <Link to={`/product/${product.slug}`} className="block flex-grow">
+        <Link href={`/product/${product.slug}`} className="block flex-grow">
           <h3 className="text-sm font-semibold text-secondary mb-1 line-clamp-2 leading-tight hover:text-primary transition-colors">
             {product.name}
           </h3>
@@ -58,7 +56,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <ProductRatingDisplay productId={product.id} compact={true} />
           </div>
           <p className="text-xs text-gray-500 mb-3 truncate">
-            {product.type === 'customizable' ? 'Customizable' : 'Standard'}
+            {'Standard'}
           </p>
           <div className="flex items-center gap-2 mb-4">
             <span className="text-lg font-bold text-secondary">₦{product.price.toLocaleString()}</span>
@@ -71,7 +69,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           to={`/product/${product.slug}`}
           className="w-full text-center py-2.5 bg-secondary text-white font-bold text-sm rounded hover:bg-primary hover:text-secondary transition-colors mt-auto"
         >
-          {(product.type === 'customizable' || product.customizationFields?.length) ? 'Customize & Buy' : 'View Product'}
+          {(product.customizationFields?.length) ? 'Customize & Buy' : 'View Product'}
         </Link>
       </div>
     </div>

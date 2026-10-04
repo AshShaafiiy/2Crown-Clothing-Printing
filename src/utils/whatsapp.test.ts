@@ -36,7 +36,7 @@ describe('whatsapp utility', () => {
       total: 30000,
       deliveryMethod: 'local',
       deliveryAddress: 'Ikeja, Lagos',
-      status: 'WhatsApp Pending',
+      status: 'Awaiting Confirmation',
       updatedAt: new Date().toISOString(),
       createdAt: new Date().toISOString()
     };
@@ -69,7 +69,7 @@ describe('whatsapp utility', () => {
       discount: 0,
       total: 1000,
       deliveryMethod: 'pickup',
-      status: 'WhatsApp Pending',
+      status: 'Awaiting Confirmation',
       updatedAt: new Date().toISOString(),
       createdAt: new Date().toISOString()
     };

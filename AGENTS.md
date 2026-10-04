@@ -8,9 +8,9 @@ The visual identity is strictly **Black, Gold, and White**. The UI must feel pre
 
 ## 2. Current Stack & Architecture
 - **Stack**: React, TypeScript, Vite, Vitest, Tailwind CSS, Zustand, React Router.
-- **Architecture Pattern**: Component → Hook/State → Service Interface → Mock Implementation.
-- The project is strictly in **Phase 1** (Frontend + Mock Services).
-- **Service Layer**: We use an interface-based service layer (`src/services/interfaces`) currently backed by mock data (`src/services/mock`).
+- **Architecture Pattern**: Component → Hook/State → Service Interface → API implementation → Express/Knex/SQLite.
+- **Current state**: Phase 8 release candidate preparation; the production-like Docker/Caddy stack has been verified locally, but the site is **NOT PUBLICLY DEPLOYED**.
+- **Service Layer**: `src/services/interfaces` is backed by `src/services/api` in development/production; `src/services/mock` is selected for tests or explicit `VITE_USE_MOCK_SERVICES=true`.
 
 ## 3. Important Business Rules
 - **Custom Work Flow**:
@@ -29,6 +29,10 @@ The visual identity is strictly **Black, Gold, and White**. The UI must feel pre
 - **Rating System**:
   - Customer product feedback is **Star-Rating Only** (1-5 stars).
   - There are NO written reviews. Always use the terminology "rating(s)" instead of "review(s)".
+- **Catalog**: One image per product. There is no inventory system or Product Type. Do not introduce multiple product images.
+- **Custom Work data**: There is no customer Custom Work form, database order, or website upload flow; use WhatsApp.
+- **Administrator hierarchy**: Root Super Admin → Super Admin → Admin. Enforce authorization in the backend and preserve Root protections.
+- **Dialogs**: Use the existing application dialog/toast UI instead of native `alert`, `confirm`, or `prompt` for application flows.
 - **Navigation**:
   - Normal links (Logo, Home, Shop, Track Order, Cart) must reset the scroll to the TOP of the page.
   - The Custom Work link must scroll to `#custom-work`.
@@ -39,17 +43,8 @@ The visual identity is strictly **Black, Gold, and White**. The UI must feel pre
 - **DO NOT INTRODUCE**: Firebase, Supabase, AWS, Cloudinary, Paid Databases, or any billing-dependent infrastructure.
 - **DO NOT INTRODUCE**: Customer file storage (e.g., S3). The website only uses Admin-managed media (hosted locally or on a $0 static tier).
 
-## 5. Phase Boundaries
-Do NOT jump ahead. Do not implement a real backend, OpenAPI, or databases unless explicitly instructed by the user to move to the next phase.
-
-- **Phase 1**: Frontend + Mock Services + Tests (Current)
-- **Phase 2**: Repository & Documentation Restructuring
-- **Phase 3**: OpenAPI Contract
-- **Phase 4**: Real Backend
-- **Phase 5**: Database Persistence
-- **Phase 6**: Frontend/Backend Integration
-- **Phase 7**: Integration/E2E Testing
-- **Phase 8**: Free-Tier Production Deployment + Custom Domain
+## 5. Release Boundary
+Keep the implemented React/Express/Knex/SQLite architecture, secure production boot chain, and zero-cost requirement. Current work is release-candidate verification and documentation; public cloud/domain deployment remains future work. Do not add a new database, backend architecture, paid service, or customer upload flow without explicit instruction.
 
 ## 6. Testing & Quality
 - Run tests via `npx vitest run`.
@@ -61,4 +56,4 @@ Do NOT jump ahead. Do not implement a real backend, OpenAPI, or databases unless
 - Do NOT fabricate fake product images or UI sections not approved by the user.
 - Do NOT migrate to Next.js or other meta-frameworks.
 - Do NOT reintroduce the "Shop by Category", "How Custom Orders Work", or "Testimonials" sections to the Homepage.
-- Do NOT add a real database or backend yet.
+- Do NOT replace the existing SQLite backend or add another database/backend system without explicit instruction.

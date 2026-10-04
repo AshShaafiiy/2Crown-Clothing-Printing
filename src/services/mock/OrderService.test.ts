@@ -17,14 +17,14 @@ describe('MockOrderService', () => {
       subtotal: 1000,
       discount: 0,
       total: 1000,
-      status: 'WhatsApp Pending',
+      status: 'Awaiting Confirmation',
       deliveryMethod: 'pickup',
     };
 
     const createdOrder = await service.createOrder(newOrderData);
     
     expect(createdOrder.id).toBeDefined();
-    expect(createdOrder.reference).toMatch(/^2CROWN-\d+$/);
+    expect(createdOrder.reference).toMatch(/^2C-[A-F0-9]{8}(?:-[A-F0-9]{8}){3}$/);
     expect(createdOrder.createdAt).toBeDefined();
     expect(createdOrder.updatedAt).toBeDefined();
     expect(createdOrder.customerName).toBe(newOrderData.customerName);
@@ -43,7 +43,7 @@ describe('MockOrderService', () => {
       subtotal: 500,
       discount: 0,
       total: 500,
-      status: 'WhatsApp Pending',
+      status: 'Awaiting Confirmation',
       deliveryMethod: 'local',
     });
 
@@ -60,7 +60,7 @@ describe('MockOrderService', () => {
       subtotal: 200,
       discount: 0,
       total: 200,
-      status: 'WhatsApp Pending',
+      status: 'Awaiting Confirmation',
       deliveryMethod: 'local',
     });
 
@@ -77,7 +77,7 @@ describe('MockOrderService', () => {
     expect(byRef).toBeNull();
   });
 
-  it('should update order status', async () => {
+  it('should update order status and append to history', async () => {
     const order = await service.createOrder({
       customerName: 'Status User',
       customerPhone: '222222222',
@@ -85,12 +85,17 @@ describe('MockOrderService', () => {
       subtotal: 300,
       discount: 0,
       total: 300,
-      status: 'WhatsApp Pending',
+      status: 'Awaiting Confirmation',
       deliveryMethod: 'local',
     });
 
     const updatedOrder = await service.updateOrderStatus(order.id, 'Confirmed');
     expect(updatedOrder.status).toBe('Confirmed');
+    expect(updatedOrder.history).toBeDefined();
+    expect(updatedOrder.history!.length).toBe(2);
+    expect(updatedOrder.history![1].newStatus).toBe('Confirmed');
+    expect(updatedOrder.history![1].previousStatus).toBe('Awaiting Confirmation');
+    expect(updatedOrder.history![1].actorName).toBe('Admin (Mock)');
     
     const fetchedOrder = await service.getOrderById(order.id);
     expect(fetchedOrder?.status).toBe('Confirmed');
@@ -98,5 +103,39 @@ describe('MockOrderService', () => {
 
   it('should throw error when updating status of non-existent order', async () => {
     await expect(service.updateOrderStatus('invalid-id', 'Confirmed')).rejects.toThrow('Order not found');
+  });
+
+  it('should allow updating delivery fee for local delivery', async () => {
+    const order = await service.createOrder({
+      customerName: 'Delivery Fee User',
+      customerPhone: '09012345678',
+      items: [],
+      subtotal: 10000,
+      discount: 0,
+      total: 10000,
+      status: 'Confirmed',
+      deliveryMethod: 'local',
+    });
+    expect(order.deliveryFee).toBeNull();
+
+    const updated = await service.updateOrderDeliveryFee(order.id, 2000);
+    expect(updated.deliveryFee).toBe(2000);
+    expect(updated.total).toBe(12000);
+    expect(updated.history?.some(h => h.note?.includes('2,000'))).toBe(true);
+  });
+
+  it('should throw error when setting delivery fee for store pickup', async () => {
+    const order = await service.createOrder({
+      customerName: 'Pickup User',
+      customerPhone: '09012345678',
+      items: [],
+      subtotal: 10000,
+      discount: 0,
+      total: 10000,
+      status: 'Confirmed',
+      deliveryMethod: 'pickup',
+    });
+
+    await expect(service.updateOrderDeliveryFee(order.id, 2000)).rejects.toThrow('Cannot set delivery fee for store pickup');
   });
 });

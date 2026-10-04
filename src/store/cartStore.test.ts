@@ -1,3 +1,4 @@
+"use client";
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useCartStore } from './cartStore';
 import { OrderItem } from '../domain/models';

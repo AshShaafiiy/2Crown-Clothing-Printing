@@ -28,8 +28,15 @@
 - The UI terminology must strictly use "rating", "ratings", or "Rate this product". The word "review" is forbidden in customer-facing UI.
 
 ## 6. Admin Media
-- Admin-managed website media (product thumbnails, gallery images, promotional banners) remains supported and is structurally different from customer file storage.
+- Admin-managed website media (product thumbnails and promotional banners) remains supported and is structurally different from customer file storage.
+- Products use one image URL. There is no product inventory or Product Type system.
 
-## 7. Homepage Sections
+## 7. Orders, tracking, and administrators
+- New order references use a 128-bit random uppercase hex format. Public tracking returns a minimized order and customer-facing status timeline; customer identity, contact details, address, internal IDs, notes, and administrator metadata are excluded. Older short references require the original phone number.
+- Orders begin at `Awaiting Confirmation`, then move to `Confirmed` and `Processing`. Local delivery continues through `Ready for Delivery`, `Out for Delivery`, and `Delivered`; pickup continues through `Ready for Pickup` and `Picked Up`. Cancellation is available only from supported intermediate states. The backend enforces valid transitions.
+- Administrator roles are Root Super Admin, Super Admin, and Admin. Backend authorization protects administrator records and Root-specific operations. Root cannot be deleted, demoted, or deactivated.
+- Product badges are derived from product fields such as featured, previous price, and age. The badge helper also accepts promotion and order inputs, but current storefront callers do not supply them; scheduled flash-sale and best-seller badges are therefore not active storefront behavior. Dates use the stored timestamps; no Africa/Lagos-specific scheduling code exists.
+
+## 8. Homepage Sections
 - **Approved**: Hero, Featured Products, Services, Custom Work (Need Something Custom?).
 - **Removed (Do Not Reintroduce)**: Shop by Category, How Custom Orders Work, Testimonials (What Our Clients Say).

@@ -1,32 +1,32 @@
+import { toPublicOrder, rememberSubmittedOrder } from '../../utils/publicOrder';
 import { 
   IProductService, ICategoryService, IPromotionService, IOrderService, 
-  IGalleryService, IAuthService, IRBACService,
-  IReviewService, ITestimonialService, ISettingsService
+   IAuthService, IRBACService,
+  IReviewService, ITestimonialService, ISettingsService, IDashboardService
 } from '../interfaces';
 import { 
-  Product, Category, Promotion, Order, GalleryItem, 
+  Product, Category, Promotion, Order,
   User, OrderStatus, ID, Role, Review, Testimonial, BusinessSettings 
 } from '../../domain/models';
 
 // Mock Data
 let categories: Category[] = [
-  { id: 'cat-1', name: 'Corporate Wears', slug: 'corporate-wears', active: true, order: 1 },
-  { id: 'cat-2', name: 'Large Format Printing', slug: 'large-format-printing', active: true, order: 2 },
-  { id: 'cat-3', name: 'Souvenirs & Gifts', slug: 'souvenirs-gifts', active: true, order: 3 },
-  { id: 'cat-4', name: 'Awards & Plaques', slug: 'awards-plaques', active: true, order: 4 },
+  { id: 'cat-1', name: 'Corporate Wears', slug: 'corporate-wears', active: true, order: 1, createdAt: new Date().toISOString() },
+  { id: 'cat-2', name: 'Large Format Printing', slug: 'large-format-printing', active: true, order: 2, createdAt: new Date().toISOString() },
+  { id: 'cat-3', name: 'Souvenirs & Gifts', slug: 'souvenirs-gifts', active: true, order: 3, createdAt: new Date().toISOString() },
+  { id: 'cat-4', name: 'Awards & Plaques', slug: 'awards-plaques', active: true, order: 4, createdAt: new Date().toISOString() },
 ];
 
 let products: Product[] = [
   {
     id: 'prod-1',
+    imageUrl: '/2Crown-logo.jpeg',
     name: 'Custom Polo Shirt (Owerri Spec)',
     slug: 'custom-polo-shirt',
     description: 'High quality corporate polo shirt with your logo.',
     categoryId: 'cat-1',
-    type: 'customizable',
+
     price: 7500, // NGN
-    images: [],
-    stock: 500,
     featured: true,
     active: true,
     customizationFields: [
@@ -35,31 +35,30 @@ let products: Product[] = [
   },
   {
     id: 'prod-2',
+    imageUrl: '/2Crown-logo.jpeg',
     name: 'Roll-up Banner (8x8ft)',
     slug: 'rollup-banner',
     description: 'Durable flex banner for Lagos events.',
     categoryId: 'cat-2',
-    type: 'quote',
+
     price: 35000,
-    images: [],
-    stock: 999,
     featured: true,
     active: true,
   },
   {
     id: 'prod-3',
+    imageUrl: '/2Crown-logo.jpeg',
     name: 'Branded Magic Mug',
     slug: 'branded-magic-mug',
     description: 'Ceramic mug with heat-sensitive custom print.',
     categoryId: 'cat-3',
-    type: 'customizable',
+
     price: 4500,
     previousPrice: 5500,
-    images: [],
-    stock: 150,
     featured: false,
     active: true,
-    promotionalBadge: 'Awoof'
+    tags: ['new'],
+    createdAt: new Date().toISOString()
   }
 ];
 
@@ -177,14 +176,14 @@ export class MockCategoryService implements ICategoryService {
     return categories.find(c => c.slug === slug) || null;
   }
   async createCategory(category: Omit<Category, 'id'>): Promise<Category> {
-    const newCategory = { ...category, id: `cat-${Date.now()}` };
-    categories.push(newCategory as Category);
-    return newCategory as Category;
+    const newCategory: Category = { ...category, id: `cat-${Date.now()}`, createdAt: new Date().toISOString() };
+    categories.push(newCategory);
+    return newCategory;
   }
   async updateCategory(id: ID, category: Partial<Category>): Promise<Category> {
     const index = categories.findIndex(c => c.id === id);
     if (index === -1) throw new Error('Category not found');
-    categories[index] = { ...categories[index], ...category };
+    categories[index] = { ...categories[index], ...category, id: categories[index].id, createdAt: categories[index].createdAt };
     return categories[index];
   }
   async deleteCategory(id: ID): Promise<void> {
@@ -201,31 +200,78 @@ export class MockPromotionService implements IPromotionService {
 export class MockOrderService implements IOrderService {
   async getOrders(_filters?: any): Promise<Order[]> { return orders; }
   async getOrderById(id: ID): Promise<Order | null> { return orders.find(o => o.id === id) || null; }
-  async getOrderByReference(reference: string): Promise<Order | null> { return orders.find(o => o.reference === reference) || null; }
+  async getOrderByReference(reference: string, phone?: string) { const canonical = reference.trim().toUpperCase(); const order = orders.find(o => o.reference === canonical); if (!order || (/^2C-\d{5,6}$/.test(canonical) && order.customerPhone !== phone)) return null; return toPublicOrder(order); }
   async createOrder(order: Omit<Order, 'id' | 'reference' | 'createdAt' | 'updatedAt'>): Promise<Order> {
+    const now = new Date().toISOString();
     const newOrder: Order = {
       ...order,
       id: `ord-${Date.now()}`,
-      reference: `2CROWN-${Math.floor(Math.random() * 1000000)}`,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      reference: `2C-${Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('').toUpperCase().match(/.{8}/g)!.join('-')}`,
+      status: 'Awaiting Confirmation',
+      createdAt: now,
+      updatedAt: now,
+      deliveryFee: order.deliveryMethod === 'pickup' ? 0 : (order.deliveryFee ?? null),
+      history: [{
+        id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(),
+        newStatus: 'Awaiting Confirmation',
+        timestamp: now,
+        actorName: 'System'
+      }]
     };
     orders.push(newOrder);
+    rememberSubmittedOrder(newOrder);
     return newOrder;
   }
   async updateOrderStatus(id: ID, status: OrderStatus): Promise<Order> {
     const order = orders.find(o => o.id === id);
     if (!order) throw new Error('Order not found');
-    order.status = status;
+
+    if (order.status !== status) {
+      if (!order.history) {
+        order.history = [];
+      }
+      order.history.push({
+        id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(),
+        previousStatus: order.status,
+        newStatus: status,
+        timestamp: new Date().toISOString(),
+        actorName: 'Admin (Mock)'
+      });
+      order.status = status;
+      order.updatedAt = new Date().toISOString();
+    }
+    return order;
+  }
+  async updateOrderDeliveryFee(id: ID, fee: number): Promise<Order> {
+    const order = orders.find(o => o.id === id);
+    if (!order) throw new Error('Order not found');
+
+    if (order.deliveryMethod === 'pickup') {
+      throw new Error('Cannot set delivery fee for store pickup');
+    }
+    if (fee < 0) {
+      throw new Error('Delivery fee cannot be negative');
+    }
+
+    order.deliveryFee = fee;
+    order.total = order.subtotal - order.discount + fee;
+
+    if (!order.history) {
+      order.history = [];
+    }
+    order.history.push({
+      id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(),
+      newStatus: order.status,
+      timestamp: new Date().toISOString(),
+      actorName: 'Admin',
+      note: `Delivery fee updated to ₦${fee.toLocaleString()}`
+    });
+
     order.updatedAt = new Date().toISOString();
     return order;
   }
 }
 
-
-export class MockGalleryService implements IGalleryService {
-  async getGalleryItems(_categoryId?: ID): Promise<GalleryItem[]> { return []; }
-}
 
 export class MockReviewService implements IReviewService {
   async getReviewsByProductId(productId: ID): Promise<Review[]> { return reviews.filter(r => r.productId === productId && r.approved); }
@@ -268,22 +314,53 @@ export class MockAuthService implements IAuthService {
   async login(email: string, _password: string): Promise<User> {
     const user = users.find(u => u.email === email);
     if (user) {
+      user.lastLogin = new Date().toISOString();
       this.currentUser = user;
       return user;
     }
     // Default login for testing if not explicitly in the mock array
     if (email === 'annarsjay3@gmail.com') {
-      const rootUser: User = { id: 'root-1', email, name: 'Root Admin', role: 'root_super_admin', active: true };
+      const rootUser: User = {
+        id: 'root-1',
+        email,
+        name: 'Root Admin',
+        role: 'root_super_admin',
+        active: true,
+        lastLogin: new Date().toISOString()
+      };
       this.currentUser = rootUser;
       if(!users.find(u => u.email === email)) users.push(rootUser);
       return rootUser;
     }
     
-    this.currentUser = { id: `user-${Date.now()}`, email, name: 'Test User', role: 'customer', active: true };
+    this.currentUser = { id: `user-${Date.now()}`, email, name: 'Test User', role: 'customer', active: true, lastLogin: new Date().toISOString() };
     return this.currentUser;
   }
   async logout(): Promise<void> {
     this.currentUser = null;
+  }
+  async updateProfile(data: { name: string; email: string; phone?: string }): Promise<User> {
+    if (!this.currentUser) throw new Error('Not logged in');
+    if (data.email !== this.currentUser.email && users.some(u => u.email === data.email)) {
+      throw new Error('This email address is already in use.');
+    }
+    this.currentUser.name = data.name;
+    this.currentUser.email = data.email;
+    if (data.phone !== undefined) this.currentUser.phone = data.phone;
+    const dbUser = users.find(u => u.id === this.currentUser!.id);
+    if (dbUser) {
+      dbUser.name = data.name;
+      dbUser.email = data.email;
+      if (data.phone !== undefined) dbUser.phone = data.phone;
+    }
+    return this.currentUser;
+  }
+  async changePassword(_currentPassword: string, _newPassword: string): Promise<void> {
+    if (!this.currentUser) throw new Error('Not logged in');
+    // Mock current password verification
+    if (_currentPassword !== 'correctpassword' && _currentPassword !== 'admin123') {
+      throw new Error('Current password is incorrect.');
+    }
   }
 }
 
@@ -331,6 +408,18 @@ export class MockRBACService implements IRBACService {
     return targetUser;
   }
 
+  async updateUserStatus(targetUserId: ID, active: boolean, currentUser: User): Promise<User> {
+    const targetUser = users.find(u => u.id === targetUserId);
+    if (!targetUser) throw new Error('User not found');
+
+    if (targetUser.role === 'root_super_admin') throw new Error('Forbidden: Root Super Admin status cannot be modified');
+    if (currentUser.role === 'admin' || currentUser.role === 'customer') throw new Error('Forbidden: Admins cannot modify status');
+    if (targetUser.role === 'super_admin' && currentUser.role !== 'root_super_admin') throw new Error('Forbidden: Only Root Super Admin can modify Super Admin status');
+
+    targetUser.active = active;
+    return targetUser;
+  }
+
   async deleteUser(targetUserId: ID, currentUser: User): Promise<void> {
     const targetUser = users.find(u => u.id === targetUserId);
     if (!targetUser) throw new Error('User not found');
@@ -349,16 +438,34 @@ export class MockRBACService implements IRBACService {
   }
 }
 
+export class MockDashboardService implements IDashboardService {
+  async getStats() {
+    const terminalStates: OrderStatus[] = ['Delivered', 'Picked Up', 'Cancelled'];
+    const pendingOrders = orders.filter(o => !terminalStates.includes(o.status)).length;
+
+    const totalSales = orders
+      .filter(o => o.status === 'Delivered' || o.status === 'Picked Up')
+      .reduce((sum, order) => sum + (order.total || (order.subtotal - (order.discount || 0) + (order.deliveryFee || 0))), 0);
+
+    return {
+      totalOrders: orders.length,
+      pendingOrders,
+      totalProducts: products.length,
+      totalSales
+    };
+  }
+}
+
 // Service Locator
 export const services = {
   products: new MockProductService(),
   categories: new MockCategoryService(),
   promotions: new MockPromotionService(),
   orders: new MockOrderService(),
-  gallery: new MockGalleryService(),
   reviews: new MockReviewService(),
   testimonials: new MockTestimonialService(),
   settings: new MockSettingsService(),
   auth: new MockAuthService(),
   rbac: new MockRBACService(),
+  dashboard: new MockDashboardService(),
 };

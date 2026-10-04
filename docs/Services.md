@@ -2,7 +2,7 @@
 
 This document outlines the strict TypeScript interfaces located in `src/services/interfaces/index.ts`. 
 
-Because 2Crown uses a decoupled architecture, the React components ONLY communicate with these interfaces. Currently, they are satisfied by the Mock Services. In **Phase 4 (Real Backend)**, these precise interfaces must be implemented by the new API client layer to ensure a seamless transition without breaking the frontend.
+Components use the central `services` export. `src/services/index.ts` chooses the API implementation in normal development/production; Vitest selects mocks, and `VITE_USE_MOCK_SERVICES=true` forces mocks for local work. The backend Express routes persist data through Knex/SQLite. The public tracking service returns a minimized `PublicOrder`; authenticated admin order methods return internal order data.
 
 ## Existing Service Interfaces
 
@@ -27,33 +27,29 @@ Manages discounts and sales.
 Manages the creation and tracking of customer orders.
 - `createOrder(order)`: Generates the order payload (which is then passed to the WhatsApp generator).
 - `getOrders(filters?)`: Used by the Admin dashboard.
-- `getOrderByReference(reference)`: Used by the public "Track Order" page.
-- `updateOrderStatus(id, status)`
+- `getOrderByReference(reference, phone?)`: Returns a minimized public tracking DTO; phone is required for older short references.
+- `updateOrderStatus(id, status)`, `updateOrderDeliveryFee(id, fee)`
 
-### 5. `IGalleryService`
-Manages portfolio images for the "Our Work" section.
-- `getGalleryItems(categoryId?)`
-
-### 6. `IReviewService`
-Manages customer product ratings.
+### 5. `IReviewService`
+Manages customer product ratings; the interface retains historical `Review` naming, but the storefront accepts stars only.
 - `addReview(review)`: Submits a 1-5 star rating.
 - `getRatingSummary(productId)`: Returns the aggregated `{ average, count }`.
-- `getReviewsByProductId(productId)`, `approveReview(id)`
+- `getReviewsByProductId(productId)`, `approveReview(id)` remain interface methods for compatibility. The current API implementation returns an empty list and performs no approval action; neither is a maintained rating-management workflow.
 
-### 7. `ITestimonialService`
+### 6. `ITestimonialService`
 *(Note: Interface exists in code, but the Testimonial UI was removed from the application).*
 - `getTestimonials()`, `getFeaturedTestimonials()`
 
-### 8. `ISettingsService`
+### 7. `ISettingsService`
 Provides the centralized configuration required across the app (especially the WhatsApp number).
 - `getBusinessSettings()`
 - `updateBusinessSettings(settings)`
 
-### 9. `IAuthService`
-Manages admin authentication (Currently mocked).
+### 8. `IAuthService`
+Manages admin authentication (API-backed in normal runtime).
 - `getCurrentUser()`, `login(email, password)`, `logout()`
 
-### 10. `IRBACService`
-Enforces Role-Based Access Control logic for admin user management.
+### 9. `IRBACService`
+Provides administrator management methods; Express enforces authorization on every protected route.
 - `getUsers()`
-- `createUser`, `updateUserRole`, `deleteUser` (Requires passing the `currentUser` to enforce strictly typed hierarchy rules, e.g., an Admin cannot delete a Super Admin).
+- `createUser`, `updateUserRole`, `updateUserStatus`, `deleteUser` accept a compatibility `currentUser` argument. Backend middleware and repository write guards enforce the hierarchy, never the frontend argument.
