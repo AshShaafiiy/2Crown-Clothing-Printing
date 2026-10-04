@@ -3,11 +3,11 @@ import { db } from '@/backend/store/db';
 import { UpdateOrderStatusSchema } from '@/backend/schemas';
 import { authenticateNext, parseBody } from '@/backend/utils/next-utils';
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, { params }: { params: { reference: string } }) {
   const { error: authError, status: authStatus } = await authenticateNext(req);
   if (authError) return NextResponse.json({ error: authError }, { status: authStatus });
 
-  const { id } = params;
+  const { reference: id } = params;
   const index = db.orders.findIndex((o: any) => o.id === id);
   if (index === -1) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
