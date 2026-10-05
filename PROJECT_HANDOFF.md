@@ -3,8 +3,8 @@
 ## Current Snapshot
 - **Date:** 2026-10-05
 - **Branch:** main
-- **HEAD:** 046086c fix: restore admin settings data flow and collection hover state
-- **origin/main:** 046086c
+- **HEAD:** 1d5d548 docs: finalize verification state after QA
+- **origin/main:** 1d5d548
 - **Vercel Project:** twocrown-clothing-printing (Pending formal confirmation)
 - **Firebase Project:** twocrown-clothing-printing
 - **Current Hosting Plan:** Vercel Hobby (Commercial viability pending decision)
@@ -78,8 +78,8 @@ The current task is to complete the **DOCUMENTATION + CROSS-ACCOUNT HANDOFF SYNC
 - Vercel "Hobby" plan is currently used; a decision on commercial production viability/upgrades is required before the final public launch.
 
 ## Verification State
-- **Latest Verified Test Count:** 203 tests pass across 13 test files. Verification state is **CLEAN**. There was a worker timeout warning in Vitest during one run, but the logical pass rate is 203/203.
-- **Test Count History:** The current discovered test count is exactly 203 tests. This includes the massive comprehensive API tests added during migration, plus 44 new Discount Badge tests and comprehensive RBAC tests.
+- **Latest Verified Test Count:** 209 tests pass across 14 test files. Verification state is **CLEAN**. Vitest runs exit cleanly with EXIT CODE 0. The transient worker-pool timeout during headless shutdown has been resolved.
+- **Test Count History:** The current discovered test count is exactly 209 tests. This includes the comprehensive API tests, 44 Discount Badge tests, RBAC tests, and new TrackOrder integration tests.
 - **Build State:** Local `npm run build` succeeds cleanly.
 - **Local vs Remote E2E Status:** End-to-end functionality (Public flows, Admin flows) has been successfully verified against BOTH the local production build (Phase 12) AND the remote Vercel deployment (Phase 15). The `/admin` production runtime crash has been confirmed resolved on the live deployment. The `/admin/settings` initialization crash has been resolved and the Browse Collection hover interaction verified remotely. Product and Category Edit/Delete operations have been validated. Favicon configuration is verified.
 
