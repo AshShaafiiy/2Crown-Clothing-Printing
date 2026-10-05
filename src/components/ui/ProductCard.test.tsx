@@ -1,8 +1,17 @@
 // @vitest-environment jsdom
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import "@testing-library/jest-dom";
+import { render, screen, waitFor } from '@testing-library/react';
 import { ProductCard } from './ProductCard';
 import { Product } from '../../domain/models';
+
+vi.mock('../../services', () => ({
+  services: {
+    reviews: {
+      getRatingSummary: vi.fn().mockResolvedValue({ average: 4.5, count: 10 })
+    }
+  }
+}));
 
 const mockProduct: Product = {
   id: 'test-product',
@@ -17,11 +26,15 @@ const mockProduct: Product = {
 };
 
 describe('ProductCard', () => {
-  it('renders safely without optional fields like previousPrice', () => {
+  it('renders safely without optional fields like previousPrice', async () => {
     render(<ProductCard product={mockProduct} />);
     expect(screen.getByText('Test Product')).toBeInTheDocument();
     expect(screen.getByText('₦5,000')).toBeInTheDocument();
-    // Verify Link renders href, not 'to'
+    
+    await waitFor(() => {
+      expect(screen.getByText('(10)')).toBeInTheDocument();
+    });
+
     const links = screen.getAllByRole('link');
     expect(links.length).toBeGreaterThan(0);
     links.forEach(link => {
@@ -29,21 +42,27 @@ describe('ProductCard', () => {
     });
   });
 
-  it('renders discount badge when previousPrice is provided and valid', () => {
+  it('renders discount badge when previousPrice is provided and valid', async () => {
     const discountedProduct = { ...mockProduct, previousPrice: 10000, price: 5000 };
     render(<ProductCard product={discountedProduct} />);
-    expect(screen.getByText('50% OFF')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('50% OFF')).toBeInTheDocument();
+    });
   });
 
-  it('safely skips discount calculation when previousPrice is 0 or undefined', () => {
+  it('safely skips discount calculation when previousPrice is 0 or undefined', async () => {
     const noDiscountProduct = { ...mockProduct, previousPrice: 0, price: 5000 };
     render(<ProductCard product={noDiscountProduct} />);
-    expect(screen.queryByText(/OFF/)).toBeNull();
+    await waitFor(() => {
+      expect(screen.queryByText(/OFF/)).toBeNull();
+    });
   });
 
-  it('renders correctly without an image URL', () => {
+  it('renders correctly without an image URL', async () => {
     const noImageProduct = { ...mockProduct, imageUrl: '' };
     render(<ProductCard product={noImageProduct} />);
-    expect(screen.getByText('Product image coming soon')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Product image coming soon')).toBeInTheDocument();
+    });
   });
 });
