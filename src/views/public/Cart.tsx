@@ -37,7 +37,7 @@ export default function Cart() {
                   <div className="flex gap-4">
                     {/* Product Image */}
                     <Link
-                      to={`/product/${item.productSlug || item.productId}`}
+                      href={`/product/${item.productSlug || item.productId}`}
                       className="flex-shrink-0 block transform transition-transform duration-300 hover:scale-105 hover:opacity-90 hover:shadow-md rounded-lg"
                     >
                       <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-50 border border-gray-100">
@@ -148,7 +148,7 @@ export default function Cart() {
             </button>
 
             <Link
-              to="/shop"
+              href="/shop"
               className="block text-center text-sm text-gray-500 hover:text-primary transition-colors mt-4 font-medium"
             >
               Continue Shopping

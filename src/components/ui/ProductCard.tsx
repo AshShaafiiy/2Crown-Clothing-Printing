@@ -66,7 +66,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
         </Link>
         <Link 
-          to={`/product/${product.slug}`}
+          href={`/product/${product.slug}`}
           className="w-full text-center py-2.5 bg-secondary text-white font-bold text-sm rounded hover:bg-primary hover:text-secondary transition-colors mt-auto"
         >
           {(product.customizationFields?.length) ? 'Customize & Buy' : 'View Product'}
