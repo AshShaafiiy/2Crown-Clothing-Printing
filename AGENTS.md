@@ -7,10 +7,9 @@ Welcome, future coding agents! This file dictates the absolute rules and context
 The visual identity is strictly **Black, Gold, and White**. The UI must feel premium, modern, professional, and clean.
 
 ## 2. Current Stack & Architecture
-- **Stack**: React, TypeScript, Vite, Vitest, Tailwind CSS, Zustand, React Router.
-- **Architecture Pattern**: Component → Hook/State → Service Interface → API implementation → Express/Knex/SQLite.
-- **Current state**: Phase 8 release candidate preparation; the production-like Docker/Caddy stack has been verified locally, but the site is **NOT PUBLICLY DEPLOYED**.
-- **Service Layer**: `src/services/interfaces` is backed by `src/services/api` in development/production; `src/services/mock` is selected for tests or explicit `VITE_USE_MOCK_SERVICES=true`.
+- **Stack**: Next.js (App Router), React, TypeScript, Tailwind CSS, Zustand.
+- **Architecture Pattern**: Component → Hook/State → Next.js API Routes → Firebase Admin SDK → Firestore.
+- **Current state**: Next.js and Firebase migration complete. Preparing for Vercel deployment. **NOT PUBLICLY DEPLOYED**.
 
 ## 3. Important Business Rules
 - **Custom Work Flow**:
@@ -38,22 +37,20 @@ The visual identity is strictly **Black, Gold, and White**. The UI must feel pre
   - The Custom Work link must scroll to `#custom-work`.
 
 ## 4. Zero-Cost Infrastructure Requirement
-- **Target Production Infrastructure**: $0/month.
-- The only paid expense is the custom domain.
-- **DO NOT INTRODUCE**: Firebase, Supabase, AWS, Cloudinary, Paid Databases, or any billing-dependent infrastructure.
-- **DO NOT INTRODUCE**: Customer file storage (e.g., S3). The website only uses Admin-managed media (hosted locally or on a $0 static tier).
+- **Target Production Infrastructure**: Vercel (Hobby/Pro evaluation pending) + Firebase (Spark plan) or equivalents. Target $0/month where possible.
+- The only mandatory paid expense is the custom domain.
+- **DO NOT INTRODUCE**: AWS, Paid Databases, or any billing-heavy infrastructure without explicit instruction.
+- **DO NOT INTRODUCE**: Customer file storage (e.g., S3). The website only uses Admin-managed media.
 
 ## 5. Release Boundary
-Keep the implemented React/Express/Knex/SQLite architecture, secure production boot chain, and zero-cost requirement. Current work is release-candidate verification and documentation; public cloud/domain deployment remains future work. Do not add a new database, backend architecture, paid service, or customer upload flow without explicit instruction.
+Keep the implemented Next.js/Firebase architecture and secure production boot chain. Current work is release-candidate verification and documentation; public domain deployment remains future work. Do not add a new database or backend architecture without explicit instruction.
 
 ## 6. Testing & Quality
-- Run tests via `npx vitest run`.
+- Run tests via `npm run test` (Vitest).
 - Check types via `npx tsc -b`.
 - Build via `npm run build`.
-- Vite polling is enabled for WSL2 environments (`server.watch.usePolling: true`). Do not remove this.
 
 ## 7. Strict Prohibitions
 - Do NOT fabricate fake product images or UI sections not approved by the user.
-- Do NOT migrate to Next.js or other meta-frameworks.
 - Do NOT reintroduce the "Shop by Category", "How Custom Orders Work", or "Testimonials" sections to the Homepage.
-- Do NOT replace the existing SQLite backend or add another database/backend system without explicit instruction.
+- Do NOT replace the existing Firestore/Firebase backend or restore the old Express/SQLite backend.
