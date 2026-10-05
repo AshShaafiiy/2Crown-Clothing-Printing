@@ -101,11 +101,12 @@ const Categories: React.FC = () => {
   const handleDelete = async (id: string, name: string) => {
     const productCount = products.filter(p => p.categoryId === id).length;
 
-    let message = `Are you sure you want to delete the "${name}" category?`;
     if (productCount > 0) {
-      message = `WARNING: This category has ${productCount} products assigned to it. Deleting it may leave products orphaned. Continue?`;
+      toast.error(`Cannot delete "${name}" because it has ${productCount} products assigned. Reassign them first.`);
+      return;
     }
 
+    const message = `Are you sure you want to delete the "${name}" category?`;
     const isConfirmed = await confirm({
       title: 'Delete Category',
       message: message,

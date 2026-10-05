@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { categoryRepository } from '@/backend/repositories';
+import { categoryRepository, productRepository } from '@/backend/repositories';
 import { CategoryInputSchema } from '@/backend/schemas';
 import { authenticateNext, parseBody, requireRolesNext } from '@/backend/utils/next-utils';
 
@@ -39,6 +39,12 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
   const { id } = params;
   const existing = await categoryRepository.findById(id);
   if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
+  const allProducts = await productRepository.findAll();
+  const hasProducts = allProducts.some(p => p.categoryId === id);
+  if (hasProducts) {
+    return NextResponse.json({ error: 'Cannot delete category with associated products' }, { status: 400 });
+  }
 
   await categoryRepository.delete(id);
   return new NextResponse(null, { status: 204 });

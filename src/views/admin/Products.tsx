@@ -259,7 +259,7 @@ const Products: React.FC = () => {
                             <p className="font-semibold text-gray-900">{product.name}</p>
                             <div className="flex gap-1 mt-1 flex-wrap">
                               {product.featured && <span className="text-[10px] bg-secondary text-white px-1.5 py-0.5 rounded font-medium">Featured</span>}
-                              {product.price < (product.previousPrice || 0) && <span className="text-[10px] bg-red-100 text-red-800 px-1.5 py-0.5 rounded font-medium">% OFF</span>}
+                              {product.price < (product.previousPrice || 0) && <span className="text-[10px] bg-red-100 text-red-800 px-1.5 py-0.5 rounded font-medium">{Math.round(((product.previousPrice! - product.price) / product.previousPrice!) * 100)}% OFF</span>}
                                                                                         </div>
                           </div>
                         </div>

@@ -4,19 +4,19 @@ import { Category } from '../schemas';
 export class CategoryRepository {
   async findAll(): Promise<Category[]> {
     const snap = await db.collection('categories').orderBy('order', 'asc').get();
-    return snap.docs.map( (doc: any) => doc.data() as Category);
+    return snap.docs.map( (doc: any) => ({ id: doc.id, ...doc.data() } as Category));
   }
 
   async findById(id: string): Promise<Category | null> {
     const doc = await db.collection('categories').doc(id).get();
     if (!doc.exists) return null;
-    return doc.data() as Category;
+    return { id: doc.id, ...doc.data() } as Category;
   }
 
   async findBySlug(slug: string): Promise<Category | null> {
     const snap = await db.collection('categories').where('slug', '==', slug).limit(1).get();
     if (snap.empty) return null;
-    return snap.docs[0].data() as Category;
+    return { id: snap.docs[0].id, ...snap.docs[0].data() } as Category;
   }
 
   async create(category: Category): Promise<Category> {

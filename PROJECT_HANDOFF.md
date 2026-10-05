@@ -100,3 +100,25 @@ After every substantial accepted work batch:
 7. do not declare handoff-ready with stale docs
 
 `PROJECT_HANDOFF.md` should be updated after every substantial accepted batch. `README.md` should NOT be churned for tiny fixes.
+
+## Hosting Decision
+
+- 2Crown will remain on Vercel Hobby for now.
+- Do not proactively migrate hosting solely because of the current Vercel Hobby commercial-use policy issue.
+- Continue using the stable Vercel deployment unless one of these triggers occurs:
+  1. Vercel explicitly flags the project for commercial-use/plan reasons
+  2. Vercel suspends or restricts the project
+  3. Hobby resource limits become an actual operational problem
+  4. reliability/performance becomes inadequate
+  5. the user explicitly decides to migrate
+- If a trigger occurs, perform a deliberate migration analysis rather than an emergency architecture rewrite.
+- Current preferred fallback candidate: Cloudflare-based hosting.
+- HOWEVER: the existing Next.js/Firebase Admin Node-runtime architecture must receive a compatibility assessment before any Cloudflare migration.
+- Do NOT migrate to Netlify, Oracle, or another provider without a fresh technical evaluation.
+- Firebase remains on the current Spark/$0 plan unless a genuine product requirement requires billing.
+- Custom-domain attachment can proceed independently.
+
+### DEPLOYMENT RISK NOTE
+Vercel Hobby currently works technically for this application.
+Commercial-use compliance remains a Vercel platform-policy consideration.
+The project is consciously accepting that operational risk for now.

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { productRepository } from '@/backend/repositories';
 import { ProductInputSchema } from '@/backend/schemas';
-import { authenticateNext, parseBody } from '@/backend/utils/next-utils';
+import { authenticateNext, requireRolesNext, parseBody } from '@/backend/utils/next-utils';
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   const { id } = params;
@@ -14,8 +14,11 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 }
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
-  const { error: authError, status: authStatus } = await authenticateNext(req);
+  const { user, error: authError, status: authStatus } = await authenticateNext(req);
   if (authError) return NextResponse.json({ error: authError }, { status: authStatus });
+
+  const roleError = requireRolesNext(user, ['root_super_admin', 'super_admin', 'admin']);
+  if (roleError) return NextResponse.json({ error: roleError.error }, { status: roleError.status });
 
   const { id } = params;
   const existing = await productRepository.findById(id);
@@ -29,8 +32,11 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 }
 
 export async function DELETE(req: Request, { params }: { params: { id: string } }) {
-  const { error: authError, status: authStatus } = await authenticateNext(req);
+  const { user, error: authError, status: authStatus } = await authenticateNext(req);
   if (authError) return NextResponse.json({ error: authError }, { status: authStatus });
+
+  const roleError = requireRolesNext(user, ['root_super_admin', 'super_admin', 'admin']);
+  if (roleError) return NextResponse.json({ error: roleError.error }, { status: roleError.status });
 
   const { id } = params;
   const existing = await productRepository.findById(id);
