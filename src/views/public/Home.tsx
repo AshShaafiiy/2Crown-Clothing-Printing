@@ -91,7 +91,7 @@ export const Home = () => {
                 Chat on WhatsApp
                 <ArrowRight className="ml-2" size={20} />
               </button>
-              <Link href="/shop" className="bg-white hover:bg-gray-100 text-secondary font-bold py-3 px-8 rounded-md text-center shadow-lg border border-gray-200 transition-colors duration-300">
+              <Link href="/shop" className="bg-white hover:bg-gray-200 text-secondary font-bold py-3 px-8 rounded-md text-center shadow-lg border border-gray-200 transition-colors duration-300">
                 Browse Collection
               </Link>
             </div>
