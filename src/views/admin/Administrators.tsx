@@ -1,3 +1,4 @@
+"use client";
 import { PasswordInput } from '../../components/ui/PasswordInput';
 import { PasswordStrengthMeter } from '../../components/ui/PasswordStrengthMeter';
 import { evaluatePasswordStrength } from '../../utils/passwordPolicy';

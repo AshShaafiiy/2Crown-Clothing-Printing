@@ -1,3 +1,4 @@
+"use client";
 import { useConfirm } from '../../components/ui/ConfirmProvider';
 import { toast } from 'react-hot-toast';
 import React, { useEffect, useState } from 'react';

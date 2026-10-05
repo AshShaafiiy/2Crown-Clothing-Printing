@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from 'react';
 import { services } from '../../services';
 import { Order } from '../../domain/models';
