@@ -3,8 +3,8 @@
 ## Current Snapshot
 - **Date:** 2026-10-05
 - **Branch:** main
-- **HEAD:** 9700697 fix: restore secure phone-verified order tracking
-- **origin/main:** 9700697
+- **HEAD:** 4d470eb docs: synchronize project handoff for cross-account continuity
+- **origin/main:** 4d470eb
 - **Vercel Project:** twocrown-clothing-printing (Pending formal confirmation)
 - **Firebase Project:** twocrown-clothing-printing
 - **Current Hosting Plan:** Vercel Hobby (Commercial viability pending decision)
@@ -30,24 +30,25 @@ The application has been migrated from Vite/Express/SQLite to a unified **Next.j
 - Reconfigured `.env.example` to remove old DB/custom JWT variables.
 
 ## Current Known Defects / Open Work
+- **Both intended homepage WhatsApp buttons fail to open WhatsApp correctly:** There are intentionally two WhatsApp-related CTAs on the Home page (one in the Hero section and one in the Custom Work section). They currently fail to resolve their intended destination. Both must be preserved and fixed.
 - **Homepage hero entrance animation:** `animate-hero-enter-delayed-2` (and similar) are missing from `tailwind.config.js` and `globals.css`, breaking hero animations.
-- **Two homepage WhatsApp buttons:** The homepage currently has two WhatsApp buttons (one in the Hero section, one in the Custom Work section), which may be redundant.
-- **/admin production crash:** Verify whether the admin dashboard crashes on a production Vercel build.
-- **Full application regression audit:** The app transitioned from Vite to Next.js; full end-to-end functionality requires manual and automated verification.
-- **Any remaining Vite → Next.js parity problems:** Layouts, CSS modules, dynamic imports, etc., might still have regressions.
-- **Remote Vercel E2E gaps:** Remote tests on Vercel deployments are not fully configured.
+- **/admin production runtime crash:** The production `/admin` route has been observed displaying "This page couldn't load" in the browser. A local `npm run build` succeeds, but actual Vercel runtime behavior remains unverified.
+- **Full application regression/E2E audit still required:** The app transitioned from Vite to Next.js; full end-to-end functionality requires manual and automated verification against actual infrastructure.
+- **Remote Vercel E2E gaps:** Remote tests on live Vercel deployments are not fully configured.
+- **TrackOrder test timeout:** The test infrastructure has a pending Vitest worker timeout issue in `TrackOrder.test.tsx` that must be cleanly rerun.
 
 ## Current Task In Progress
-The current task is to complete the **DOCUMENTATION + CROSS-ACCOUNT HANDOFF SYNCHRONIZATION**. The previous agent was interrupted. The `README.md` and `PROJECT_HANDOFF.md` are being updated to reflect the true current Next.js/Firebase state, and obsolete files are being purged of SQLite/Express/Knex claims.
+The current task is to complete the **DOCUMENTATION + CROSS-ACCOUNT HANDOFF SYNCHRONIZATION**. Handoff accuracy corrections are currently being applied to ensure no claims of functionality are overstated without empirical Vercel/runtime proof.
 
 ## Next Recommended Actions
-1. **Fix Hero Animations:** Add the missing keyframes/animations to `tailwind.config.js`.
-2. **Audit Homepage Buttons:** Review and potentially remove the duplicate WhatsApp button in the hero section to maintain a clean flow.
-3. **Verify Production Build:** Ensure `npm run build` succeeds without `/admin` crashing and deploy to Vercel.
-4. **Full Regression Testing:** Manually step through the critical paths (Normal Order, Track Order, Admin Login, Admin Order Management) to catch any remaining Next.js parity issues.
-5. **E2E Automation:** Update Playwright tests to run against the Vercel preview URLs.
+1. **Fix WhatsApp Buttons:** Identify both intended WhatsApp CTAs on the homepage and restore their correct destination behavior.
+2. **Fix Hero Animations:** Add the missing keyframes/animations to `tailwind.config.js`.
+3. **Verify Production `/admin` Runtime:** Confirm the actual deployed Vercel `/admin` route loads correctly in the browser without crashing.
+4. **Fix Test Infrastructure:** Resolve the Vitest worker timeout in `TrackOrder.test.tsx` and run the suite to a clean 0 exit code.
+5. **Full Regression Testing:** Execute a full end-to-end audit (manually and via Playwright) of the Next.js parity.
 
 ## Do Not Change
+- **WhatsApp Buttons:** Both homepage WhatsApp CTAs are intentional and part of the accepted UI/business flow. Do not remove either.
 - **Custom Work → direct WhatsApp:** No database records, no uploads, no pricing calculator for custom work.
 - **Normal Order Flow:** Persist order first, then provide structured WhatsApp continuation.
 - **Order Reference:** `2C-123456` uppercase hex format.
@@ -74,10 +75,11 @@ The current task is to complete the **DOCUMENTATION + CROSS-ACCOUNT HANDOFF SYNC
 - Vercel "Hobby" plan is currently used; a decision on commercial production viability/upgrades is required before the final public launch.
 
 ## Verification State
-- **Latest Verified Test Count:** (Pending full Next.js test suite run).
-- **Build State:** (Pending current Next.js build verification).
+- **Latest Verified Test Count:** 192 tests pass, but verification state is **PARTIAL / TEST INFRASTRUCTURE ISSUE REMAINS** due to a Vitest worker timeout on `TrackOrder.test.tsx` leading to a non-zero exit code. 
+- **Test Count History:** The count decreased from historical highs (198/199) down to 192 because approximately 77 obsolete Knex/SQLite-specific tests were legitimately removed or skipped during the Next.js/Firestore migration.
+- **Build State:** Local `npm run build` succeeds, but actual Vercel runtime is unverified.
 - **Flows E2E Tested:** Store Pickup lifecycle, Track Order, Admin flows were tested on the *old* mock backend architecture. They must be re-verified against the new Next.js API.
-- **Unverified:** Remote Vercel deployment stability, Next.js specific routing parity.
+- **Unverified:** Remote Vercel deployment runtime stability (`/admin`), Next.js specific routing parity, E2E regressions.
 
 ---
 
