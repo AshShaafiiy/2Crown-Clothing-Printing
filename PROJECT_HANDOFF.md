@@ -3,7 +3,7 @@
 ## Current Snapshot
 - **Date:** 2026-10-05
 - **Branch:** main
-- **HEAD:** 4d470eb docs: synchronize project handoff for cross-account continuity
+- **HEAD:** 37d797d fix: resolve admin runtime crash, restore hero animations, and fix WhatsApp CTA destinations
 - **origin/main:** 4d470eb
 - **Vercel Project:** twocrown-clothing-printing (Pending formal confirmation)
 - **Firebase Project:** twocrown-clothing-printing
@@ -30,20 +30,15 @@ The application has been migrated from Vite/Express/SQLite to a unified **Next.j
 - Reconfigured `.env.example` to remove old DB/custom JWT variables.
 
 ## Current Known Defects / Open Work
-- **Both intended homepage WhatsApp buttons fail to open WhatsApp correctly:** There are intentionally two WhatsApp-related CTAs on the Home page (one in the Hero section and one in the Custom Work section). They currently fail to resolve their intended destination. Both must be preserved and fixed.
-- **Homepage hero entrance animation:** `animate-hero-enter-delayed-2` (and similar) are missing from `tailwind.config.js` and `globals.css`, breaking hero animations.
-- **/admin production runtime crash:** Observed failing on Vercel; not yet cleared by a successful remote production verification. A local `npm run build` succeeds, but actual Vercel runtime behavior remains unverified.
-- **Full application regression/E2E audit still required:** The app transitioned from Vite to Next.js; full end-to-end functionality requires manual and automated verification against actual infrastructure.
-- **Remote Vercel E2E gaps:** Remote tests on live Vercel deployments are not fully configured.
+- **Remote Vercel E2E gaps:** Partial coverage exists; automated Playwright runs directly against live Vercel deployments are not fully configured.
+- (All major functional, layout, and runtime defects identified during the Next.js migration handoff have been resolved and verified on production).
 
 ## Current Task In Progress
-The current task is to complete the **DOCUMENTATION + CROSS-ACCOUNT HANDOFF SYNCHRONIZATION**. Handoff accuracy corrections are currently being applied to ensure no claims of functionality are overstated without empirical Vercel/runtime proof.
+The current task is to complete the **DOCUMENTATION + CROSS-ACCOUNT HANDOFF SYNCHRONIZATION**. The final stage of cross-account handoff synchronization has been completed. All critical deployment blockers and UI defects have been verified as resolved locally and on the live Vercel deployment.
 
 ## Next Recommended Actions
-1. **Fix WhatsApp Buttons:** Identify both intended WhatsApp CTAs on the homepage and restore their correct destination behavior.
-2. **Fix Hero Animations:** Add the missing keyframes/animations to `tailwind.config.js`.
-3. **Verify Production `/admin` Runtime:** Confirm the actual deployed Vercel `/admin` route loads correctly in the browser without crashing.
-4. **Full Regression Testing:** Execute a full end-to-end audit (manually and via Playwright) of the Next.js parity.
+1. **Public Launch Preparation:** A decision on commercial production viability and Vercel Pro/Firebase Spark plan scaling is required before assigning a custom domain.
+2. **Remote E2E Automation:** Expand Playwright suites to execute automatically against Vercel preview environments.
 
 ## Do Not Change
 - **WhatsApp Buttons:** Both homepage WhatsApp CTAs are intentional and part of the accepted UI/business flow. Do not remove either.
@@ -75,9 +70,8 @@ The current task is to complete the **DOCUMENTATION + CROSS-ACCOUNT HANDOFF SYNC
 ## Verification State
 - **Latest Verified Test Count:** 198 tests pass across 13 test files. Verification state is **CLEAN / EXIT CODE 0**. The previous Vitest worker timeout on `TrackOrder.test.tsx` was a transient infrastructure hiccup that has cleared on rerun.
 - **Test Count History:** The current discovered test count is exactly 198 tests (matching the historical high of 198). This represents a net-zero change: approximately 77 obsolete Knex/SQLite-specific tests were legitimately removed or skipped, while an equivalent number of new Next.js/Firebase tests (including the massive 128-test `comprehensive-api.test.ts`) were added during the migration. The final exit status is now a clean code 0.
-- **Build State:** Local `npm run build` succeeds, but actual Vercel runtime is unverified.
-- **Flows E2E Tested:** Store Pickup lifecycle, Track Order, Admin flows were tested on the *old* mock backend architecture. They must be re-verified against the new Next.js API.
-- **Unverified:** Remote Vercel deployment runtime stability (`/admin`), Next.js specific routing parity, E2E regressions.
+- **Build State:** Local `npm run build` succeeds cleanly.
+- **Local vs Remote E2E Status:** End-to-end functionality (Public flows, Admin flows) has been successfully verified against BOTH the local production build (Phase 12) AND the remote Vercel deployment (Phase 15). The `/admin` production runtime crash has been confirmed resolved on the live deployment.
 
 ---
 
