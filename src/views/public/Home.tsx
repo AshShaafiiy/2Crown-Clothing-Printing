@@ -6,6 +6,8 @@ import { usePathname } from 'next/navigation';
 import { ArrowRight, Star, CheckCircle2, ShoppingBag, ImageIcon, MessageSquare, Shirt } from 'lucide-react';
 import { services } from '../../services';
 import { Category, Product, Promotion, } from '../../domain/models';
+import { useSettingsStore } from '../../store/settingsStore';
+import { getWhatsAppLink } from '../../utils/whatsapp';
 import { ImageFallback } from '../../components/ui/ImageFallback';
 import { ProductCard } from '../../components/ui/ProductCard';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
@@ -52,18 +54,21 @@ export const Home = () => {
     }
   }, []);
 
-  const openWhatsAppCustom = async (e: React.MouseEvent) => {
+  
+  const openWhatsApp = (e: React.MouseEvent, text: string) => {
     e.preventDefault();
-    const waWindow = window.open('about:blank', '_blank');
-    try {
-      const settings = await services.settings.getBusinessSettings();
-      const { getWhatsAppLink } = await import('../../utils/whatsapp');
-      const msg = "Hello 2Crown Clothing & Printing, I'm interested in your custom work. I'd like to discuss what I need. Please let me know what information, pictures, designs, or other materials you need from me.";
-      if (waWindow) waWindow.location.href = getWhatsAppLink(settings.whatsappNumber, msg);
-    } catch (err) {
-      if (waWindow) waWindow.close();
-      console.error(err);
-    }
+    const settings = useSettingsStore.getState().settings;
+    const phone = settings?.whatsappNumber || '2349061747646';
+    const link = getWhatsAppLink(phone, encodeURIComponent(text));
+    window.open(link, '_blank', 'noopener,noreferrer');
+  };
+
+  const openWhatsAppHero = (e: React.MouseEvent) => {
+    openWhatsApp(e, "Hello 2Crown Clothing & Printing, I'd like to make an inquiry.");
+  };
+
+  const openWhatsAppCustom = (e: React.MouseEvent) => {
+    openWhatsApp(e, "Hello 2Crown Clothing & Printing, I'm interested in your custom work. I'd like to discuss what I need. Please let me know what information, pictures, designs, or other materials you need from me.");
   };
 
   return (
@@ -82,10 +87,7 @@ export const Home = () => {
               Quality printing and branding for your business, team, or personal style. Clothing and printing under one roof.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 animate-hero-enter-delayed-2">
-              <button 
-                onClick={openWhatsAppCustom}
-                className="bg-primary hover:bg-primary-dark text-secondary font-bold py-3 px-8 rounded-md flex items-center justify-center shadow-lg btn-premium-gold"
-              >
+              <button onClick={openWhatsAppHero} className="bg-primary hover:bg-primary-dark text-secondary font-bold py-3 px-8 rounded-md flex items-center justify-center shadow-lg btn-premium-gold">
                 Chat on WhatsApp
                 <ArrowRight className="ml-2" size={20} />
               </button>

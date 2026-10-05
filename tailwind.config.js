@@ -6,6 +6,18 @@ export default {
   ],
   theme: {
     extend: {
+      
+      keyframes: {
+        heroEnter: {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        }
+      },
+      animation: {
+        'hero-enter': 'heroEnter 0.8s ease-out both',
+        'hero-enter-delayed': 'heroEnter 0.8s ease-out 0.2s both',
+        'hero-enter-delayed-2': 'heroEnter 0.8s ease-out 0.4s both',
+      },
       colors: {
         primary: {
           DEFAULT: "#D4AF37", // Gold
