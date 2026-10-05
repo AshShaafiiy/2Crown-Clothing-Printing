@@ -28,6 +28,9 @@ The application has been migrated from Vite/Express/SQLite to a unified **Next.j
 - Corrected Next.js layout composition for Header/Footer and resolved animations parity.
 - Restored secure phone-verified order tracking (2C-123456 reference format).
 - Reconfigured `.env.example` to remove old DB/custom JWT variables.
+- Resolved production `/admin` runtime crash caused by missing Next.js Link `href` props and invalid onClick event signatures.
+- Fixed both homepage WhatsApp CTA buttons (Hero and Custom Work) to open the WhatsApp destination reliably without being blocked by popup-blockers.
+- The hero entrance animation is now working and is part of the current accepted Next.js UI behavior. It was not present in the original pre-migration Vite hero.
 
 ## Current Known Defects / Open Work
 - **Remote Vercel E2E gaps:** Partial coverage exists; automated Playwright runs directly against live Vercel deployments are not fully configured.
