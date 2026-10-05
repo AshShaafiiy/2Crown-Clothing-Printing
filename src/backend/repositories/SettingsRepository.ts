@@ -8,14 +8,22 @@ export class SettingsRepository {
       return {
         id: 'config',
         storeName: '2Crown Clothing & Printing',
-        contactEmail: 'contact@2crown.com',
+        contactEmail: 'info@2crown.com.ng',
         contactPhone: '+234 906 174 7646',
         whatsappNumber: '2349061747646',
-        address: 'Nigeria',
+        address: 'Ikeja, Lagos, Nigeria',
         currency: 'NGN',
         currencySymbol: '₦',
-        vatPercentage: 0,
-        deliverySettings: { pickupFee: 0, localDeliveryBaseFee: 0, outOfStateBaseFee: 0 }
+        vatPercentage: 7.5,
+        deliverySettings: { 
+          pickupEnabled: true, 
+          pickupAddress: 'Ikeja, Lagos, Nigeria', 
+          localDeliveryEnabled: true, 
+          localDeliveryFee: null, 
+          nationwideDeliveryEnabled: true, 
+          nationwideDeliveryBaseFee: null, 
+          freeDeliveryThreshold: null 
+        }
       };
     }
     const doc = snap.docs[0];
