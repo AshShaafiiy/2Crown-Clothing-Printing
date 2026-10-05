@@ -8,9 +8,19 @@ if (process.env.FIRESTORE_EMULATOR_HOST) {
 }
 
 if (!getApps().length) {
-  initializeApp({
-    projectId: 'demo-2crown-clothing' // Demo project for emulators
-  });
+  if (process.env.FIREBASE_PRIVATE_KEY) {
+    initializeApp({
+      credential: cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      })
+    });
+  } else {
+    initializeApp({
+      projectId: 'demo-2crown-clothing' // Fallback for local emulator
+    });
+  }
 }
 
 export const db = getFirestore();
