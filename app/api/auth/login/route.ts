@@ -1,10 +1,7 @@
 import { NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { db, _passwordHashes } from '@/backend/store/db';
 import { LoginRequestSchema } from '@/backend/schemas';
 import { parseBody } from '@/backend/utils/next-utils';
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+import { userRepository } from '@/backend/repositories';
 
 export async function POST(req: Request) {
   const { data, error, status } = await parseBody(req, LoginRequestSchema);
@@ -12,24 +9,37 @@ export async function POST(req: Request) {
 
   const { email, password } = data!;
   
-  const user = db.users.find((u: any) => u.email === email && u.active);
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized: Invalid credentials' }, { status: 401 });
+  // Swap email/password for Firebase idToken using the Identity Toolkit API
+  const API_KEY = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+  if (!API_KEY) {
+     return NextResponse.json({ error: 'Server misconfiguration: missing API KEY' }, { status: 500 });
   }
 
-  const hash = _passwordHashes[email];
-  if (!hash) {
-    return NextResponse.json({ error: 'Unauthorized: Invalid credentials' }, { status: 401 });
+  try {
+    const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, returnSecureToken: true }),
+    });
+
+    const result = await res.json();
+    
+    if (!res.ok) {
+       return NextResponse.json({ error: 'Unauthorized: Invalid credentials' }, { status: 401 });
+    }
+
+    const token = result.idToken;
+
+    // Fetch user profile from Firestore to return the user payload
+    const user = await userRepository.findByEmail(email);
+    if (!user || !user.active) {
+       return NextResponse.json({ error: 'Unauthorized: User inactive or not found' }, { status: 401 });
+    }
+
+    const response = NextResponse.json({ ...user, token });
+    response.headers.set('Authorization', `Bearer ${token}`);
+    return response;
+  } catch (err: any) {
+    return NextResponse.json({ error: 'Internal server error during login' }, { status: 500 });
   }
-
-  const isMatch = await bcrypt.compare(password, hash);
-  if (!isMatch) {
-    return NextResponse.json({ error: 'Unauthorized: Invalid credentials' }, { status: 401 });
-  }
-
-  const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1d' });
-
-  const response = NextResponse.json({ ...user, token });
-  response.headers.set('Authorization', `Bearer ${token}`);
-  return response;
 }
