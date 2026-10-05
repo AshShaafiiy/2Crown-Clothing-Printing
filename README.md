@@ -1,110 +1,172 @@
 # 2Crown Clothing & Printing
 
-## Project Overview
-2Crown Clothing & Printing is a premium e-commerce platform built for a Nigerian custom clothing and printing business. The visual identity is strictly **Black, Gold, and White**. The UI is designed to feel premium, modern, professional, and clean.
+A premium e-commerce platform for a Nigerian custom clothing and printing business. Visual identity: **Black, Gold, White**.
 
-## Current Stack
-- **Framework**: Next.js (App Router / API Routes)
-- **UI Library**: React
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS (v3)
-- **Authentication**: Firebase Auth
-- **Database**: Firestore (Production Persistence)
-- **Admin SDK**: Firebase Admin (Server-side)
-- **Deployment**: Vercel
-- **Domain Layer**: Cloudflare / Truehost (Planned)
+## Current Architecture
 
-*(Note: ImageKit and Resend integrations are currently deferred unless active code requires them.)*
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript |
+| UI | React 19, Tailwind CSS 3 |
+| State | Zustand |
+| Auth | Firebase Authentication (Email/Password) |
+| Database | Cloud Firestore |
+| Server SDK | Firebase Admin SDK |
+| Hosting | Vercel (GitHub integration) |
+| Image CDN | ImageKit (deferred — not yet wired) |
+| Email | Resend (deferred — not yet wired) |
+| Domain | Cloudflare + Truehost (planned, not configured) |
+| Testing | Vitest, Playwright |
+
+### Request / Data Flow
+
+```
+Browser → Next.js Client Component → fetch() → Next.js API Route Handler
+  → Firebase Admin SDK → Firestore
+```
+
+Admin authentication:
+```
+Browser → Firebase Client SDK signInWithEmailAndPassword()
+  → Firebase ID Token → Authorization: Bearer <token>
+  → API Route → Firebase Admin verifyIdToken()
+  → Firestore user profile lookup → role + active check
+```
 
 ## Repository Layout
-- `/src/app`: Next.js App Router (Pages, Layouts, API Routes).
-- `/src/components`: Reusable UI components.
-- `/src/services`: Application services layer.
-- `/src/hooks`: Custom React hooks.
-- `/src/utils`: Utilities and helpers.
-- `/public`: Static assets.
 
-## Development Setup
+```
+app/                      # Next.js App Router
+  (public)/               # Public routes (Home, Shop, Cart, Checkout, Track Order)
+  admin/
+    (protected)/          # Auth-guarded admin pages
+    login/                # Admin login page
+  api/                    # Next.js Route Handlers (server-side)
+  globals.css             # Tailwind styles
+  layout.tsx              # Root layout
+src/
+  backend/                # Server-side logic
+    repositories/         # Firestore data access
+    middleware/            # Auth middleware
+    schemas/              # Validation schemas
+    services/             # Business logic
+    utils/                # Server utilities
+  components/             # React components
+    admin/                # Admin layout, protected route wrapper
+    layout/               # Navbar, Footer
+    ui/                   # Shared UI components
+  domain/models/          # TypeScript domain types
+  hooks/                  # Custom React hooks
+  services/               # Client-side service layer
+    api/                  # API-backed implementations
+    interfaces/           # Service interfaces
+    mock/                 # Mock implementations (tests only)
+  store/                  # Zustand stores
+  utils/                  # Client utilities (WhatsApp, transitions)
+  views/                  # Page-level view components
+    admin/                # Admin view components
+    public/               # Public view components
+tests/                    # Vitest + Playwright test files
+firebase.json             # Firebase emulator config
+firestore.rules           # Firestore security rules
+firestore.indexes.json    # Firestore indexes
+```
 
-### Requirements
-- Node.js (v18+ recommended)
-- npm (v9+ recommended)
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm 9+
+- Firebase project with Auth + Firestore enabled
 
 ### Installation
+
 ```bash
 npm install
 ```
 
 ### Environment Variables
-To run the application, provide the following environment variables (Do NOT track real values in Git). See `.env.example` for templates.
 
-**Required:**
+Copy `.env.example` to `.env.local` and fill in the values.
+
+**Firebase Client (browser-safe, NEXT_PUBLIC_ prefix):**
 - `NEXT_PUBLIC_FIREBASE_API_KEY`
 - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
 - `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
 - `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
 - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
 - `NEXT_PUBLIC_FIREBASE_APP_ID`
+
+**Firebase Admin (server-only, never exposed to browser):**
 - `FIREBASE_PROJECT_ID`
 - `FIREBASE_CLIENT_EMAIL`
-- `FIREBASE_PRIVATE_KEY` (MUST be properly formatted with line breaks `\n`)
+- `FIREBASE_PRIVATE_KEY`
 
-### Running the Development Server
+The Firebase service-account JSON is stored **outside the repository** at `~/.config/2crown/service-account.json`. Never commit it.
+
+### Development
+
 ```bash
 npm run dev
 ```
 
-## Testing
-To run the Vitest suite:
+### Testing
+
 ```bash
-npm run test
+npm run test          # Vitest unit/integration tests
+npm run test:e2e      # Playwright E2E tests
 ```
 
-To run the TypeScript compiler check:
-```bash
-npx tsc -b
-```
+### Production Build
 
-## Production Build
 ```bash
 npm run build
+npm run start
 ```
 
-## Firebase Architecture & Production Persistence
-The backend architecture is entirely driven by **Firebase**. 
-- **Firestore** handles all production persistence (replacing obsolete SQLite/InMemoryDB).
-- **Firebase Admin** is used server-side (Next.js API routes) to validate tokens and securely query/mutate data.
-- **Firebase Auth** manages client-side authentication and session state.
+## Deployment
 
-## Security Model
-- **Authentication**: Firebase Auth exclusively. (Custom JWT is NOT used).
-- **Admin Authorization**: Strict Role-Based Access Control (RBAC). Roles include `root_super_admin`, `super_admin`, and `admin`.
-- **Root Protection**: Backend enforces root protection, preventing unauthorized deletion or modification of the Root Super Admin.
-- **Service Account Security**: The Firebase service account key (`FIREBASE_PRIVATE_KEY`) is stored entirely outside the repository as a secure environment variable on Vercel. Secrets are strictly excluded from Git tracking.
-- **Tracking Privacy**: The public Order Tracking timeline contains fulfillment statuses and timestamps only. It explicitly excludes customer identity, contact info, address, internal IDs, and internal communication/audit events.
+The repository is connected to Vercel via GitHub integration. Pushing to `main` triggers automatic deployment.
 
-## Deployment Model
-- The application is deployed on **Vercel** via **GitHub Deployment Integration**.
-- Automatic deployments are triggered upon pushes to the main branch.
-- Domain layer routing/DNS is planned via Cloudflare / Truehost.
+- **Vercel project**: `2crown-clothing-printing`
+- **Production URL**: `https://2crown-clothing-printing.vercel.app`
+- **Firebase project**: `twocrown-clothing-printing`
 
-## Important Stable Business Rules
-- **Custom Work Flow**: The "Custom Work" link navigates directly to `#custom-work`. The CTA button triggers WhatsApp. **NO Customer File Uploads**, NO Custom Work DB record, NO Custom Work admin table, and NO Custom Work pricing calculator.
-- **Normal Product Ordering**: Shop → Product Details → Add to Cart → Cart → Checkout → Save Order (persisted first) → Structured WhatsApp continuation.
-- **Order Reference**: The reference format is `2C-123456` (128 cryptographic random bits in uppercase hex, or equivalent secure format).
-- **Track Order**: Requires BOTH order reference + phone number.
-- **Privacy Safe**: Tracking DTO is privacy-safe. Unknown/malformed reference or wrong phone yields an indistinguishable generic failure.
-- **Delivery Rules**: 
-  - Store Pickup fee = `₦0`.
-  - Local Delivery fee = "To be confirmed".
-- **Currency**: NGN (`₦`) only.
-- **Catalog**: One product image per product. No stock/inventory management. No Product Type (unless explicitly reintroduced). Do not duplicate automatic badges.
-- **UI Dialogs**: Use existing application dialog/toast UI; no native `alert()`, `confirm()`, or `prompt()`.
-- **Admin Tables**: Use `nowrap` + horizontal scroll.
+Vercel environment variables must be configured in the Vercel dashboard (both client and server Firebase variables). The service-account private key is set as a Vercel environment variable — it is never stored in the repository.
 
-## Obsolete Architecture References
-The following technologies and architectures are historically deprecated and should NOT be used:
-- Express (Production), SQLite, Knex, PostgreSQL, Oracle, InMemoryDB.
-- Netlify, Old Vite Production Architecture.
-- Custom JWT.
-- Old UUID-style references, reference-only tracking.
+## Security Architecture
+
+- **Authentication**: Firebase Auth (Email/Password). No custom JWT.
+- **Authorization**: Three-tier RBAC — `root_super_admin`, `super_admin`, `admin`.
+- **Root protection**: Backend-enforced. Root Super Admin cannot be deleted, deactivated, or demoted.
+- **API security**: All admin API routes verify Firebase ID tokens via `firebase-admin` `verifyIdToken()`, then check Firestore user profile for `active === true` and appropriate role.
+- **Firestore rules**: Default deny. Public reads allowed only for active products, categories, promotions, and settings.
+- **Secrets**: No secrets in Git. `.env`, `.env.local`, and service-account files are gitignored.
+- **Tracking privacy**: Order tracking returns sanitized DTO only. Malformed reference, unknown reference, and wrong phone number all return identical generic failure.
+
+## Business Rules
+
+See `AGENTS.md` for the complete, authoritative set of business rules that all developers and AI agents must follow.
+
+Key rules:
+- **Custom Work** → direct WhatsApp. No database record, no uploads, no pricing calculator.
+- **Normal orders** → server-side order creation first, then WhatsApp continuation.
+- **Order reference format**: `2C-123456` (6-digit numeric).
+- **Track Order** requires both order reference and phone number.
+- **Pickup fee**: ₦0. **Local delivery fee**: "To be confirmed" (set manually via WhatsApp).
+- **Currency**: NGN only.
+- **One product image**. No inventory/stock system.
+- **No native alert/confirm/prompt** — use application dialogs/toasts.
+
+## Historical Context
+
+This project was originally built with Vite + Express + SQLite. It was migrated to Next.js + Firebase in October 2026. The old Express/SQLite/Knex/PostgreSQL architecture is fully replaced. Some legacy files remain in the repository for reference but are not used in production.
+
+## Documentation
+
+- `AGENTS.md` — Mandatory rules for AI coding agents
+- `PROJECT_HANDOFF.md` — Live continuation document for cross-account handoff
+- `docs/` — Historical domain documentation
+- `.env.example` — Required environment variable template

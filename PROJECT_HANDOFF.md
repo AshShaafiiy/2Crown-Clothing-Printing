@@ -3,8 +3,8 @@
 ## Current Snapshot
 - **Date:** 2026-10-05
 - **Branch:** main
-- **HEAD:** 37d797d fix: resolve admin runtime crash, restore hero animations, and fix WhatsApp CTA destinations
-- **origin/main:** 4d470eb
+- **HEAD:** 046086c fix: restore admin settings data flow and collection hover state
+- **origin/main:** 046086c
 - **Vercel Project:** twocrown-clothing-printing (Pending formal confirmation)
 - **Firebase Project:** twocrown-clothing-printing
 - **Current Hosting Plan:** Vercel Hobby (Commercial viability pending decision)
@@ -18,6 +18,8 @@ The application has been migrated from Vite/Express/SQLite to a unified **Next.j
 - **Domain Layer:** Cloudflare or Truehost is planned for DNS/Domain routing.
 
 ## Completed Work
+- Resolved `/admin/settings` API crash by gracefully handling empty Firestore collections with default configurations.
+- Restored missing Tailwind hover-dimming state to the "Browse Collection" homepage CTA.
 - Migrated 2Crown to Next.js and Firebase architecture.
 - Resolved Next.js order route slug conflict.
 - Redeployed with new service account credentials.
@@ -74,7 +76,7 @@ The current task is to complete the **DOCUMENTATION + CROSS-ACCOUNT HANDOFF SYNC
 - **Latest Verified Test Count:** 198 tests pass across 13 test files. Verification state is **CLEAN / EXIT CODE 0**. The previous Vitest worker timeout on `TrackOrder.test.tsx` was a transient infrastructure hiccup that has cleared on rerun.
 - **Test Count History:** The current discovered test count is exactly 198 tests (matching the historical high of 198). This represents a net-zero change: approximately 77 obsolete Knex/SQLite-specific tests were legitimately removed or skipped, while an equivalent number of new Next.js/Firebase tests (including the massive 128-test `comprehensive-api.test.ts`) were added during the migration. The final exit status is now a clean code 0.
 - **Build State:** Local `npm run build` succeeds cleanly.
-- **Local vs Remote E2E Status:** End-to-end functionality (Public flows, Admin flows) has been successfully verified against BOTH the local production build (Phase 12) AND the remote Vercel deployment (Phase 15). The `/admin` production runtime crash has been confirmed resolved on the live deployment.
+- **Local vs Remote E2E Status:** End-to-end functionality (Public flows, Admin flows) has been successfully verified against BOTH the local production build (Phase 12) AND the remote Vercel deployment (Phase 15). The `/admin` production runtime crash has been confirmed resolved on the live deployment. The `/admin/settings` initialization crash has been resolved and the Browse Collection hover interaction verified remotely.
 
 ---
 
