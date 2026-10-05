@@ -200,13 +200,13 @@ export class MockPromotionService implements IPromotionService {
 export class MockOrderService implements IOrderService {
   async getOrders(_filters?: any): Promise<Order[]> { return orders; }
   async getOrderById(id: ID): Promise<Order | null> { return orders.find(o => o.id === id) || null; }
-  async getOrderByReference(reference: string, phone?: string) { const canonical = reference.trim().toUpperCase(); const order = orders.find(o => o.reference === canonical); if (!order || (/^2C-\d{5,6}$/.test(canonical) && order.customerPhone !== phone)) return null; return toPublicOrder(order); }
+  async getOrderByReference(reference: string, phone: string) { const canonical = reference.trim().toUpperCase(); if (!/^2C-\d{6}$/.test(canonical)) return null; const order = orders.find(o => o.reference === canonical); if (!order || !phone) return null; if (order.customerPhone.replace(/[^\d+]/g, '') !== phone.replace(/[^\d+]/g, '')) return null; return toPublicOrder(order); }
   async createOrder(order: Omit<Order, 'id' | 'reference' | 'createdAt' | 'updatedAt'>): Promise<Order> {
     const now = new Date().toISOString();
     const newOrder: Order = {
       ...order,
       id: `ord-${Date.now()}`,
-      reference: `2C-${Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('').toUpperCase().match(/.{8}/g)!.join('-')}`,
+      reference: `2C-${Math.floor(100000 + Math.random() * 900000)}`,
       status: 'Awaiting Confirmation',
       createdAt: now,
       updatedAt: now,

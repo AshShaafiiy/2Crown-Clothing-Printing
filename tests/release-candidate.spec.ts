@@ -39,7 +39,7 @@ async function addProductAndCheckout(page: import('@playwright/test').Page, slug
   await expect(page).toHaveURL(/\/order-confirmation\/2C-[A-F0-9-]+$/);
   await expect(page.getByRole('heading',{name:'Order Received!'})).toBeVisible();
   const reference = page.url().split('/').pop()!;
-  expect(reference).toMatch(/^2C-[A-F0-9]{8}(?:-[A-F0-9]{8}){3}$/);
+  expect(reference).toMatch(/^2C-\d{6}$/);
   return reference;
 }
 
@@ -180,7 +180,7 @@ test('security headers, origin policy, API routing and protected files', async (
 });
 
 test('public tracking has a dedicated rate limit', async ({request}) => {
-  const unknownReference = '2C-FFFFFFFF-FFFFFFFF-FFFFFFFF-FFFFFFFF';
+  const unknownReference = '2C-999999';
   let limited = false;
   for (let attempt = 0; attempt < 35; attempt++) {
     const response = await request.get(`/orders/${unknownReference}`, {

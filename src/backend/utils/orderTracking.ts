@@ -2,8 +2,8 @@ import { randomBytes } from 'node:crypto';
 import { Order, OrderStatusSchema } from '../schemas';
 
 // 16 random bytes (128 bits); uppercase hex groups are easy to copy and read.
-export const generateOrderReference = () => `2C-${randomBytes(16).toString('hex').toUpperCase().match(/.{8}/g)!.join('-')}`;
-export const REFERENCE_PATTERN = /^2C-[A-F0-9]{8}(?:-[A-F0-9]{8}){3}$/;
+export const generateOrderReference = () => `2C-${Math.floor(100000 + Math.random() * 900000)}`;
+export const REFERENCE_PATTERN = /^2C-\d{6}$/i;
 export const canonicalReference = (value: string) => value.trim().toUpperCase();
 // Legacy communication/audit states are internal; customers see fulfillment only.
 const publicStatus = (status: string) => OrderStatusSchema.safeParse(status).success ? status : 'Awaiting Confirmation';

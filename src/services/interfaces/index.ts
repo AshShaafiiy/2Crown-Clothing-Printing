@@ -32,7 +32,7 @@ export interface IPromotionService {
 export interface IOrderService {
   getOrders(filters?: any): Promise<Order[]>;
   getOrderById(id: ID): Promise<Order | null>;
-  getOrderByReference(reference: string, phone?: string): Promise<PublicOrder | null>;
+  getOrderByReference(reference: string, phone: string): Promise<PublicOrder | null>;
   createOrder(order: Omit<Order, 'id' | 'reference' | 'createdAt' | 'updatedAt'>): Promise<Order>;
   updateOrderStatus(id: ID, status: OrderStatus): Promise<Order>;
   updateOrderDeliveryFee(id: ID, fee: number): Promise<Order>;

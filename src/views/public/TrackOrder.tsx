@@ -46,16 +46,16 @@ export default function TrackOrder() {
               id="tracking-reference"
               type="text" 
               required 
-              placeholder="2C-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX"
+              placeholder="2C-123456"
               value={reference} 
               onChange={e => setReference(e.target.value)}
               className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-primary focus:border-primary"
             />
           </div>
-          {isLegacy && <div>
+          <div>
             <label htmlFor="tracking-phone" className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
             <input id="tracking-phone" type="tel" required maxLength={32} value={phone} onChange={e => setPhone(e.target.value)} placeholder="Number used for the order" className="w-full border border-gray-300 rounded-md px-4 py-2" />
-          </div>}
+          </div>
           <button 
             type="submit" 
             disabled={loading}

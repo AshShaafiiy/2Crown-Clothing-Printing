@@ -1,0 +1,57 @@
+# Placeholder domain for Phase 8B documentation
+# Replace with actual domain in Phase 8C, e.g. 2crown.com.ng
+
+# Temporary local testing
+:80 {
+    root * /srv/public
+    encode gzip
+    header {
+        -Server
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy no-referrer
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+        Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    }
+    # HTTP-only local stack: HSTS/upgrade-insecure-requests await HTTPS deployment.
+    @api path /auth /auth/* /products /products/* /categories /categories/* /promotions /promotions/* /orders /orders/* /ratings /ratings/* /settings /settings/* /admins /admins/* /dashboard /dashboard/* /api /api/*
+    handle @api {
+        reverse_proxy app:4000
+    }
+    @private path_regexp private (?i)(^|/)(\.[^/]+|backend|src|backups|node_modules|scripts|Dockerfile|Caddyfile|docker-compose\.yml)(/|$)|\.(sqlite3?(-wal|-shm)?|db|map|env|ts|tsx)$
+    handle @private {
+        header Content-Type application/json
+        respond `{"error":"Not found"}` 404
+    }
+    handle {
+        try_files {path} /index.html
+        file_server {
+            hide .*
+        }
+    }
+}
+
+# Production template (uncomment for Phase 8C):
+# example.com {
+#     root * /srv/public
+#     encode gzip
+#
+#     @static {
+#         file
+#     }
+#     handle @static {
+#         file_server
+#     }
+#
+#     @api {
+#         path /auth /auth/* /products /products/* /categories /categories/* /promotions /promotions/* /orders /orders/* /ratings /ratings/* /settings /settings/* /admins /admins/* /dashboard /dashboard/* /api /api/*
+#     }
+#     handle @api {
+#         reverse_proxy app:4000
+#     }
+#
+#     handle {
+#         try_files {path} /index.html
+#         file_server
+#     }
+# }

@@ -16,7 +16,7 @@ describe('whatsapp utility', () => {
   it('should format a normal order message correctly', () => {
     const mockOrder: Order = {
       id: '1',
-      reference: '2C-12345',
+      reference: '2C-123456',
       customerName: 'John Doe',
       customerEmail: 'john@example.com',
       customerPhone: '08012345678',
@@ -44,7 +44,7 @@ describe('whatsapp utility', () => {
     const encoded = generateWhatsAppOrderMessage(mockOrder);
     const decoded = decodeURIComponent(encoded);
 
-    expect(decoded).toContain('*NEW ORDER: 2C-12345*');
+    expect(decoded).toContain('*NEW ORDER: 2C-123456*');
     expect(decoded).toContain('Name: John Doe');
     expect(decoded).toContain('Phone: 08012345678');
     expect(decoded).toContain('Email: john@example.com');
@@ -61,7 +61,7 @@ describe('whatsapp utility', () => {
   it('should exclude delivery address if method is pickup', () => {
     const mockOrder: Order = {
       id: '2',
-      reference: '2C-99999',
+      reference: '2C-999999',
       customerName: 'Bob',
       customerPhone: '1234',
       items: [],

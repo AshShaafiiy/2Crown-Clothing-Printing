@@ -24,7 +24,7 @@ describe('MockOrderService', () => {
     const createdOrder = await service.createOrder(newOrderData);
     
     expect(createdOrder.id).toBeDefined();
-    expect(createdOrder.reference).toMatch(/^2C-[A-F0-9]{8}(?:-[A-F0-9]{8}){3}$/);
+    expect(createdOrder.reference).toMatch(/^2C-\d{6}$/);
     expect(createdOrder.createdAt).toBeDefined();
     expect(createdOrder.updatedAt).toBeDefined();
     expect(createdOrder.customerName).toBe(newOrderData.customerName);
@@ -64,7 +64,7 @@ describe('MockOrderService', () => {
       deliveryMethod: 'local',
     });
 
-    const fetchedOrder = await service.getOrderByReference(order.reference);
+    const fetchedOrder = await service.getOrderByReference(order.reference, order.customerPhone);
     expect(fetchedOrder).not.toBeNull();
     expect(fetchedOrder?.reference).toBe(order.reference);
   });
@@ -73,7 +73,7 @@ describe('MockOrderService', () => {
     const byId = await service.getOrderById('invalid-id');
     expect(byId).toBeNull();
     
-    const byRef = await service.getOrderByReference('invalid-ref');
+    const byRef = await service.getOrderByReference('invalid-ref', '09000000000');
     expect(byRef).toBeNull();
   });
 
