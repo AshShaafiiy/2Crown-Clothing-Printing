@@ -1,17 +1,13 @@
 const fs = require('fs');
+const path = 'PROJECT_HANDOFF.md';
+let content = fs.readFileSync(path, 'utf8');
 
-let content = fs.readFileSync('PROJECT_HANDOFF.md', 'utf8');
-
-const newRules = `
-## Final Accepted Badge Rules
-- **% OFF** = light red/pink background + darker red text (\`bg-red-100 text-red-800\`)
-- **NEW** = blue background + white text (\`bg-blue-500 text-white\`)
-- **FEATURED** = black background + white text (\`bg-secondary text-white\`)
-- **SALE** = completely removed
-- **NEW Expiry** = expires automatically after 24 hours
+const newRule = `
+## Category Slug Synchronization
+Category slugs are automatically derived from Category names and automatically update when the Category name changes. Product-category relationships rely on Category document IDs, not slugs.
 `;
 
-if (!content.includes('Final Accepted Badge Rules')) {
-  content = content.replace('## 4. Current State', '## 4. Current State' + newRules);
-  fs.writeFileSync('PROJECT_HANDOFF.md', content);
+if (!content.includes('Category Slug Synchronization')) {
+  content = content.replace('## 4. Current State', '## 4. Current State' + newRule);
+  fs.writeFileSync(path, content);
 }

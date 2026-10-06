@@ -3,6 +3,17 @@ import { categoryRepository, productRepository } from '@/backend/repositories';
 import { CategoryInputSchema } from '@/backend/schemas';
 import { authenticateNext, parseBody, requireRolesNext } from '@/backend/utils/next-utils';
 
+
+function generateSlug(text) {
+  if (!text) return '';
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   const { id } = await params;
   let cat = await categoryRepository.findById(id);
@@ -26,6 +37,11 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   const { data, error, status } = await parseBody(req, CategoryInputSchema);
   if (error) return NextResponse.json(error, { status });
 
+  data.slug = generateSlug(data.name);
+  const existingBySlug = await categoryRepository.findBySlug(data.slug);
+  if (existingBySlug && existingBySlug.id !== id) {
+    return NextResponse.json({ error: 'A category with a similar name already exists.' }, { status: 409 });
+  }
   const updated = await categoryRepository.update(id, data!);
   return NextResponse.json(updated);
 }

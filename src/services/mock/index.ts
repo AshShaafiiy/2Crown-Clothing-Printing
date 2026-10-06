@@ -165,6 +165,17 @@ export class MockProductService implements IProductService {
   }
 }
 
+
+function generateSlug(text: string): string {
+  if (!text) return '';
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 export class MockCategoryService implements ICategoryService {
   async getCategories(): Promise<Category[]> {
     return categories.sort((a, b) => a.order - b.order);
@@ -176,14 +187,33 @@ export class MockCategoryService implements ICategoryService {
     return categories.find(c => c.slug === slug) || null;
   }
   async createCategory(category: Omit<Category, 'id'>): Promise<Category> {
-    const newCategory: Category = { ...category, id: `cat-${Date.now()}`, createdAt: new Date().toISOString() };
+    const slug = generateSlug(category.name);
+    if (categories.find(c => c.slug === slug)) {
+      throw new Error('A category with a similar name already exists.');
+    }
+    const newCategory: Category = { ...category, slug, id: `cat-${Math.random()}`, createdAt: new Date().toISOString() };
     categories.push(newCategory);
     return newCategory;
   }
   async updateCategory(id: ID, category: Partial<Category>): Promise<Category> {
     const index = categories.findIndex(c => c.id === id);
     if (index === -1) throw new Error('Category not found');
-    categories[index] = { ...categories[index], ...category, id: categories[index].id, createdAt: categories[index].createdAt };
+    
+    let updatedSlug = categories[index].slug;
+    if (category.name) {
+      updatedSlug = generateSlug(category.name);
+      if (categories.find(c => c.slug === updatedSlug && c.id !== id)) {
+        throw new Error('A category with a similar name already exists.');
+      }
+    }
+
+    categories[index] = { 
+      ...categories[index], 
+      ...category, 
+      slug: updatedSlug,
+      id: categories[index].id, 
+      createdAt: categories[index].createdAt 
+    };
     return categories[index];
   }
   async deleteCategory(id: ID): Promise<void> {
