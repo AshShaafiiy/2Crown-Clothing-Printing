@@ -59,7 +59,7 @@ describe('ProductDetails Cart UX', () => {
     });
     
     // 3. + -> 2
-    const incBtn = screen.getByLabelText('Increase quantity');
+    const incBtn = screen.getByRole('button', { name: /Increase quantity/i });
     fireEvent.click(incBtn);
     
     await waitFor(() => {
@@ -74,7 +74,7 @@ describe('ProductDetails Cart UX', () => {
     });
 
     // 5. - -> 2
-    const decBtn = screen.getByLabelText('Decrease quantity');
+    const decBtn = screen.getByRole('button', { name: /Decrease quantity/i });
     fireEvent.click(decBtn);
     await waitFor(() => {
       expect(screen.getByText('2')).toBeInTheDocument();
