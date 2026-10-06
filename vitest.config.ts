@@ -6,6 +6,9 @@ export default defineConfig({
     globals: true,
     exclude: ['node_modules', 'dist', '**/*.js', '**/*.spec.ts'],
     fileParallelism: false,
+    pool: 'forks',
+    isolate: false,
+    teardownTimeout: 10000,
     environmentMatchGlobs: [
       ['src/views/**', 'jsdom'],
       ['src/components/**', 'jsdom'],
@@ -13,11 +16,6 @@ export default defineConfig({
       ['tests/**/*.ts', 'node'],
       ['src/services/**', 'node'],
       ['src/utils/**', 'node']
-    ],
-    poolOptions: {
-      threads: {
-        singleThread: true
-      }
-    }
+    ]
   },
 });
