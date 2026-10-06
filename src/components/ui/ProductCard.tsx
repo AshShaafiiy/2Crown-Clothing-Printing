@@ -21,16 +21,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
-    addItem({
-      id: `cart-item-${Date.now()}`,
-      productId: product.id,
-      productSlug: product.slug,
-      productName: product.name,
-      price: product.price,
-      previousPrice: product.previousPrice,
-      quantity: 1,
-      imageUrl: product.imageUrl,
-    });
+    addItem(toCartItem(product, 1));
     toast.success(`Added ${product.name} to cart!`);
   };
 

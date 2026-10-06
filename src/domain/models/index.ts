@@ -20,6 +20,7 @@ export interface ProductVariant {
   attributes: Record<string, string>; 
   price: number;
   previousPrice?: number;
+  previousPrice?: number;
   sku?: string;
 }
 
@@ -40,7 +41,8 @@ export interface Product {
   slug: string;
   description: string;
   categoryId: ID;
-  price: number; // in NGN ₦
+  price: number;
+  previousPrice?: number; // in NGN ₦
   previousPrice?: number;
   imageUrl: string;
   featured: boolean;
@@ -87,6 +89,7 @@ export interface OrderItem {
   productName: string;
   quantity: number;
   price: number;
+  previousPrice?: number;
   imageUrl?: string;
   variantId?: ID;
   variantName?: string;

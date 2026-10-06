@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 
+import { toCartItem } from '../../utils/cartUtils';
 import { services } from '../../services';
 import { useCartStore } from '../../store/cartStore';
 import { Product, ProductVariant, CustomizationField } from '../../domain/models';
@@ -93,18 +94,17 @@ const ProductDetails: React.FC = () => {
       Object.entries(customization).filter(([_, v]) => v !== '' && v !== null && v !== undefined)
     );
 
-    addItem({
-      id: `cart-item-${Date.now()}`,
-      productId: product.id,
-      productSlug: product.slug,
-      productName: product.name,
-      price: finalPrice,
-      quantity: 1,
-      imageUrl: product.imageUrl,
-      variantId: selectedVariantId || undefined,
+        const finalPreviousPrice = selectedVariant ? selectedVariant.previousPrice : product.previousPrice;
+    
+    addItem(toCartItem(
+      product,
+      1,
+      selectedVariantId || undefined,
       variantName,
-      customization: Object.keys(finalCustomization).length > 0 ? finalCustomization : undefined,
-    });
+      Object.keys(finalCustomization).length > 0 ? finalCustomization : undefined,
+      finalPrice,
+      finalPreviousPrice
+    ));
     
     toast.success(`Added 1x ${product.name} to cart!`);
   };

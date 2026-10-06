@@ -99,6 +99,10 @@ Copy `.env.example` to `.env.local` and fill in the values.
 - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
 - `NEXT_PUBLIC_FIREBASE_APP_ID`
 
+**Application Security (server-only):**
+- `BUYER_FINGERPRINT_SECRET` (HMAC buyer fingerprinting)
+- `RATING_TOKEN_SECRET` (JWT rating verification token)
+
 **Firebase Admin (server-only, never exposed to browser):**
 - `FIREBASE_PROJECT_ID`
 - `FIREBASE_CLIENT_EMAIL`
