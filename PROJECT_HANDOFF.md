@@ -127,3 +127,10 @@ After every substantial accepted work batch:
 Vercel Hobby currently works technically for this application.
 Commercial-use compliance remains a Vercel platform-policy consideration.
 The project is consciously accepting that operational risk for now.
+
+
+## Git Safety Rule
+- **NEVER** use `git push --force` or `git push -f` against `main` during normal 2Crown work.
+- Do not rewrite shared `main` history.
+- If an accidental commit needs correction, prefer a new corrective commit.
+- Force-push may only occur with explicit user authorization for that specific operation.

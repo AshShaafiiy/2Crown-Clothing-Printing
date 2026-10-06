@@ -55,6 +55,13 @@ Keep the implemented Next.js/Firebase architecture and secure production boot ch
 - Do NOT reintroduce the "Shop by Category", "How Custom Orders Work", or "Testimonials" sections to the Homepage.
 - Do NOT replace the existing Firestore/Firebase backend or restore the old Express/SQLite backend.
 
+
+## 8. Git Safety Rule
+- **NEVER** use `git push --force` or `git push -f` against `main` during normal 2Crown work.
+- Do not rewrite shared `main` history.
+- If an accidental commit needs correction, prefer a new corrective commit.
+- Force-push may only occur with explicit user authorization for that specific operation.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know
