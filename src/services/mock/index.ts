@@ -308,6 +308,14 @@ export class MockReviewService implements IReviewService {
   async checkEligibility(productId: ID): Promise<{ eligible: boolean; reason: string; existingRating?: number }> {
     return { eligible: true, reason: 'eligible' }; // mock always eligible for UI testing if not logged in? Wait, let's just make it always eligible in mock for now
   }
+  
+  async verifyPurchase(productId: ID, reference: string, phone: string): Promise<{ token: string; existingRating?: number }> {
+    if (reference === '2C-123456') {
+      return { token: 'mock-token', existingRating: undefined };
+    }
+    throw new Error('We couldn\'t verify this purchase.');
+  }
+
   async getRatingSummary(productId: ID): Promise<{ average: number; count: number }> {
     const productReviews = reviews.filter(r => r.productId === productId && r.approved);
     if (productReviews.length === 0) return { average: 0, count: 0 };

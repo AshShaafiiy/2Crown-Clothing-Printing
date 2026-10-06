@@ -41,6 +41,7 @@ export interface IOrderService {
 
 
 export interface IReviewService {
+  verifyPurchase(productId: string, reference: string, phone: string): Promise<{ token: string; existingRating?: number }>;
   getReviewsByProductId(productId: ID): Promise<Review[]>;
   checkEligibility?(productId: ID): Promise<{ eligible: boolean; reason: string; existingRating?: number }>;
   getRatingSummary(productId: ID): Promise<{ average: number; count: number }>;

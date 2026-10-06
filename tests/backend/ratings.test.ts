@@ -1,130 +1,131 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { POST as verifyPOST } from '../../app/api/ratings/[productId]/verify/route';
 import { GET, POST } from '../../app/api/ratings/[productId]/route';
-import { reviewRepository, orderRepository } from '../../src/backend/repositories';
-import * as nextUtils from '../../src/backend/utils/next-utils';
+import * as orderRepo from '../../src/backend/repositories/OrderRepository';
+import * as reviewRepo from '../../src/backend/repositories/ReviewRepository';
+import jwt from 'jsonwebtoken';
 
-vi.mock('../../src/backend/repositories', () => ({
-  reviewRepository: {
-    getRatingSummary: vi.fn(),
-    findById: vi.fn(),
-    create: vi.fn(),
-    update: vi.fn()
-  },
+vi.mock('../../src/backend/repositories/OrderRepository', () => ({
   orderRepository: {
-    checkPurchaseStatus: vi.fn()
+    findByReference: vi.fn()
   }
 }));
 
-vi.mock('../../src/backend/utils/next-utils', () => ({
-  authenticateCustomerNext: vi.fn(),
-  parseBody: vi.fn()
+vi.mock('../../src/backend/repositories/ReviewRepository', () => ({
+  reviewRepository: {
+    findById: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    getRatingSummary: vi.fn()
+  }
 }));
 
-describe('Ratings API (Verified Purchase)', () => {
+const mockOrder = {
+  id: 'order1',
+  status: 'Delivered',
+  customerPhone: '09012345678',
+  items: [{ productId: 'prod1' }]
+};
+
+function createReq(body: any, method = 'POST', authHeader?: string) {
+  const headers = new Headers();
+  if (authHeader) headers.set('authorization', authHeader);
+  return new Request('http://localhost:3000/api/test', {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined
+  });
+}
+
+describe('Ratings API (Accountless)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('rejects unauthenticated user for eligibility', async () => {
-    vi.spyOn(nextUtils, 'authenticateCustomerNext').mockResolvedValue({ error: 'Unauthorized' });
-    const req = new Request('http://localhost/api/ratings/prod1?eligibility=true');
-    const res = await GET(req, { params: { productId: 'prod1' } });
-    const data = await res.json();
-    expect(data.eligible).toBe(false);
-    expect(data.reason).toBe('not_authenticated');
-  });
+  describe('Verification Endpoint', () => {
+    it('rejects wrong reference', async () => {
+      (orderRepo.orderRepository.findByReference as any).mockResolvedValue(null);
+      const req = createReq({ reference: '2C-111111', phone: '09012345678' });
+      const res = await verifyPOST(req, { params: { productId: 'prod1' } });
+      expect(res.status).toBe(404);
+      expect(await res.json()).toHaveProperty('error', "We couldn't verify this purchase.");
+    });
 
-  it('rejects unauthenticated user for POST', async () => {
-    vi.spyOn(nextUtils, 'authenticateCustomerNext').mockResolvedValue({ error: 'Unauthorized', status: 401 });
-    const req = new Request('http://localhost/api/ratings/prod1', { method: 'POST' });
-    const res = await POST(req, { params: { productId: 'prod1' } });
-    expect(res.status).toBe(401);
-  });
+    it('rejects wrong phone', async () => {
+      (orderRepo.orderRepository.findByReference as any).mockResolvedValue(mockOrder);
+      const req = createReq({ reference: '2C-123456', phone: '08000000000' }); // diff phone
+      const res = await verifyPOST(req, { params: { productId: 'prod1' } });
+      expect(res.status).toBe(404);
+    });
 
-  it('rejects if no purchase found', async () => {
-    vi.spyOn(nextUtils, 'authenticateCustomerNext').mockResolvedValue({ uid: 'cust1' });
-    vi.spyOn(orderRepository, 'checkPurchaseStatus').mockResolvedValue({ purchased: false, delivered: false });
+    it('rejects product absent from order', async () => {
+      (orderRepo.orderRepository.findByReference as any).mockResolvedValue(mockOrder);
+      const req = createReq({ reference: '2C-123456', phone: '09012345678' });
+      const res = await verifyPOST(req, { params: { productId: 'wrongProd' } });
+      expect(res.status).toBe(404);
+    });
+
+    it('rejects non-Delivered order', async () => {
+      (orderRepo.orderRepository.findByReference as any).mockResolvedValue({ ...mockOrder, status: 'Preparing' });
+      const req = createReq({ reference: '2C-123456', phone: '09012345678' });
+      const res = await verifyPOST(req, { params: { productId: 'prod1' } });
+      expect(res.status).toBe(403);
+      expect(await res.json()).toHaveProperty('error', 'You can rate this product after delivery.');
+    });
+
+    it('allows valid verification and returns token', async () => {
+      (orderRepo.orderRepository.findByReference as any).mockResolvedValue(mockOrder);
+      (reviewRepo.reviewRepository.findById as any).mockResolvedValue(null);
+      const req = createReq({ reference: '2C-123456', phone: '09012345678' });
+      const res = await verifyPOST(req, { params: { productId: 'prod1' } });
+      expect(res.status).toBe(200);
+      const data = await res.json();
+      expect(data.token).toBeDefined();
+      expect(data.existingRating).toBeUndefined();
+    });
     
-    const req = new Request('http://localhost/api/ratings/prod1?eligibility=true');
-    const res = await GET(req, { params: { productId: 'prod1' } });
-    const data = await res.json();
-    expect(data.eligible).toBe(false);
-    expect(data.reason).toBe('not_purchased');
+    it('normalizes phone number correctly', async () => {
+      (orderRepo.orderRepository.findByReference as any).mockResolvedValue(mockOrder); // order has 09012345678
+      (reviewRepo.reviewRepository.findById as any).mockResolvedValue(null);
+      const req = createReq({ reference: '2C-123456', phone: '+2349012345678' }); // client sends +234
+      const res = await verifyPOST(req, { params: { productId: 'prod1' } });
+      expect(res.status).toBe(200);
+    });
   });
 
-  it('rejects if purchased but not delivered', async () => {
-    vi.spyOn(nextUtils, 'authenticateCustomerNext').mockResolvedValue({ uid: 'cust1' });
-    vi.spyOn(orderRepository, 'checkPurchaseStatus').mockResolvedValue({ purchased: true, delivered: false });
-    
-    const req = new Request('http://localhost/api/ratings/prod1?eligibility=true');
-    const res = await GET(req, { params: { productId: 'prod1' } });
-    const data = await res.json();
-    expect(data.eligible).toBe(false);
-    expect(data.reason).toBe('not_delivered');
-  });
+  describe('Rating POST Endpoint', () => {
+    it('rejects without token', async () => {
+      const req = createReq({ rating: 5 });
+      const res = await POST(req, { params: { productId: 'prod1' } });
+      expect(res.status).toBe(401);
+    });
 
-  it('allows rating if delivered and not already rated', async () => {
-    vi.spyOn(nextUtils, 'authenticateCustomerNext').mockResolvedValue({ uid: 'cust1' });
-    vi.spyOn(orderRepository, 'checkPurchaseStatus').mockResolvedValue({ purchased: true, delivered: true });
-    vi.spyOn(reviewRepository, 'findById').mockResolvedValue(null);
-    
-    const req = new Request('http://localhost/api/ratings/prod1?eligibility=true');
-    const res = await GET(req, { params: { productId: 'prod1' } });
-    const data = await res.json();
-    expect(data.eligible).toBe(true);
-    expect(data.reason).toBe('eligible');
-  });
+    it('rejects with token for wrong product', async () => {
+      const token = jwt.sign({ buyerFingerprint: 'fingerprint1', productId: 'wrongProd' }, process.env.JWT_SECRET || 'dev_secret');
+      const req = createReq({ rating: 5 }, 'POST', `Bearer ${token}`);
+      const res = await POST(req, { params: { productId: 'prod1' } });
+      expect(res.status).toBe(403);
+    });
 
-  it('indicates already rated if existing rating found', async () => {
-    vi.spyOn(nextUtils, 'authenticateCustomerNext').mockResolvedValue({ uid: 'cust1' });
-    vi.spyOn(orderRepository, 'checkPurchaseStatus').mockResolvedValue({ purchased: true, delivered: true });
-    vi.spyOn(reviewRepository, 'findById').mockResolvedValue({ rating: 4 } as any);
-    
-    const req = new Request('http://localhost/api/ratings/prod1?eligibility=true');
-    const res = await GET(req, { params: { productId: 'prod1' } });
-    const data = await res.json();
-    expect(data.eligible).toBe(true);
-    expect(data.reason).toBe('already_rated');
-    expect(data.existingRating).toBe(4);
-    // Ensure no private order data is leaked in the response keys
-    expect(Object.keys(data)).toEqual(['eligible', 'reason', 'existingRating']);
-  });
+    it('creates new rating', async () => {
+      const token = jwt.sign({ buyerFingerprint: 'fingerprint1', productId: 'prod1' }, process.env.JWT_SECRET || 'dev_secret');
+      (reviewRepo.reviewRepository.findById as any).mockResolvedValue(null);
+      const req = createReq({ rating: 4 }, 'POST', `Bearer ${token}`);
+      const res = await POST(req, { params: { productId: 'prod1' } });
+      expect(res.status).toBe(201);
+      expect(reviewRepo.reviewRepository.create).toHaveBeenCalled();
+      const callArgs = (reviewRepo.reviewRepository.create as any).mock.calls[0][0];
+      expect(callArgs.rating).toBe(4);
+      expect(callArgs.verifiedPurchase).toBe(true);
+    });
 
-  it('POST creates new rating if eligible and none exists', async () => {
-    vi.spyOn(nextUtils, 'authenticateCustomerNext').mockResolvedValue({ uid: 'cust1', name: 'Cust' });
-    vi.spyOn(orderRepository, 'checkPurchaseStatus').mockResolvedValue({ purchased: true, delivered: true });
-    vi.spyOn(nextUtils, 'parseBody').mockResolvedValue({ data: { rating: 5 } });
-    vi.spyOn(reviewRepository, 'findById').mockResolvedValue(null);
-    
-    const req = new Request('http://localhost/api/ratings/prod1', { method: 'POST' });
-    const res = await POST(req, { params: { productId: 'prod1' } });
-    expect(res.status).toBe(201);
-    expect(reviewRepository.create).toHaveBeenCalledWith(expect.objectContaining({
-      id: 'cust1_prod1',
-      rating: 5,
-      customerId: 'cust1'
-    }));
-  });
-
-  it('POST updates existing rating if one exists', async () => {
-    vi.spyOn(nextUtils, 'authenticateCustomerNext').mockResolvedValue({ uid: 'cust1' });
-    vi.spyOn(orderRepository, 'checkPurchaseStatus').mockResolvedValue({ purchased: true, delivered: true });
-    vi.spyOn(nextUtils, 'parseBody').mockResolvedValue({ data: { rating: 2 } });
-    vi.spyOn(reviewRepository, 'findById').mockResolvedValue({ rating: 5 } as any);
-    
-    const req = new Request('http://localhost/api/ratings/prod1', { method: 'POST' });
-    const res = await POST(req, { params: { productId: 'prod1' } });
-    expect(res.status).toBe(200);
-    expect(reviewRepository.update).toHaveBeenCalledWith('cust1_prod1', expect.objectContaining({
-      rating: 2
-    }));
-  });
-
-  it('aggregate excludes unverified legacy ratings', async () => {
-    // In our backend tests, we mock ReviewRepository entirely.
-    // Wait, the ReviewRepository is mocked, but we should test the actual ReviewRepository getRatingSummary logic.
-    // To do that we need a separate test file for ReviewRepository, or just let it be since it's just a query.
-    // But the prompt says "Add/update tests for: aggregate excludes unverified legacy rating".
-    expect(true).toBe(true); // placeholder if we don't test the DB logic locally
+    it('updates existing rating', async () => {
+      const token = jwt.sign({ buyerFingerprint: 'fingerprint1', productId: 'prod1' }, process.env.JWT_SECRET || 'dev_secret');
+      (reviewRepo.reviewRepository.findById as any).mockResolvedValue({ id: 'rating_fingerprint1_prod1', rating: 4 });
+      const req = createReq({ rating: 5 }, 'POST', `Bearer ${token}`);
+      const res = await POST(req, { params: { productId: 'prod1' } });
+      expect(res.status).toBe(200);
+      expect(reviewRepo.reviewRepository.update).toHaveBeenCalled();
+    });
   });
 });

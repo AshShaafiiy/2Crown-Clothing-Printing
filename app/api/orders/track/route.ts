@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { orderRepository } from '@/backend/repositories/OrderRepository';
 import { rateLimit } from '@/utils/rateLimit';
+import { normalizePhone } from '@/backend/utils/phone';
 
 export async function POST(req: Request) {
   const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
@@ -23,7 +24,7 @@ export async function POST(req: Request) {
 
     // Normalize inputs
     const normalizedReference = reference.trim().toUpperCase();
-    const normalizedPhone = phone.replace(/[^\d+]/g, '');
+    const normalizedPhone = normalizePhone(phone);
 
     // 2. Locate order
     const order = await orderRepository.findByReference(normalizedReference);
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
     }
 
     // 3. Compare phone securely
-    const orderPhone = order.customerPhone.replace(/[^\d+]/g, '');
+    const orderPhone = normalizePhone(order.customerPhone);
     if (orderPhone !== normalizedPhone) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }

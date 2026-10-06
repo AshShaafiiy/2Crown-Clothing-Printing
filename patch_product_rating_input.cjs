@@ -1,3 +1,7 @@
+const fs = require('fs');
+let code = fs.readFileSync('src/components/ui/ProductRatingInput.tsx', 'utf8');
+
+const newCode = `
 "use client";
 import React, { useState, useEffect } from 'react';
 import { Star } from 'lucide-react';
@@ -52,7 +56,7 @@ export const ProductRatingInput: React.FC<ProductRatingInputProps> = ({ productI
     setVerifyError('');
     try {
       const res = await services.reviews.verifyPurchase(productId, reference, phone);
-      localStorage.setItem(`rating_token_${productId}`, res.token);
+      localStorage.setItem(\`rating_token_\${productId}\`, res.token);
       setShowVerifyModal(false);
       check();
     } catch (err: any) {
@@ -203,3 +207,6 @@ export const ProductRatingInput: React.FC<ProductRatingInputProps> = ({ productI
     </div>
   );
 };
+`;
+
+fs.writeFileSync('src/components/ui/ProductRatingInput.tsx', newCode.trim());
