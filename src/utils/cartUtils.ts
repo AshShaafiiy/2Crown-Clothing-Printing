@@ -10,7 +10,7 @@ export function toCartItem(
   previousPriceOverride?: number
 ): OrderItem {
   return {
-    id: \`cart-item-\${Date.now()}-\${Math.random().toString(36).substring(2, 9)}\`,
+    id: `cart-item-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
     productId: product.id,
     productSlug: product.slug,
     productName: product.name,

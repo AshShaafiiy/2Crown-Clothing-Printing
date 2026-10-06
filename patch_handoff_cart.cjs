@@ -1,14 +1,12 @@
 const fs = require('fs');
-const path = 'PROJECT_HANDOFF.md';
-let content = fs.readFileSync(path, 'utf8');
+let code = fs.readFileSync('PROJECT_HANDOFF.md', 'utf8');
 
-const updatedRules = `
-## Cart Item Layout
-- Cart item layout uses a responsive ecommerce pattern: desktop places product information on the left, price summary upper-right, Remove lower-left, quantity lower-right; mobile compacts image/details and keeps Remove/quantity on a bottom action row.
-`;
+code = code.replace(/### Final Verification Status/, 
+`### Cart Data Consistency & Normalization
+- All add-to-cart entry points use one canonical \`toCartItem\` mapping.
+- Current \`price\` + \`previousPrice\` are preserved consistently regardless of source.
+- Cart discount presentation does not depend on whether the product was added from Home, Shop, or Product Details.
 
-if (!content.includes('Cart item layout uses a responsive ecommerce pattern')) {
-  content += '\n' + updatedRules;
-  fs.writeFileSync(path, content);
-  console.log("Updated PROJECT_HANDOFF.md for Cart layout");
-}
+### Final Verification Status`);
+
+fs.writeFileSync('PROJECT_HANDOFF.md', code);
