@@ -131,7 +131,6 @@ export class ApiReviewService implements IReviewService {
     } catch {
       return { eligible: false, reason: 'not_authenticated' };
     }
-  }>(`/ratings/${productId}?eligibility=true`);
   }
   
   async verifyPurchase(productId: ID, reference: string, phone: string): Promise<{ token: string; existingRating?: number }> {
@@ -144,6 +143,7 @@ export class ApiReviewService implements IReviewService {
   async getRatingSummary(productId: ID): Promise<{ average: number; count: number }> {
     return apiClient<{ average: number; count: number }>(`/ratings/${productId}`);
   }
+  
   async addReview(review: Omit<Review, 'id' | 'createdAt' | 'approved'>): Promise<Review> {
     const token = localStorage.getItem(`rating_token_${review.productId}`);
     if (!token) throw new Error('Not authenticated');
@@ -160,14 +160,6 @@ export class ApiReviewService implements IReviewService {
       throw new Error(data.error || 'Failed to submit rating');
     }
     return res.json();
-  }`, { 
-      method: 'POST', 
-      body: JSON.stringify({
-        rating: review.rating,
-        customerId: review.customerId,
-        customerName: review.customerName
-      }) 
-    });
   }
   async approveReview(_id: ID): Promise<void> {
     // Not explicitly in openapi.yaml
