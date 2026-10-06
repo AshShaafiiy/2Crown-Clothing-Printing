@@ -2,6 +2,7 @@
 import { useState } from 'react';
 
 import { Search } from 'lucide-react';
+import { normalizeOrderHistoryDate } from '../../utils/orderHistory';
 import { services } from '../../services';
 import { PublicOrder, OrderStatus } from '../../domain/models';
 import { getStatusLabel, getStatusDescription, getCustomerFacingStatus } from '../../utils/orderTransitions';
