@@ -78,7 +78,7 @@ The current task is to complete the **DOCUMENTATION + CROSS-ACCOUNT HANDOFF SYNC
 - Vercel "Hobby" plan is currently used; a decision on commercial production viability/upgrades is required before the final public launch.
 
 ## Verification State
-- **Latest Verified Test Count:** 214 tests pass across 16 test files. Verification state is **CLEAN**. Vitest runs exit cleanly with EXIT CODE 0. The transient worker-pool timeout during headless shutdown has been resolved.
+- **Latest Verified Test Count:** 214 passing tests (clean exit code 0) across 16 test files. Verification state is **CLEAN**. Vitest runs exit cleanly with EXIT CODE 0. The transient worker-pool timeout during headless shutdown has been resolved.
 - **Test Count History:** The current discovered test count is exactly 214 tests. This includes the comprehensive API tests, 44 Discount Badge tests, RBAC tests, TrackOrder integration tests, and new ProductCard/Home resilience tests.
 - **Build State:** Local `npm run build` succeeds cleanly.
 - **Local vs Remote E2E Status:** End-to-end functionality (Public flows, Admin flows) has been successfully verified against BOTH the local production build (Phase 12) AND the remote Vercel deployment (Phase 15). The `/admin` production runtime crash and Homepage `This page couldn't load` crash have been confirmed resolved on the live deployment. The `/admin/settings` initialization crash has been resolved and the Browse Collection hover interaction verified remotely. Product and Category Edit/Delete operations have been validated. Favicon configuration is verified with new rounded corners.
