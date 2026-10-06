@@ -1,22 +1,35 @@
 const fs = require('fs');
-const path = 'src/views/public/TrackOrder.tsx';
-let content = fs.readFileSync(path, 'utf8');
+let code = fs.readFileSync('src/views/public/TrackOrder.tsx', 'utf8');
 
-// Replace grid grid-cols-2 with flex flex-col sm:flex-row sm:justify-between
-content = content.replace(/<div className="grid grid-cols-2 gap-4 py-3 border-b border-gray-100">/g, 
-  '<div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4 py-3 border-b border-gray-100">');
+if (!code.includes("import { normalizeOrderHistoryDate }")) {
+  code = code.replace("import { Package, Truck, CheckCircle, Clock } from 'lucide-react';", "import { Package, Truck, CheckCircle, Clock } from 'lucide-react';\nimport { normalizeOrderHistoryDate } from '../../utils/orderHistory';");
+}
 
-// For Order Items, change to match
-content = content.replace(
-  /<div className="py-3 border-b border-gray-100">\s*<div className="text-gray-500 mb-2">Order Items<\/div>/,
-  `<div className="py-3 border-b border-gray-100">\n              <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4 mb-2">\n                <div className="text-gray-500">Order Items</div>\n              </div>`
-);
+const target = `                  // Find timestamp from history if available
+                  let timestamp = '';
+                  if (order.history) {
+                    const entry = order.history.find(h => getCustomerFacingStatus(h.newStatus) === status);
+                    if (entry) timestamp = new Date(entry.timestamp).toLocaleString();
+                  }
+                  if (index === 0 && !timestamp) timestamp = new Date(order.createdAt).toLocaleString();`;
 
-// We need to also check if getStatusLabel handles "WhatsApp Pending". 
-// Wait, the status is replaced in the API to be "Awaiting Confirmation". But what if an old order has "WhatsApp Pending"? 
-// The prompt says: 'If the UI currently says: WhatsApp Pending ... determine whether that is a separate WhatsApp communication state or incorrectly replacing the actual order status. Do NOT conflate: WhatsApp state with Order lifecycle status.'
-// The `getStatusLabel` does not know "WhatsApp Pending" because it's not a valid status in the new system.
-// We should make sure `status` is displayed correctly.
+const replacement = `                  // Find timestamp from history if available
+                  let timestamp = '';
+                  if (order.history) {
+                    const entry = order.history.find(h => {
+                      const entryStatus = h.newStatus || (h as any).status;
+                      if (!entryStatus) return false;
+                      return getCustomerFacingStatus(entryStatus) === status;
+                    });
+                    if (entry) {
+                      const normalized = normalizeOrderHistoryDate(entry.timestamp);
+                      if (normalized) timestamp = new Date(normalized).toLocaleString();
+                    }
+                  }
+                  if (index === 0 && !timestamp) {
+                    const normCreatedAt = normalizeOrderHistoryDate(order.createdAt);
+                    if (normCreatedAt) timestamp = new Date(normCreatedAt).toLocaleString();
+                  }`;
 
-fs.writeFileSync(path, content);
-console.log("Updated TrackOrder.tsx layout");
+code = code.replace(target, replacement);
+fs.writeFileSync('src/views/public/TrackOrder.tsx', code);

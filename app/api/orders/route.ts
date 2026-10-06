@@ -23,10 +23,12 @@ export async function POST(req: Request) {
   if (error) return NextResponse.json(error, { status });
 
   const now = new Date().toISOString();
-  const initialHistory = [{
-    status: 'Awaiting Confirmation',
+    const initialHistory = [{
+    id: uuid(),
+    newStatus: 'Awaiting Confirmation',
     timestamp: now,
-    comment: 'Order placed and awaiting admin confirmation.'
+    actorName: 'System',
+    note: 'Order placed and awaiting admin confirmation.'
   }];
 
   const newOrder = {
