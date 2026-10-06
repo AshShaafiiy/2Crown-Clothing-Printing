@@ -30,9 +30,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <div className="absolute top-3 left-3 flex flex-col gap-2">
           {computeProductBadges(product).map((badge, idx) => {
             // Apply different styles based on badge type
-            let badgeClass = "bg-primary text-secondary";
+            let badgeClass = "bg-red-100 text-red-800"; // default for discount
             if (badge.type === 'status' && badge.label === 'NEW') {
-               badgeClass = "bg-white text-secondary border border-gray-200";
+               badgeClass = "bg-blue-500 text-white";
             } else if (badge.label === 'FEATURED') {
                badgeClass = "bg-secondary text-white";
             }

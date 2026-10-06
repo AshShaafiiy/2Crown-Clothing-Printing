@@ -146,14 +146,15 @@ const ProductDetails: React.FC = () => {
           </div>
           <div className="mb-6 flex flex-wrap gap-2">
             {computeProductBadges(product).map((badge, idx) => {
-              let badgeClass = "bg-primary text-secondary";
-              if (badge.type === 'status' && badge.label === 'NEW') {
-                 badgeClass = "bg-white text-secondary border border-gray-200";
-              } else if (badge.label === 'FEATURED') {
-                 badgeClass = "bg-secondary text-white";
-              }
-              return (
-                <span key={idx} className={`${badgeClass} text-xs font-bold px-3 py-1 rounded shadow-sm uppercase tracking-wider`}>
+              let badgeClass = "bg-red-100 text-red-800"; // default for discount
+            if (badge.type === 'status' && badge.label === 'NEW') {
+               badgeClass = "bg-blue-500 text-white";
+            } else if (badge.label === 'FEATURED') {
+               badgeClass = "bg-secondary text-white";
+            }
+
+            return (
+              <span key={idx} className={`${badgeClass} text-xs font-bold px-2 py-1 rounded shadow-sm`}>
                   {badge.label}
                 </span>
               );
