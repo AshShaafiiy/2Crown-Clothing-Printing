@@ -33,8 +33,8 @@ describe('Cart UX', () => {
     // Show quantity 2
     expect(screen.getByText('2')).toBeInTheDocument();
 
-    const incBtn = screen.getByLabelText('Increase quantity');
-    const decBtn = screen.getByLabelText('Decrease quantity');
+    const incBtn = screen.getByLabelText(/Increase quantity/i);
+    const decBtn = screen.getByLabelText(/Decrease quantity/i);
 
     fireEvent.click(incBtn);
     await waitFor(() => {
