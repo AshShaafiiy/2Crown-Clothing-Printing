@@ -7,7 +7,7 @@ export default defineConfig({
     exclude: ['node_modules', 'dist', '**/*.js', '**/*.spec.ts'],
     fileParallelism: false,
     pool: 'forks',
-    isolate: false,
+    
     teardownTimeout: 10000,
     environmentMatchGlobs: [
       ['src/views/**', 'jsdom'],
