@@ -4,7 +4,7 @@ import { SubmitRatingSchema } from '@/backend/schemas';
 import { parseBody } from '@/backend/utils/next-utils';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
+const TOKEN_SECRET = process.env.RATING_TOKEN_SECRET || process.env.JWT_SECRET || 'dev_token_secret';
 
 export async function GET(req: Request, { params }: { params: { productId: string } }) {
   const { productId } = await params;
@@ -20,7 +20,7 @@ export async function GET(req: Request, { params }: { params: { productId: strin
     
     const token = authHeader.split(' ')[1];
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as any;
+      const decoded = jwt.verify(token, TOKEN_SECRET) as any;
       if (decoded.productId !== productId) {
         return NextResponse.json({ eligible: false, reason: 'not_authenticated' });
       }
@@ -52,7 +52,7 @@ export async function POST(req: Request, { params }: { params: { productId: stri
   const token = authHeader.split(' ')[1];
   let decoded;
   try {
-    decoded = jwt.verify(token, JWT_SECRET) as any;
+    decoded = jwt.verify(token, TOKEN_SECRET) as any;
   } catch (e) {
     return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
   }

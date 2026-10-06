@@ -4,7 +4,8 @@ import { normalizePhone } from '@/backend/utils/phone';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
+const FINGERPRINT_SECRET = process.env.BUYER_FINGERPRINT_SECRET || process.env.JWT_SECRET || 'dev_fingerprint_secret';
+const TOKEN_SECRET = process.env.RATING_TOKEN_SECRET || process.env.JWT_SECRET || 'dev_token_secret';
 
 export async function POST(req: Request, { params }: { params: { productId: string } }) {
   const { productId } = await params;
@@ -44,11 +45,11 @@ export async function POST(req: Request, { params }: { params: { productId: stri
       }, { status: 403 });
     }
 
-    const buyerFingerprint = crypto.createHmac('sha256', JWT_SECRET)
+    const buyerFingerprint = crypto.createHmac('sha256', FINGERPRINT_SECRET)
                                    .update(normalizedClientPhone)
                                    .digest('hex');
 
-    const token = jwt.sign({ buyerFingerprint, productId }, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ buyerFingerprint, productId }, TOKEN_SECRET, { expiresIn: '1h' });
 
     const existingId = `rating_${buyerFingerprint}_${productId}`;
     const existingRating = await reviewRepository.findById(existingId);

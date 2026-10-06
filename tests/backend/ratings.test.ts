@@ -101,14 +101,14 @@ describe('Ratings API (Accountless)', () => {
     });
 
     it('rejects with token for wrong product', async () => {
-      const token = jwt.sign({ buyerFingerprint: 'fingerprint1', productId: 'wrongProd' }, process.env.JWT_SECRET || 'dev_secret');
+      const token = jwt.sign({ buyerFingerprint: 'fingerprint1', productId: 'wrongProd' }, process.env.RATING_TOKEN_SECRET || process.env.JWT_SECRET || 'dev_token_secret');
       const req = createReq({ rating: 5 }, 'POST', `Bearer ${token}`);
       const res = await POST(req, { params: { productId: 'prod1' } });
       expect(res.status).toBe(403);
     });
 
     it('creates new rating', async () => {
-      const token = jwt.sign({ buyerFingerprint: 'fingerprint1', productId: 'prod1' }, process.env.JWT_SECRET || 'dev_secret');
+      const token = jwt.sign({ buyerFingerprint: 'fingerprint1', productId: 'prod1' }, process.env.RATING_TOKEN_SECRET || process.env.JWT_SECRET || 'dev_token_secret');
       (reviewRepo.reviewRepository.findById as any).mockResolvedValue(null);
       const req = createReq({ rating: 4 }, 'POST', `Bearer ${token}`);
       const res = await POST(req, { params: { productId: 'prod1' } });
@@ -120,7 +120,7 @@ describe('Ratings API (Accountless)', () => {
     });
 
     it('updates existing rating', async () => {
-      const token = jwt.sign({ buyerFingerprint: 'fingerprint1', productId: 'prod1' }, process.env.JWT_SECRET || 'dev_secret');
+      const token = jwt.sign({ buyerFingerprint: 'fingerprint1', productId: 'prod1' }, process.env.RATING_TOKEN_SECRET || process.env.JWT_SECRET || 'dev_token_secret');
       (reviewRepo.reviewRepository.findById as any).mockResolvedValue({ id: 'rating_fingerprint1_prod1', rating: 4 });
       const req = createReq({ rating: 5 }, 'POST', `Bearer ${token}`);
       const res = await POST(req, { params: { productId: 'prod1' } });
