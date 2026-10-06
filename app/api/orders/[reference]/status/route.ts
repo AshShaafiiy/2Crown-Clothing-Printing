@@ -12,7 +12,7 @@ export async function PATCH(req: Request, { params }: { params: { reference: str
   // Note: the route says [reference] but it's used as ID based on the old code.
   // Actually, Vercel frontend uses the ID in /api/orders/:id/status.
   // Let's use it as ID.
-  const { reference: id } = params;
+  const { reference: id } = await params;
   const existing = await orderRepository.findById(id);
   if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 

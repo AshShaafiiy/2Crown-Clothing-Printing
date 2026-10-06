@@ -5,13 +5,13 @@ import { parseBody } from '@/backend/utils/next-utils';
 import { v4 as uuid } from 'uuid';
 
 export async function GET(req: Request, { params }: { params: { productId: string } }) {
-  const { productId } = params;
+  const { productId } = await params;
   const summary = await reviewRepository.getRatingSummary(productId);
   return NextResponse.json(summary);
 }
 
 export async function POST(req: Request, { params }: { params: { productId: string } }) {
-  const { productId } = params;
+  const { productId } = await params;
   
   const { data, error, status } = await parseBody(req, SubmitRatingSchema);
   if (error) return NextResponse.json(error, { status });

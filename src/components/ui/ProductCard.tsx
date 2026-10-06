@@ -32,13 +32,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             // Apply different styles based on badge type
             let badgeClass = "bg-primary text-secondary";
             if (badge.type === 'status' && badge.label === 'NEW') {
-               badgeClass = "bg-blue-500 text-white";
+               badgeClass = "bg-white text-secondary border border-gray-200";
             } else if (badge.label === 'FEATURED') {
                badgeClass = "bg-secondary text-white";
             }
 
             return (
-              <span key={idx} className={`${badgeClass} text-[10px] sm:text-xs font-bold px-2 py-1 rounded shadow-sm`}>
+              <span key={idx} className={`${badgeClass} text-xs font-bold px-2 py-1 rounded shadow-sm`}>
                 {badge.label}
               </span>
             );

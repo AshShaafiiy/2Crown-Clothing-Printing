@@ -10,7 +10,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   const authErr = requireRolesNext(user, MANAGER_ROLES);
   if (authErr) return NextResponse.json({ error: authErr.error }, { status: authErr.status });
 
-  const { id } = params;
+  const { id } = await params;
   const admin = await userRepository.findById(id);
   if (!admin || admin.role === 'customer') return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json(adminDto(admin as any));
@@ -23,7 +23,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
   const authErr = requireRolesNext(currentUser, MANAGER_ROLES);
   if (authErr) return NextResponse.json({ error: authErr.error }, { status: authErr.status });
 
-  const { id } = params;
+  const { id } = await params;
   const targetUser = await userRepository.findById(id);
   
   if (!targetUser || targetUser.role === 'customer') return NextResponse.json({ error: 'Not found' }, { status: 404 });

@@ -4,7 +4,7 @@ import { ProductInputSchema } from '@/backend/schemas';
 import { authenticateNext, requireRolesNext, parseBody } from '@/backend/utils/next-utils';
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+  const { id } = await params;
   let product = await productRepository.findById(id);
   if (!product) {
     product = await productRepository.findBySlug(id);
@@ -20,7 +20,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   const roleError = requireRolesNext(user, ['root_super_admin', 'super_admin', 'admin']);
   if (roleError) return NextResponse.json({ error: roleError.error }, { status: roleError.status });
 
-  const { id } = params;
+  const { id } = await params;
   const existing = await productRepository.findById(id);
   if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
@@ -38,7 +38,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
   const roleError = requireRolesNext(user, ['root_super_admin', 'super_admin', 'admin']);
   if (roleError) return NextResponse.json({ error: roleError.error }, { status: roleError.status });
 
-  const { id } = params;
+  const { id } = await params;
   const existing = await productRepository.findById(id);
   if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 

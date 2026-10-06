@@ -148,7 +148,7 @@ const ProductDetails: React.FC = () => {
             {computeProductBadges(product).map((badge, idx) => {
               let badgeClass = "bg-primary text-secondary";
               if (badge.type === 'status' && badge.label === 'NEW') {
-                 badgeClass = "bg-blue-500 text-white";
+                 badgeClass = "bg-white text-secondary border border-gray-200";
               } else if (badge.label === 'FEATURED') {
                  badgeClass = "bg-secondary text-white";
               }

@@ -4,7 +4,7 @@ import { CategoryInputSchema } from '@/backend/schemas';
 import { authenticateNext, parseBody, requireRolesNext } from '@/backend/utils/next-utils';
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+  const { id } = await params;
   let cat = await categoryRepository.findById(id);
   if (!cat) {
     cat = await categoryRepository.findBySlug(id);
@@ -19,7 +19,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   const roleErr = requireRolesNext(user, ['admin', 'super_admin', 'root_super_admin']);
   if (roleErr) return NextResponse.json({ error: roleErr.error }, { status: roleErr.status });
 
-  const { id } = params;
+  const { id } = await params;
   const existing = await categoryRepository.findById(id);
   if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
@@ -36,7 +36,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
   const roleErr = requireRolesNext(user, ['admin', 'super_admin', 'root_super_admin']);
   if (roleErr) return NextResponse.json({ error: roleErr.error }, { status: roleErr.status });
 
-  const { id } = params;
+  const { id } = await params;
   const existing = await categoryRepository.findById(id);
   if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
