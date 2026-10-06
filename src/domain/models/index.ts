@@ -19,6 +19,7 @@ export interface ProductVariant {
   name: string; 
   attributes: Record<string, string>; 
   price: number;
+  previousPrice?: number;
   sku?: string;
 }
 

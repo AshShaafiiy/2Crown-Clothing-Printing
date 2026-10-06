@@ -1,4 +1,6 @@
-// @vitest-environment jsdom
+const fs = require('fs');
+const path = 'src/views/public/Cart.test.tsx';
+let content = `// @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import "@testing-library/jest-dom";
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
@@ -76,3 +78,7 @@ describe('Cart UX', () => {
     expect(screen.getByText('-40%')).toBeInTheDocument(); // discount badge
   });
 });
+`;
+
+fs.writeFileSync(path, content);
+console.log("Updated Cart.test.tsx");

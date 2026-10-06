@@ -1,4 +1,6 @@
-import React from 'react';
+const fs = require('fs');
+const path = 'src/components/ui/QuantityControl.tsx';
+let content = `import React from 'react';
 import { Minus, Plus } from 'lucide-react';
 import { useCartStore } from '../../store/cartStore';
 
@@ -54,26 +56,26 @@ export const QuantityControl: React.FC<QuantityControlProps> = ({
   const spanWidthClass = variant === 'card' ? 'flex-1' : 'w-10';
 
   return (
-    <div className={`flex flex-col sm:flex-row items-start sm:items-center gap-3 ${showAddedText || variant === 'card' ? 'w-full' : ''}`}>
-      <div className={`flex items-center bg-gray-100 rounded-md border border-gray-200 shadow-sm ${containerWidthClass} p-1 overflow-hidden`} onClick={e => e.stopPropagation()}>
+    <div className={\`flex flex-col sm:flex-row items-start sm:items-center gap-3 \${showAddedText || variant === 'card' ? 'w-full' : ''}\`}>
+      <div className={\`flex items-center bg-gray-100 rounded-md border border-gray-200 shadow-sm \${containerWidthClass} p-1 overflow-hidden\`} onClick={e => e.stopPropagation()}>
         <button 
           type="button"
           onClick={handleDecrease}
           disabled={isMinusDisabled}
           aria-disabled={isMinusDisabled}
           className={minusClass}
-          aria-label={`Decrease quantity of ${productName}`}
+          aria-label={\`Decrease quantity of \${productName}\`}
         >
           <Minus size={16} strokeWidth={3} />
         </button>
-        <span className={`${spanWidthClass} text-center text-sm font-bold text-gray-800 select-none`}>
+        <span className={\`\${spanWidthClass} text-center text-sm font-bold text-gray-800 select-none\`}>
           {quantity}
         </span>
         <button 
           type="button"
           onClick={handleIncrease}
           className={plusClass}
-          aria-label={`Increase quantity of ${productName}`}
+          aria-label={\`Increase quantity of \${productName}\`}
         >
           <Plus size={16} strokeWidth={3} />
         </button>
@@ -86,3 +88,7 @@ export const QuantityControl: React.FC<QuantityControlProps> = ({
     </div>
   );
 };
+`;
+
+fs.writeFileSync(path, content);
+console.log("Updated QuantityControl");

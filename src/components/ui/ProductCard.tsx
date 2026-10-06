@@ -27,6 +27,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       productSlug: product.slug,
       productName: product.name,
       price: product.price,
+      previousPrice: product.previousPrice,
       quantity: 1,
       imageUrl: product.imageUrl,
     });
@@ -87,7 +88,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
         </Link>
         {cartItem ? (
-          <QuantityControl cartItemId={cartItem.id} quantity={cartItem.quantity} productName={product.name} />
+          <QuantityControl cartItemId={cartItem.id} quantity={cartItem.quantity} productName={product.name} variant="card" />
         ) : requiresCustomization ? (
           <Link 
             href={`/product/${product.slug}`}
