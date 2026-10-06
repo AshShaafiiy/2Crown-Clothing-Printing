@@ -92,14 +92,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         ) : requiresCustomization ? (
           <Link 
             href={`/product/${product.slug}`}
-            className="w-full text-center py-2.5 bg-secondary text-white font-bold text-sm rounded hover:bg-primary hover:text-secondary transition-colors mt-auto block"
+            className="w-full text-center py-2.5 bg-primary text-secondary font-bold text-sm rounded hover:bg-primary-dark transition-colors mt-auto block focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50"
           >
             Customize & Buy
           </Link>
         ) : (
           <button
             onClick={handleAddToCart}
-            className="w-full text-center py-2.5 bg-secondary text-white font-bold text-sm rounded hover:bg-primary hover:text-secondary transition-colors mt-auto block"
+            className="w-full text-center py-2.5 bg-primary text-secondary font-bold text-sm rounded hover:bg-primary-dark transition-colors mt-auto block focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50"
           >
             Add to Cart
           </button>

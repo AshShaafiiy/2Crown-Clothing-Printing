@@ -1,4 +1,6 @@
-import React from 'react';
+const fs = require('fs');
+const path = 'src/components/ui/QuantityControl.tsx';
+let content = `import React from 'react';
 import { Minus, Plus } from 'lucide-react';
 import { useCartStore } from '../../store/cartStore';
 
@@ -60,7 +62,7 @@ export const QuantityControl: React.FC<QuantityControlProps> = ({
 
   return (
     <div 
-      className={`flex flex-row items-center gap-3 sm:gap-4 whitespace-nowrap ${variant === 'card' ? 'w-full' : ''}`}
+      className={\`flex flex-row items-center gap-3 sm:gap-4 whitespace-nowrap \${variant === 'card' ? 'w-full' : ''}\`}
       onClick={e => e.stopPropagation()}
     >
       <div className={innerContainerClass}>
@@ -70,7 +72,7 @@ export const QuantityControl: React.FC<QuantityControlProps> = ({
           disabled={isMinusDisabled}
           aria-disabled={isMinusDisabled}
           className={minusClass}
-          aria-label={`Decrease quantity of ${productName}`}
+          aria-label={\`Decrease quantity of \${productName}\`}
         >
           <Minus size={16} strokeWidth={3} />
         </button>
@@ -83,7 +85,7 @@ export const QuantityControl: React.FC<QuantityControlProps> = ({
           type="button"
           onClick={handleIncrease}
           className={plusClass}
-          aria-label={`Increase quantity of ${productName}`}
+          aria-label={\`Increase quantity of \${productName}\`}
         >
           <Plus size={16} strokeWidth={3} />
         </button>
@@ -97,3 +99,7 @@ export const QuantityControl: React.FC<QuantityControlProps> = ({
     </div>
   );
 };
+`;
+
+fs.writeFileSync(path, content);
+console.log("Updated QuantityControl structure.");

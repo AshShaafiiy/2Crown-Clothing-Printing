@@ -156,3 +156,15 @@ Cart quantity controls use gold decrement/increment buttons with a display-only 
 - Discounted Cart items show current price, previous price and discount %.
 - Per-unit 'each' label appears only when quantity > 1.
 - Home and Shop ProductCard quantity controls retain the same full-width CTA footprint as the Add to Cart button. Product Details and Cart use compact quantity controls.
+
+
+## Commerce UI & Styling Rules
+- Primary commerce CTAs (Add to Cart, Proceed to Checkout) default to gold with subtle darker-gold hover.
+- ProductCard quantity controls retain full CTA width.
+- Product Details quantity controls are compact and visually separated (button, text, button).
+- Product Details feedback stays beside control on normal mobile widths.
+- Cart minus is disabled at quantity 1; Cart uses a separate Remove action.
+- Cart does not duplicate current unit price underneath product name.
+- 'each' appears only for quantity > 1.
+- Right-side Cart price is the current line total.
+- Discounted Cart lines show original line value + discount badge.

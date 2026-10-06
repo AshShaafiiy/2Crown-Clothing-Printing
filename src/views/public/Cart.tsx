@@ -63,27 +63,25 @@ export default function Cart() {
                           <h3 className="font-semibold text-base sm:text-lg text-secondary truncate">{item.productName}</h3>
                           {item.variantName && <p className="text-sm text-gray-500 mt-0.5">{item.variantName}</p>}
                           
-                          <div className="flex flex-wrap items-center gap-2 mt-1">
-                            <span className="font-bold text-lg text-secondary">₦{item.price.toLocaleString()}</span>
-                            {item.previousPrice && item.previousPrice > item.price && (
-                              <>
-                                <span className="text-sm text-gray-400 line-through">₦{item.previousPrice.toLocaleString()}</span>
-                                <span className="text-xs font-bold bg-red-100 text-red-700 px-1.5 py-0.5 rounded">
-                                  -{Math.round(((item.previousPrice - item.price) / item.previousPrice) * 100)}%
-                                </span>
-                              </>
-                            )}
-                          </div>
-                          
                           {item.quantity > 1 && (
-                            <div className="text-sm text-gray-500 mt-0.5">₦{item.price.toLocaleString()} each</div>
+                            <div className="text-sm text-gray-500 mt-1">₦{item.price.toLocaleString()} each</div>
                           )}
                         </div>
                         {/* Line total - desktop */}
-                        <div className="hidden sm:block text-right flex-shrink-0">
+                        <div className="hidden sm:flex flex-col items-end flex-shrink-0">
                           <div className="font-bold text-lg text-secondary">
                             ₦{(item.price * item.quantity).toLocaleString()}
                           </div>
+                          {item.previousPrice && item.previousPrice > item.price && (
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-sm text-gray-400 line-through">
+                                ₦{(item.previousPrice * item.quantity).toLocaleString()}
+                              </span>
+                              <span className="text-xs font-bold bg-red-100 text-red-700 px-1.5 py-0.5 rounded">
+                                -{Math.round(((item.previousPrice - item.price) / item.previousPrice) * 100)}%
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -105,8 +103,20 @@ export default function Cart() {
                         </div>
 
                         {/* Line total - mobile */}
-                        <div className="sm:hidden font-bold text-base text-secondary">
-                          ₦{(item.price * item.quantity).toLocaleString()}
+                        <div className="sm:hidden flex flex-col items-end">
+                          <div className="font-bold text-base text-secondary">
+                            ₦{(item.price * item.quantity).toLocaleString()}
+                          </div>
+                          {item.previousPrice && item.previousPrice > item.price && (
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <span className="text-xs text-gray-400 line-through">
+                                ₦{(item.previousPrice * item.quantity).toLocaleString()}
+                              </span>
+                              <span className="text-[10px] font-bold bg-red-100 text-red-700 px-1 py-0.5 rounded">
+                                -{Math.round(((item.previousPrice - item.price) / item.previousPrice) * 100)}%
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -142,7 +152,7 @@ export default function Cart() {
             
             <button 
               onClick={() => router.push('/checkout')}
-              className="w-full bg-secondary text-white px-6 py-4 rounded-md font-bold hover:bg-secondary-light transition-all duration-250 hover:shadow-lg"
+              className="w-full bg-primary text-secondary px-6 py-4 rounded-md font-bold hover:bg-primary-dark transition-all duration-250 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50"
             >
               Proceed to Checkout
             </button>

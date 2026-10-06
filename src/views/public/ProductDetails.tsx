@@ -264,7 +264,7 @@ const ProductDetails: React.FC = () => {
                 <button
                   onClick={handleAddToCart}
                   disabled={!product.active}
-                  className="w-full bg-primary hover:bg-primary-dark text-secondary font-bold py-4 px-8 rounded-md shadow-sm transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed mb-8"
+                  className="w-full bg-primary hover:bg-primary-dark text-secondary font-bold py-4 px-8 rounded-md shadow-sm transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed mb-8 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50"
                 >
                   {!product.active ? 'Unavailable' : <span className="flex items-center justify-center gap-2"><ShoppingCart size={20} /> Add to Cart</span>}
                 </button>
