@@ -168,3 +168,7 @@ Cart quantity controls use gold decrement/increment buttons with a display-only 
 - 'each' appears only for quantity > 1.
 - Right-side Cart price is the current line total.
 - Discounted Cart lines show original line value + discount badge.
+
+
+## Cart Item Layout
+- Cart item layout uses a responsive ecommerce pattern: desktop places product information on the left, price summary upper-right, Remove lower-left, quantity lower-right; mobile compacts image/details and keeps Remove/quantity on a bottom action row.
