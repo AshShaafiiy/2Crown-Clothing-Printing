@@ -4,6 +4,7 @@ export default defineConfig({
   test: {
     setupFiles: ['./tests/setup.ts'],
     globals: true,
+    alias: { '@': '/mnt/c/Users/USER/Documents/2Crown-Clothing-Printing/src' },
     exclude: ['node_modules', 'dist', '**/*.js', '**/*.spec.ts'],
     fileParallelism: false,
     pool: 'forks',

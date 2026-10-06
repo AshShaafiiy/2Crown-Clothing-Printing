@@ -114,6 +114,9 @@ export class ApiReviewService implements IReviewService {
     return []; // No endpoint to get full review objects directly in OpenAPI spec, only summary. 
     // Actually wait, let's implement if we need it, but the UI might just need summary.
   }
+  async checkEligibility(productId: ID): Promise<{ eligible: boolean; reason: string; existingRating?: number }> {
+    return apiClient<{ eligible: boolean; reason: string; existingRating?: number }>(`/ratings/${productId}?eligibility=true`);
+  }
   async getRatingSummary(productId: ID): Promise<{ average: number; count: number }> {
     return apiClient<{ average: number; count: number }>(`/ratings/${productId}`);
   }

@@ -1,5 +1,9 @@
 const fs = require('fs');
-let content = fs.readFileSync('vitest.config.ts', 'utf8');
-content = content.replace("isolate: false,", "");
-fs.writeFileSync('vitest.config.ts', content);
-console.log("Removed isolate: false");
+let code = fs.readFileSync('vitest.config.ts', 'utf8');
+if (!code.includes('alias:')) {
+  code = code.replace(
+    /globals: true,/,
+    "globals: true,\n    alias: { '@': '/mnt/c/Users/USER/Documents/2Crown-Clothing-Printing/src' },"
+  );
+  fs.writeFileSync('vitest.config.ts', code);
+}

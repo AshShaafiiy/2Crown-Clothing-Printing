@@ -60,7 +60,7 @@ export const ProductRatingDisplay: React.FC<ProductRatingDisplayProps> = ({ prod
       </div>
       <span className="ml-1 font-bold">{average.toFixed(1)}</span>
       <span className="text-gray-500 font-normal">
-        {compact ? `(${count})` : `(${count} rating${count !== 1 ? 's' : ''})`}
+        {compact ? `(${count})` : `(${count} verified rating${count !== 1 ? 's' : ''})`}
       </span>
     </div>
   );

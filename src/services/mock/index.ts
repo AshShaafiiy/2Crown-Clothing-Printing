@@ -305,6 +305,9 @@ export class MockOrderService implements IOrderService {
 
 export class MockReviewService implements IReviewService {
   async getReviewsByProductId(productId: ID): Promise<Review[]> { return reviews.filter(r => r.productId === productId && r.approved); }
+  async checkEligibility(productId: ID): Promise<{ eligible: boolean; reason: string; existingRating?: number }> {
+    return { eligible: true, reason: 'eligible' }; // mock always eligible for UI testing if not logged in? Wait, let's just make it always eligible in mock for now
+  }
   async getRatingSummary(productId: ID): Promise<{ average: number; count: number }> {
     const productReviews = reviews.filter(r => r.productId === productId && r.approved);
     if (productReviews.length === 0) return { average: 0, count: 0 };

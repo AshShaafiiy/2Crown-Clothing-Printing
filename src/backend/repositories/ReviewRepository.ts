@@ -25,11 +25,28 @@ export class ReviewRepository {
     if (snap.empty) return { average: 0, count: 0 };
     
     let sum = 0;
+    let count = 0;
     snap.docs.forEach( (doc: any) => {
-      sum += doc.data().rating;
+      const data = doc.data();
+      if (data.verifiedPurchase === true) {
+        sum += data.rating;
+        count++;
+      }
     });
     
-    return { average: sum / snap.docs.length, count: snap.docs.length };
+    if (count === 0) return { average: 0, count: 0 };
+    
+    return { average: sum / count, count };
+  }
+
+  async findById(id: string): Promise<Review | null> {
+    const doc = await db.collection('reviews').doc(id).get();
+    if (!doc.exists) return null;
+    return doc.data() as Review;
+  }
+
+  async update(id: string, updates: Partial<Review>): Promise<void> {
+    await db.collection('reviews').doc(id).update(updates);
   }
 }
 

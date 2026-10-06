@@ -42,6 +42,7 @@ export interface IOrderService {
 
 export interface IReviewService {
   getReviewsByProductId(productId: ID): Promise<Review[]>;
+  checkEligibility?(productId: ID): Promise<{ eligible: boolean; reason: string; existingRating?: number }>;
   getRatingSummary(productId: ID): Promise<{ average: number; count: number }>;
   addReview(review: Omit<Review, 'id' | 'createdAt' | 'approved'>): Promise<Review>;
   approveReview(id: ID): Promise<void>;

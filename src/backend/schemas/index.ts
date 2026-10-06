@@ -148,9 +148,10 @@ export const ReviewSchema = z.object({
   id: z.string(),
   productId: z.string(),
   customerId: z.string(),
-  customerName: z.string(),
-  rating: z.number().min(1).max(5),
+  customerName: z.string().optional(),
+  rating: z.number().int().min(1).max(5),
   createdAt: z.string(),
+  updatedAt: z.string().optional(),
   approved: z.boolean()
 });
 export type Review = z.infer<typeof ReviewSchema>;
@@ -207,9 +208,9 @@ export const UpdateRoleRequestSchema = z.object({
 });
 
 export const SubmitRatingSchema = z.object({
-  rating: z.number().min(1).max(5),
-  customerId: z.string(),
-  customerName: z.string()
+  rating: z.number().int().min(1).max(5),
+  customerId: z.string().optional(),
+  customerName: z.string().optional()
 });
 
 export const UpdateOrderStatusSchema = z.object({
