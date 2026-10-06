@@ -38,6 +38,7 @@ The application has been migrated from Vite/Express/SQLite to a unified **Next.j
 - Restored secure RBAC middleware across Product and Category endpoints.
 - Validated Discount Badge source of truth: `previousPrice` correctly drives explicit discounts directly from the product object in alignment with the domain model.
 - Restored Favicon integrity: Replaced unreliable JPEG metadata shortcut with standard `app/icon.png` generated from the official 2Crown logo.
+- Refined Cart unit-price visibility logic: Desktop displays plain unit price for `qty=1` and "₦X each" for `qty>1`; Mobile hides unit-price text to save space.
 
 ## Current Known Defects / Open Work
 - **Remote Vercel E2E gaps:** Partial coverage exists; automated Playwright runs directly against live Vercel deployments are not fully configured. We rely on manual/scripted local verification.
@@ -176,7 +177,7 @@ Cart quantity controls use gold decrement/increment buttons with a display-only 
 
 ## Cart Item Layout & UX Polishes
 - Final cart presentation: Image hover artifacts (ghost boxes) are eliminated.
-- Unit Price Logic: `qty=1` hides the "₦X each" unit-price line; `qty>1` shows it.
+- Unit Price Logic: Shows plain unit price for `qty=1` and "₦X each" for `qty>1` strictly on desktop. Mobile completely hides the unit-price text in favor of the primary line-total.
 - Remove Action: Styled as a compact text action `[trash icon] Remove` in Gold/Primary color on the lower-left.
 - Quantity Controls: Refined to a compact `[-]` `qty` `[+]` structure resembling Jumia logic. Black borders after clicking are fully eliminated in favor of clean subtle `focus-visible:ring-primary` outlines.
 - Cart minus button at `qty=1` remains securely disabled.

@@ -66,9 +66,9 @@ export default function Cart() {
                           <h3 className="font-semibold text-sm sm:text-lg text-secondary line-clamp-2 sm:line-clamp-none">{item.productName}</h3>
                           {item.variantName && <p className="text-xs sm:text-sm text-gray-500 mt-0.5">{item.variantName}</p>}
                           
-                          {item.quantity > 1 && (
-                            <div className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">₦{item.price.toLocaleString()} each</div>
-                          )}
+                          <div className="hidden sm:block text-sm text-gray-500 mt-1">
+                            ₦{item.price.toLocaleString()}{item.quantity > 1 ? ' each' : ''}
+                          </div>
                         </div>
                         
                         {/* Price Block (Desktop: right-aligned, Mobile: left-aligned under title) */}
