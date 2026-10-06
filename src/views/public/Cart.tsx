@@ -39,14 +39,14 @@ export default function Cart() {
                     {/* Product Image */}
                     <Link
                       href={`/product/${item.productSlug || item.productId}`}
-                      className="flex-shrink-0 block transform transition-transform duration-300 hover:scale-105 hover:opacity-90 hover:shadow-md rounded-lg"
+                      className="flex-shrink-0 block rounded-md group"
                     >
-                      <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-50 border border-gray-100">
+                      <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-md overflow-hidden bg-gray-50 border border-gray-100">
                         {item.imageUrl ? (
                           <img
                             src={item.imageUrl}
                             alt={item.productName}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-gray-300">
@@ -140,7 +140,7 @@ export default function Cart() {
             
             <button 
               onClick={() => router.push('/checkout')}
-              className="w-full bg-primary text-secondary px-6 py-4 rounded-md font-bold hover:bg-primary-dark transition-all duration-250 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50"
+              className="w-full bg-primary text-secondary px-6 py-4 rounded-md font-bold hover:bg-primary-dark transition-all duration-250 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
             >
               Proceed to Checkout
             </button>
