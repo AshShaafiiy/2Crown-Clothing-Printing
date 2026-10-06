@@ -2,7 +2,8 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { Trash2, Plus, Minus, ShoppingBag, ImageOff } from 'lucide-react';
+import { Trash2, ShoppingBag, ImageOff } from 'lucide-react';
+import { QuantityControl } from '../../components/ui/QuantityControl';
 import { useCartStore } from '../../store/cartStore';
 
 export default function Cart() {
@@ -75,23 +76,7 @@ export default function Cart() {
                       <div className="flex items-center justify-between mt-3">
                         <div className="flex items-center gap-3">
                           {/* Quantity controls */}
-                          <div className="flex items-center border border-gray-200 rounded-md">
-                            <button
-                              onClick={() => item.quantity === 1 ? removeItem(item.id) : updateQuantity(item.id, item.quantity - 1)}
-                              className="p-1.5 sm:p-2 qty-btn text-gray-600 rounded-l-md"
-                              aria-label="Decrease quantity"
-                            >
-                              <Minus size={14} />
-                            </button>
-                            <span className="w-8 sm:w-10 text-center text-sm font-medium select-none">{item.quantity}</span>
-                            <button
-                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              className="p-1.5 sm:p-2 qty-btn text-gray-600 rounded-r-md"
-                              aria-label="Increase quantity"
-                            >
-                              <Plus size={14} />
-                            </button>
-                          </div>
+                          <QuantityControl cartItemId={item.id} quantity={item.quantity} productName={item.productName} />
 
                           {/* Delete */}
                           <button

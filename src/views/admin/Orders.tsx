@@ -40,10 +40,22 @@ const Orders: React.FC = () => {
   });
 
   const handleStatusChange = async (order: Order, newStatus: string) => {
+    if (newStatus === 'Confirmed' && order.deliveryMethod !== 'pickup' && order.deliveryFee == null) {
+      toast.error('Enter the delivery fee before confirming this order.', { duration: 4000 });
+      setEditingFeeId(order.id);
+      setTimeout(() => {
+        const input = document.getElementById('delivery-fee-input');
+        if (input) input.focus();
+      }, 100);
+      return;
+    }
+
     const isConfirmed = await confirm({
-      title: 'Update Order Status',
-      message: `Are you sure you want to change the status to ${newStatus}?`,
-      confirmLabel: 'Update Status',
+      title: newStatus === 'Confirmed' ? 'Confirm Order' : 'Update Order Status',
+      message: newStatus === 'Confirmed' 
+        ? (order.deliveryMethod === 'pickup' ? 'Confirm this order for Store Pickup?' : `Confirm this order with a delivery fee of ₦${order.deliveryFee?.toLocaleString()}?`)
+        : `Are you sure you want to change the status to ${newStatus}?`,
+      confirmLabel: newStatus === 'Confirmed' ? 'Confirm Order' : 'Update Status',
       isDestructive: newStatus === 'Cancelled'
     });
 
@@ -234,6 +246,7 @@ const Orders: React.FC = () => {
                                       <div className="flex items-center justify-end gap-2 my-2 bg-gray-50 p-2 rounded border border-gray-200">
                                         <span className="text-gray-500 font-medium">₦</span>
                                         <input
+                                          id="delivery-fee-input"
                                           type="number"
                                           min="0"
                                           value={tempFee}
@@ -308,7 +321,7 @@ const Orders: React.FC = () => {
                                             : 'bg-black text-white hover:bg-gray-800'
                                         }`}
                                       >
-                                        Mark as {status}
+                                        {status === 'Confirmed' ? 'Confirm Order' : 'Mark as ' + status}
                                       </button>
                                     ));
                                   })()}

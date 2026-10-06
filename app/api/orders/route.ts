@@ -24,16 +24,16 @@ export async function POST(req: Request) {
 
   const now = new Date().toISOString();
   const initialHistory = [{
-    status: 'WhatsApp Pending',
+    status: 'Awaiting Confirmation',
     timestamp: now,
-    comment: 'Order placed, awaiting WhatsApp confirmation.'
+    comment: 'Order placed and awaiting admin confirmation.'
   }];
 
   const newOrder = {
     id: uuid(),
     reference: `2C-${Math.floor(100000 + Math.random() * 900000)}`,
     ...data,
-    status: 'WhatsApp Pending',
+    status: 'Awaiting Confirmation',
     history: initialHistory,
     createdAt: now,
     updatedAt: now

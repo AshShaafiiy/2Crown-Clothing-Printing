@@ -10,7 +10,8 @@ import { ImageFallback } from '../../components/ui/ImageFallback';
 import { ProductRatingDisplay } from '../../components/ui/ProductRatingDisplay';
 import { ProductRatingInput } from '../../components/ui/ProductRatingInput';
 import toast from 'react-hot-toast';
-import { Minus, Plus } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
+import { QuantityControl } from '../../components/ui/QuantityControl';
 
 const ProductDetails: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -286,7 +287,7 @@ const ProductDetails: React.FC = () => {
                   disabled={!product.active}
                   className="w-full bg-primary hover:bg-primary-dark text-secondary font-bold py-4 px-8 rounded-md shadow-sm transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed mb-8"
                 >
-                  {!product.active ? 'Unavailable' : 'Add to Cart'}
+                  {!product.active ? 'Unavailable' : <span className="flex items-center justify-center gap-2"><ShoppingCart size={20} /> Add to Cart</span>}
                 </button>
               )}
             </div>

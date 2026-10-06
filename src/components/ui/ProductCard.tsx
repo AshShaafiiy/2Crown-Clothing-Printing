@@ -6,7 +6,7 @@ import { Product } from '../../domain/models';
 import { computeProductBadges } from '../../domain/badges';
 import { ImageFallback } from './ImageFallback';
 import { useCartStore } from '../../store/cartStore';
-import { Minus, Plus } from 'lucide-react';
+import { QuantityControl } from './QuantityControl';
 import toast from 'react-hot-toast';
 import { ProductRatingDisplay } from './ProductRatingDisplay';
 
@@ -87,25 +87,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
         </Link>
         {cartItem ? (
-          <div className="flex items-center justify-between bg-gray-100 rounded-md w-full mt-auto border border-gray-200">
-            <button 
-              type="button"
-              onClick={(e) => { e.preventDefault(); cartItem.quantity === 1 ? removeItem(cartItem.id) : updateQuantity(cartItem.id, cartItem.quantity - 1); }}
-              className="p-3 text-secondary hover:bg-gray-200 transition-colors"
-              aria-label="Decrease quantity"
-            >
-              <Minus size={16} />
-            </button>
-            <span className="font-bold text-secondary text-sm select-none">{cartItem.quantity}</span>
-            <button 
-              type="button"
-              onClick={(e) => { e.preventDefault(); updateQuantity(cartItem.id, cartItem.quantity + 1); }}
-              className="p-3 text-secondary hover:bg-gray-200 transition-colors"
-              aria-label="Increase quantity"
-            >
-              <Plus size={16} />
-            </button>
-          </div>
+          <QuantityControl cartItemId={cartItem.id} quantity={cartItem.quantity} productName={product.name} />
         ) : requiresCustomization ? (
           <Link 
             href={`/product/${product.slug}`}

@@ -78,20 +78,22 @@ export default function TrackOrder() {
           </div>
           
           <div className="space-y-4 text-sm">
-            <div className="grid grid-cols-2 gap-4 py-3 border-b border-gray-100">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4 py-3 border-b border-gray-100">
               <div className="text-gray-500">Order Reference</div>
               <div className="font-medium">{order.reference}</div>
             </div>
-            <div className="grid grid-cols-2 gap-4 py-3 border-b border-gray-100">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4 py-3 border-b border-gray-100">
               <div className="text-gray-500">Date Placed</div>
               <div className="font-medium">{new Date(order.createdAt).toLocaleDateString()}</div>
             </div>
-            <div className="grid grid-cols-2 gap-4 py-3 border-b border-gray-100">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4 py-3 border-b border-gray-100">
               <div className="text-gray-500">Delivery Method</div>
               <div className="font-medium capitalize">{order.deliveryMethod === 'pickup' ? 'Store Pickup' : 'Local Delivery'}</div>
             </div>
             <div className="py-3 border-b border-gray-100">
-              <div className="text-gray-500 mb-2">Order Items</div>
+              <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4 mb-2">
+                <div className="text-gray-500">Order Items</div>
+              </div>
               <ul className="space-y-2">
                 {order.items.map((item, idx) => (
                   <li key={idx} className="flex justify-between items-start text-gray-800">
