@@ -18,11 +18,24 @@ const ProductDetails: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshRating, setRefreshRating] = useState<number>(0);
-  const { addItem } = useCartStore();
+  
 
-  const [quantity, setQuantity] = useState<number>(1);
-  const [selectedVariantId, setSelectedVariantId] = useState<string>('');
+
+    const [selectedVariantId, setSelectedVariantId] = useState<string>('');
   const [customization, setCustomization] = useState<Record<string, any>>({});
+
+  const { items, addItem, updateQuantity, removeItem } = useCartStore();
+
+  
+  const finalCustomization = Object.fromEntries(
+    Object.entries(customization).filter(([_, v]) => v !== '' && v !== null && v !== undefined)
+  );
+  
+  const cartItem = items.find(i => 
+    i.productId === product?.id && 
+    i.variantId === (selectedVariantId || undefined) && 
+    JSON.stringify(i.customization || {}) === JSON.stringify(Object.keys(finalCustomization).length > 0 ? finalCustomization : {})
+  );
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -85,14 +98,14 @@ const ProductDetails: React.FC = () => {
       productSlug: product.slug,
       productName: product.name,
       price: finalPrice,
-      quantity,
+      quantity: 1,
       imageUrl: product.imageUrl,
       variantId: selectedVariantId || undefined,
       variantName,
       customization: Object.keys(finalCustomization).length > 0 ? finalCustomization : undefined,
     });
     
-    toast.success(`Added ${quantity}x ${product.name} to cart!`);
+    toast.success(`Added 1x ${product.name} to cart!`);
   };
 
   if (loading) {
@@ -240,42 +253,42 @@ const ProductDetails: React.FC = () => {
               </div>
             ))}
 
-            {/* Quantity */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
-              <div className="flex items-center w-32 border border-gray-300 rounded-md">
-                <button 
-                  type="button"
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="p-3 text-gray-600 hover:bg-gray-100 transition-colors"
-                >
-                  <Minus size={16} />
-                </button>
-                <input 
-                  type="number"
-                  min="1"
-                  value={quantity}
-                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-full text-center p-2 focus:outline-none appearance-none"
-                />
-                <button 
-                  type="button"
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="p-3 text-gray-600 hover:bg-gray-100 transition-colors"
-                >
-                  <Plus size={16} />
-                </button>
-              </div>
-            </div>
             
             <div className="pt-6">
-              <button
-                onClick={handleAddToCart}
-                disabled={!product.active}
-                className="w-full bg-primary hover:bg-primary-dark text-secondary font-bold py-4 px-8 rounded-md shadow-sm transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed mb-8"
-              >
-                {!product.active ? 'Unavailable' : 'Add to Cart'}
-              </button>
+              {cartItem ? (
+                <div className="flex flex-col gap-2 mb-8">
+                  <div className="flex items-center w-32 border border-gray-300 rounded-md bg-white overflow-hidden shadow-sm">
+                    <button 
+                      type="button"
+                      onClick={() => cartItem.quantity === 1 ? removeItem(cartItem.id) : updateQuantity(cartItem.id, cartItem.quantity - 1)}
+                      className="flex-1 p-3 text-gray-600 hover:bg-gray-100 transition-colors flex justify-center"
+                      aria-label="Decrease quantity"
+                    >
+                      <Minus size={16} />
+                    </button>
+                    <span className="w-12 text-center text-sm font-bold text-gray-800 select-none">
+                      {cartItem.quantity}
+                    </span>
+                    <button 
+                      type="button"
+                      onClick={() => updateQuantity(cartItem.id, cartItem.quantity + 1)}
+                      className="flex-1 p-3 text-gray-600 hover:bg-gray-100 transition-colors flex justify-center"
+                      aria-label="Increase quantity"
+                    >
+                      <Plus size={16} />
+                    </button>
+                  </div>
+                  <span className="text-sm text-gray-500 font-medium">({cartItem.quantity} item{cartItem.quantity !== 1 ? 's' : ''} added)</span>
+                </div>
+              ) : (
+                <button
+                  onClick={handleAddToCart}
+                  disabled={!product.active}
+                  className="w-full bg-primary hover:bg-primary-dark text-secondary font-bold py-4 px-8 rounded-md shadow-sm transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed mb-8"
+                >
+                  {!product.active ? 'Unavailable' : 'Add to Cart'}
+                </button>
+              )}
             </div>
 
             <div className="border-t border-gray-200 pt-8 mt-4">

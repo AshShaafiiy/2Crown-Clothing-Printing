@@ -77,7 +77,7 @@ export default function Cart() {
                           {/* Quantity controls */}
                           <div className="flex items-center border border-gray-200 rounded-md">
                             <button
-                              onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                              onClick={() => item.quantity === 1 ? removeItem(item.id) : updateQuantity(item.id, item.quantity - 1)}
                               className="p-1.5 sm:p-2 qty-btn text-gray-600 rounded-l-md"
                               aria-label="Decrease quantity"
                             >

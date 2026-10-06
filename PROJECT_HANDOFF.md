@@ -134,3 +134,7 @@ The project is consciously accepting that operational risk for now.
 - Do not rewrite shared `main` history.
 - If an accidental commit needs correction, prefer a new corrective commit.
 - Force-push may only occur with explicit user authorization for that specific operation.
+
+
+## Cart UX Rules
+Customer-facing product quantities are controlled exclusively with decrement/increment buttons. No editable quantity input is used on ProductCard, Product Details, or Cart. All components synchronize globally with the `cartStore`.
