@@ -2,16 +2,13 @@ const fs = require('fs');
 const path = 'PROJECT_HANDOFF.md';
 let content = fs.readFileSync(path, 'utf8');
 
-const updatedCartRules = `
-## Cart & Quantity UI Rules
-- Cart quantity behavior differs intentionally from ProductCard/Product Details: Cart decrement is disabled at quantity 1 because Cart has a dedicated Remove action. ProductCard/Product Details decrement-at-1 removes the item.
-- Discounted Cart items show current price, previous price and discount %.
-- Per-unit 'each' label appears only when quantity > 1.
-- Home and Shop ProductCard quantity controls retain the same full-width CTA footprint as the Add to Cart button. Product Details and Cart use compact quantity controls.
+const updatedRules = `
+## Cart Item Layout
+- Cart item layout uses a responsive ecommerce pattern: desktop places product information on the left, price summary upper-right, Remove lower-left, quantity lower-right; mobile compacts image/details and keeps Remove/quantity on a bottom action row.
 `;
 
-if (!content.includes('Cart quantity behavior differs intentionally')) {
-  content += '\n' + updatedCartRules;
+if (!content.includes('Cart item layout uses a responsive ecommerce pattern')) {
+  content += '\n' + updatedRules;
   fs.writeFileSync(path, content);
-  console.log("Updated PROJECT_HANDOFF.md");
+  console.log("Updated PROJECT_HANDOFF.md for Cart layout");
 }
