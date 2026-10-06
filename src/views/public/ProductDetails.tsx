@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { services } from '../../services';
 import { useCartStore } from '../../store/cartStore';
 import { Product, ProductVariant, CustomizationField } from '../../domain/models';
-import { computeProductBadges } from '../../domain/badges';
+
 import { ImageFallback } from '../../components/ui/ImageFallback';
 import { ProductRatingDisplay } from '../../components/ui/ProductRatingDisplay';
 import { ProductRatingInput } from '../../components/ui/ProductRatingInput';
@@ -158,33 +158,25 @@ const ProductDetails: React.FC = () => {
           <div className="mb-6">
             <ProductRatingDisplay key={refreshRating} productId={product.id} />
           </div>
-          <div className="mb-6 flex flex-wrap gap-2">
-            {computeProductBadges(product).map((badge, idx) => {
-              let badgeClass = "bg-red-100 text-red-800"; // default for discount
-            if (badge.type === 'status' && badge.label === 'NEW') {
-               badgeClass = "bg-blue-500 text-white";
-            } else if (badge.label === 'FEATURED') {
-               badgeClass = "bg-secondary text-white";
-            }
-
-            return (
-              <span key={idx} className={`${badgeClass} text-xs font-bold px-2 py-1 rounded shadow-sm`}>
-                  {badge.label}
-                </span>
-              );
-            })}
-          </div>
-
           <div className="flex items-center mb-6">
             <p className="text-3xl font-bold text-primary">₦{currentPrice.toLocaleString()}</p>
             {product.previousPrice && product.previousPrice > currentPrice && (
-              <p className="ml-4 text-xl text-gray-500 line-through">₦{product.previousPrice.toLocaleString()}</p>
+              <div className="ml-4 flex items-center gap-2">
+                <p className="text-xl text-gray-500 line-through">₦{product.previousPrice.toLocaleString()}</p>
+                <span className="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded shadow-sm">
+                  -{Math.round(((product.previousPrice - currentPrice) / product.previousPrice) * 100)}%
+                </span>
+              </div>
             )}
           </div>
           
-          <div className="text-base text-gray-700 mb-8 pb-8 border-b border-gray-200">
-            <p>{product.description || 'No description available for this product.'}</p>
-          </div>
+          {product.description ? (
+            <div className="text-base text-gray-700 mb-8 pb-8 border-b border-gray-200">
+              <p>{product.description}</p>
+            </div>
+          ) : (
+            <div className="mb-6 border-b border-gray-200"></div>
+          )}
           
           <div className="space-y-6">
             {/* Variants */}

@@ -55,7 +55,7 @@ describe('ProductDetails Cart UX', () => {
     // Now it should show quantity 1
     await waitFor(() => {
       expect(screen.getByText('1')).toBeInTheDocument();
-      expect(screen.getByText('1 item added')).toBeInTheDocument();
+      expect(screen.getByText(/\(1 item added\)/)).toBeInTheDocument();
     });
     
     // 3. + -> 2
@@ -64,7 +64,7 @@ describe('ProductDetails Cart UX', () => {
     
     await waitFor(() => {
       expect(screen.getByText('2')).toBeInTheDocument();
-      expect(screen.getByText('2 items added')).toBeInTheDocument();
+      expect(screen.getByText(/\(2 items added\)/)).toBeInTheDocument();
     });
 
     // 4. + -> 3

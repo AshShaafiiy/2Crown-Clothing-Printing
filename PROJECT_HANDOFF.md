@@ -39,6 +39,7 @@ The application has been migrated from Vite/Express/SQLite to a unified **Next.j
 - Validated Discount Badge source of truth: `previousPrice` correctly drives explicit discounts directly from the product object in alignment with the domain model.
 - Restored Favicon integrity: Replaced unreliable JPEG metadata shortcut with standard `app/icon.png` generated from the official 2Crown logo.
 - Refined Cart unit-price visibility logic: Desktop displays plain unit price for `qty=1` and "₦X each" for `qty>1`; Mobile hides unit-price text to save space.
+- Refined Product Details page layout: Removed top status badges, moved discount badge beside original price, wrapped added-item text in brackets, and cleanly collapsed the empty description message.
 
 ## Current Known Defects / Open Work
 - **Remote Vercel E2E gaps:** Partial coverage exists; automated Playwright runs directly against live Vercel deployments are not fully configured. We rely on manual/scripted local verification.

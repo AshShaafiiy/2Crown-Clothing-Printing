@@ -91,7 +91,7 @@ export const QuantityControl: React.FC<QuantityControlProps> = ({
       
       {showAddedText && (
         <span className="text-sm text-gray-500 font-medium">
-          {quantity} item{quantity !== 1 ? 's' : ''} added
+          ({quantity} item{quantity !== 1 ? 's' : ''} added)
         </span>
       )}
     </div>
