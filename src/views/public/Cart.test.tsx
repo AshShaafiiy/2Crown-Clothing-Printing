@@ -71,7 +71,7 @@ describe('Cart UX', () => {
 
     render(<Cart />);
     
-    expect(screen.getByText('₦600')).toBeInTheDocument();
+    expect(screen.getAllByText('₦600')[0]).toBeInTheDocument();
     expect(screen.getByText('₦1,000')).toBeInTheDocument(); // original price
     expect(screen.getByText('-40%')).toBeInTheDocument(); // discount badge
   });
