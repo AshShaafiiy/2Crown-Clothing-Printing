@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { auth } from '@/backend/db/firebase';
 import { userRepository } from '@/backend/repositories';
 import { CreateUserRequestSchema } from '@/backend/schemas';
 import { authenticateNext, requireRolesNext, parseBody } from '@/backend/utils/next-utils';
@@ -51,16 +52,38 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Email already exists' }, { status: 400 });
   }
 
-  const hash = await bcrypt.hash(password, 10);
-  const newUser = await userRepository.create({
-    id: uuid(),
-    email,
-    name,
-    role,
-    active: true,
-    passwordHash: hash,
-    createdAt: new Date().toISOString()
-  });
+  // 1. Create Firebase Auth user
+  
+  let fbUser;
+  try {
+    fbUser = await auth.createUser({
+      email,
+      password,
+      displayName: name,
+    });
+    // 2. Set Custom Claims
+    await auth.setCustomUserClaims(fbUser.uid, { role });
+  } catch (err: any) {
+    if (err.code === 'auth/email-already-exists') {
+      return NextResponse.json({ error: 'Email already exists in Firebase Auth' }, { status: 400 });
+    }
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
 
-  return NextResponse.json(adminDto(newUser as any), { status: 201 });
+  // 3. Create Firestore User Profile
+  try {
+    const newUser = await userRepository.create({
+      id: fbUser.uid,
+      email,
+      name,
+      role,
+      active: true,
+      createdAt: new Date().toISOString()
+    });
+    return NextResponse.json(adminDto(newUser as any), { status: 201 });
+  } catch (err: any) {
+    // Rollback Firebase Auth user if Firestore fails
+    await auth.deleteUser(fbUser.uid);
+    return NextResponse.json({ error: 'Failed to create user profile. Rolled back auth.' }, { status: 500 });
+  }
 }
