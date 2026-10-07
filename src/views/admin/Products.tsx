@@ -26,8 +26,8 @@ const Products: React.FC = () => {
     name: '',
     description: '',
     categoryId: '',
-    price: 0,
-    previousPrice: 0,
+    price: "" as string | number,
+    previousPrice: "" as string | number,
 
     imageUrl: '',
     active: true,
@@ -136,10 +136,10 @@ const Products: React.FC = () => {
     setFormError(null);
 
     // Customized frontend validation
-    if (!formData.name.trim()) return setFormError('Product name is required.');
-    if (!formData.categoryId) return setFormError('Please select a category.');
-    if (formData.price <= 0) return setFormError('Selling price must be greater than ₦0.');
-        if (!formData.imageUrl) return setFormError('Please provide a product image.');
+    if (!formData.name.trim()) return toast.error('Product name is required.');
+    if (!formData.categoryId) return toast.error('Please select a category.');
+    if ((parseFloat(formData.price as string) || 0) <= 0) return toast.error('Selling price must be greater than ₦0.');
+        if (!formData.imageUrl) return toast.error('Please provide a product image.');
 
     setIsSaving(true);
     try {
@@ -151,8 +151,8 @@ const Products: React.FC = () => {
         slug: slug,
         description: formData.description,
         categoryId: formData.categoryId,
-        price: formData.price,
-        previousPrice: formData.previousPrice > 0 ? formData.previousPrice : undefined,
+        price: parseFloat(formData.price as string) || 0,
+        previousPrice: (parseFloat(formData.previousPrice as string) || 0) > 0 ? parseFloat(formData.previousPrice as string) : undefined,
 
         imageUrl: formData.imageUrl,
         active: formData.active,
@@ -177,7 +177,7 @@ const Products: React.FC = () => {
           errMsg = `Invalid field (${firstErr.path.join('.')}): ${firstErr.message}`;
         }
       }
-      setFormError(errMsg);
+      toast.error(errMsg);
     } finally {
       setIsSaving(false);
     }
@@ -314,19 +314,7 @@ const Products: React.FC = () => {
 
             <div className="overflow-y-auto flex-1 relative">
               <div className="p-4 sm:p-6 space-y-6">
-                {formError && (
-                  <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm font-medium border border-red-100">
-                    {formError}
-                  </div>
-                )}
-
-                {/* Basic Info */}
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wider">Basic Information</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label htmlFor="product-name" className="block text-sm font-medium text-gray-700 mb-1">Product Name *</label>
-                      <input ref={nameInputRef} id="product-name" type="text" className="w-full border border-gray-300 rounded-md p-2 focus-visible:ring-primary focus:border-primary outline-none" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                } />
                     </div>
                     <div>
                       <label htmlFor="product-description" className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
@@ -350,14 +338,14 @@ const Products: React.FC = () => {
                       <label htmlFor="product-price" className="block text-sm font-medium text-gray-700 mb-1">Selling Price *</label>
                       <div className="relative">
                         <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">₦</span>
-                        <input id="product-price" type="number" className="w-full border border-gray-300 rounded-md p-2 pl-8 focus-visible:ring-primary focus:border-primary outline-none" value={formData.price} onChange={e => setFormData({...formData, price: parseFloat(e.target.value) || 0})} />
+                        <input id="product-price" type="number" className="w-full border border-gray-300 rounded-md p-2 pl-8 focus-visible:ring-primary focus:border-primary outline-none" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
                       </div>
                     </div>
                     <div>
                       <label htmlFor="product-previous-price" className="block text-sm font-medium text-gray-700 mb-1">Original Price</label>
                       <div className="relative">
                         <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">₦</span>
-                        <input id="product-previous-price" type="number" className="w-full border border-gray-300 rounded-md p-2 pl-8 focus-visible:ring-primary focus:border-primary outline-none" value={formData.previousPrice} onChange={e => setFormData({...formData, previousPrice: parseFloat(e.target.value) || 0})} />
+                        <input id="product-previous-price" type="number" className="w-full border border-gray-300 rounded-md p-2 pl-8 focus-visible:ring-primary focus:border-primary outline-none" value={formData.previousPrice} onChange={e => setFormData({...formData, previousPrice: e.target.value})} />
                       </div>
                     </div>
                   </div>

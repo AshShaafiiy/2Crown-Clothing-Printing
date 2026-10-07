@@ -70,7 +70,7 @@ const Categories: React.FC = () => {
 
   const handleSave = async () => {
     setFormError(null);
-    if (!formData.name.trim()) return setFormError('Name is required');
+    if (!formData.name.trim()) return toast.error('Name is required');
 
     setIsSaving(true);
     try {
@@ -92,7 +92,7 @@ const Categories: React.FC = () => {
       fetchData();
       toast.success(modalMode === 'create' ? 'Category created successfully.' : 'Category updated successfully.');
     } catch (err: any) {
-      setFormError(err.message || 'Validation error');
+      toast.error(err.message || 'Validation error');
     } finally {
       setIsSaving(false);
     }
@@ -215,7 +215,7 @@ const Categories: React.FC = () => {
               {modalMode === 'create' ? 'Add Category' : 'Edit Category'}
             </h2>
 
-            {formError && <p className="text-red-500 text-sm mb-4 bg-red-50 p-2 rounded">{formError}</p>}
+            
 
             <div className="space-y-4 mb-6">
               <div>

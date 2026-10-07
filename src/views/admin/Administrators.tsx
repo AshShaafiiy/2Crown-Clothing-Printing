@@ -77,18 +77,18 @@ const Administrators: React.FC = () => {
     setSuccessMessage(null);
     
     if (!formData.name || !formData.email) {
-      return setFormError('Name and email are required');
+      return toast.error('Name and email are required');
     }
 
     if (modalMode === 'create') {
-      if (!formData.password) return setFormError('Password is required');
+      if (!formData.password) return toast.error('Password is required');
       
       const strength = evaluatePasswordStrength(formData.password);
       if (!strength.isStrongEnough) {
-        return setFormError('Password is too weak. ' + strength.feedback.join('. '));
+        return toast.error('Password is too weak. ' + strength.feedback.join('. '));
       }
       
-      if (formData.password !== formData.confirmPassword) return setFormError('Passwords do not match');
+      if (formData.password !== formData.confirmPassword) return toast.error('Passwords do not match');
     }
 
     setIsSaving(true);
@@ -112,7 +112,7 @@ const Administrators: React.FC = () => {
       await fetchAdmins();
       setTimeout(() => setIsModalOpen(false), 1000);
     } catch (err: any) {
-      setFormError(err.message || 'Failed to save administrator');
+      toast.error(err.message || 'Failed to save administrator');
     } finally {
       setIsSaving(false);
     }
@@ -288,7 +288,7 @@ const Administrators: React.FC = () => {
               {modalMode === 'create' ? 'Add Administrator' : 'Edit Administrator'}
             </h2>
             
-            {formError && <p className="text-red-500 text-sm mb-4 bg-red-50 p-2 rounded">{formError}</p>}
+            
             {successMessage && <p className="text-green-700 text-sm mb-4 bg-green-50 p-2 rounded">{successMessage}</p>}
             
             <div className="space-y-4 mb-6">
