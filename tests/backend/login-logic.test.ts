@@ -1,3 +1,4 @@
+process.env.NEXT_PUBLIC_FIREBASE_API_KEY = 'mock-key';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { POST } from '../../app/api/auth/login/route';
 import { userRepository } from '../../src/backend/repositories/UserRepository';
