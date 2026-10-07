@@ -220,21 +220,21 @@ const Categories: React.FC = () => {
             <div className="space-y-4 mb-6">
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700">Name *</label>
-                <input type="text" className="w-full border border-gray-300 rounded-md p-2 focus:ring-primary outline-none" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                <input type="text" className="w-full border border-gray-300 rounded-md p-2 focus-visible:ring-primary outline-none" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
               </div>
 
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700">Description</label>
-                <textarea className="w-full border border-gray-300 rounded-md p-2 focus:ring-primary outline-none" rows={2} value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
+                <textarea className="w-full border border-gray-300 rounded-md p-2 focus-visible:ring-primary outline-none" rows={2} value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
               </div>
 
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700">Display Order</label>
-                <input type="number" min="0" className="w-full border border-gray-300 rounded-md p-2 focus:ring-primary outline-none" value={formData.order} onChange={e => setFormData({...formData, order: Number(e.target.value)})} />
+                <input type="number" min="0" className="w-full border border-gray-300 rounded-md p-2 focus-visible:ring-primary outline-none" value={formData.order} onChange={e => setFormData({...formData, order: Number(e.target.value)})} />
               </div>
 
               <label className="flex items-center cursor-pointer mt-4">
-                <input type="checkbox" className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary" checked={formData.active} onChange={e => setFormData({...formData, active: e.target.checked})} />
+                <input type="checkbox" className="w-4 h-4 text-primary border-gray-300 rounded focus-visible:ring-primary" checked={formData.active} onChange={e => setFormData({...formData, active: e.target.checked})} />
                 <span className="ml-2 text-sm text-gray-700">Active (visible to customers)</span>
               </label>
             </div>

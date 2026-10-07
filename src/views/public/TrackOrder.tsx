@@ -50,7 +50,7 @@ export default function TrackOrder() {
               placeholder="2C-123456"
               value={reference} 
               onChange={e => setReference(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-primary focus:border-primary"
+              className="w-full border border-gray-300 rounded-md px-4 py-2 focus-visible:ring-primary focus:border-primary"
             />
           </div>
           <div>
@@ -183,7 +183,7 @@ export default function TrackOrder() {
                       <div className={`font-medium ${isCurrent ? 'text-primary' : isCompleted ? 'text-gray-800' : 'text-gray-400'}`}>
                         {getStatusLabel(status, true)}
                       </div>
-                      {timestamp && <div className="text-xs text-gray-500">{timestamp}</div>}
+                      {timestamp ? <div className="text-xs text-gray-500">{timestamp}</div> : ((isCompleted || isCurrent) ? <div className="text-xs text-gray-400 italic">Date unavailable</div> : null)}
                       {isCurrent && <div className="text-sm text-gray-600 mt-1">{getStatusDescription(status, true)}</div>}
                     </div>
                   );

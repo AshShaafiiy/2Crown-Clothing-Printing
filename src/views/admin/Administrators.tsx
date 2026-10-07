@@ -99,8 +99,9 @@ const Administrators: React.FC = () => {
           name: formData.name,
           email: formData.email,
           role: formData.role,
-          active: true
-        } as Omit<User, 'id'>, user);
+          active: true,
+          password: formData.password
+        } as any, user);
         setSuccessMessage('Administrator created successfully');
       } else {
         if (!user || !formData.id || !formData.role) return;
@@ -293,24 +294,24 @@ const Administrators: React.FC = () => {
             <div className="space-y-4 mb-6">
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700">Name *</label>
-                <input type="text" className="w-full border border-gray-300 rounded-md p-2 focus:ring-primary outline-none" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} disabled={modalMode === 'edit'} />
+                <input type="text" className="w-full border border-gray-300 rounded-md p-2 focus-visible:ring-primary outline-none" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} disabled={modalMode === 'edit'} />
               </div>
               
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700">Email *</label>
-                <input type="email" className="w-full border border-gray-300 rounded-md p-2 focus:ring-primary outline-none" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} disabled={modalMode === 'edit'} />
+                <input type="email" className="w-full border border-gray-300 rounded-md p-2 focus-visible:ring-primary outline-none" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} disabled={modalMode === 'edit'} />
               </div>
               
               {modalMode === 'create' && (
                 <>
                   <div>
                     <label htmlFor="adminPassword" className="block text-sm font-medium mb-1 text-gray-700">Password *</label>
-                    <PasswordInput id="adminPassword" required className="w-full border border-gray-300 rounded-md p-2 focus:ring-primary outline-none" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
+                    <PasswordInput id="adminPassword" required className="w-full border border-gray-300 rounded-md p-2 focus-visible:ring-primary outline-none" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
                     <PasswordStrengthMeter password={formData.password} />
                   </div>
                   <div>
                     <label htmlFor="adminConfirmPassword" className="block text-sm font-medium mb-1 text-gray-700">Confirm Password *</label>
-                    <PasswordInput id="adminConfirmPassword" required className="w-full border border-gray-300 rounded-md p-2 focus:ring-primary outline-none" value={formData.confirmPassword || ''} onChange={e => setFormData({...formData, confirmPassword: e.target.value})} />
+                    <PasswordInput id="adminConfirmPassword" required className="w-full border border-gray-300 rounded-md p-2 focus-visible:ring-primary outline-none" value={formData.confirmPassword || ''} onChange={e => setFormData({...formData, confirmPassword: e.target.value})} />
                     {formData.confirmPassword && formData.password !== formData.confirmPassword && (
                       <p className="text-red-500 text-xs mt-1">Passwords do not match.</p>
                     )}
@@ -321,7 +322,7 @@ const Administrators: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700">Role *</label>
                 <select 
-                  className="w-full border border-gray-300 rounded-md p-2 focus:ring-primary outline-none" 
+                  className="w-full border border-gray-300 rounded-md p-2 focus-visible:ring-primary outline-none" 
                   value={formData.role} 
                   onChange={e => setFormData({...formData, role: e.target.value as User['role']})}
                   disabled={user?.role !== 'root_super_admin'}

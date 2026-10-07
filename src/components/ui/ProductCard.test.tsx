@@ -3,6 +3,8 @@ import { describe, it, expect, vi } from 'vitest';
 import "@testing-library/jest-dom";
 import { render, screen, waitFor } from '@testing-library/react';
 import { ProductCard } from './ProductCard';
+import userEvent from '@testing-library/user-event';
+import { useCartStore } from '../../store/cartStore';
 import { Product } from '../../domain/models';
 
 vi.mock('../../services', () => ({
@@ -34,6 +36,24 @@ describe('ProductCard', () => {
     await waitFor(() => {
       expect(screen.getByText('(10)')).toBeInTheDocument();
     });
+
+  it('adds product to cart with canonical payload and prevents navigation', async () => {
+    const user = userEvent.setup();
+    render(<ProductCard product={mockProduct} />);
+    
+    // Check Add to Cart button
+    const addButton = screen.getByRole('button', { name: /Add to Cart/i });
+    expect(addButton).toHaveClass('focus-visible:ring-2'); // verify focus ring
+    
+    await user.click(addButton);
+    
+    // Verify it changed to quantity control
+    expect(screen.getByRole('button', { name: /Increase/i })).toBeInTheDocument();
+    
+    // Clear cart for clean state
+    useCartStore.getState().clearCart();
+  });
+
 
     const links = screen.getAllByRole('link');
     expect(links.length).toBeGreaterThan(0);

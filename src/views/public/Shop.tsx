@@ -115,7 +115,7 @@ const Shop: React.FC = () => {
               placeholder="Search products..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-primary focus:border-primary"
+              className="w-full border border-gray-300 rounded-md px-4 py-2 focus-visible:ring-primary focus:border-primary"
             />
           </div>
 
@@ -130,7 +130,7 @@ const Shop: React.FC = () => {
                   value="all" 
                   checked={selectedCategory === 'all'}
                   onChange={() => setSelectedCategory('all')}
-                  className="text-primary focus:ring-primary h-4 w-4"
+                  className="text-primary focus-visible:ring-primary h-4 w-4"
                 />
                 <span className="text-gray-700 group-hover:text-primary transition-colors">All Products</span>
               </label>
@@ -142,7 +142,7 @@ const Shop: React.FC = () => {
                     value={cat.id} 
                     checked={selectedCategory === cat.id}
                     onChange={() => setSelectedCategory(cat.id)}
-                    className="text-primary focus:ring-primary h-4 w-4"
+                    className="text-primary focus-visible:ring-primary h-4 w-4"
                   />
                   <span className="text-gray-700 group-hover:text-primary transition-colors">{cat.name}</span>
                 </label>
@@ -162,7 +162,7 @@ const Shop: React.FC = () => {
               <select 
                 value={sortOption}
                 onChange={(e) => setSortOption(e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:ring-primary focus:border-primary"
+                className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus-visible:ring-primary focus:border-primary"
               >
                 <option value="newest">Newest Arrivals</option>
                 <option value="price-asc">Price: Low to High</option>

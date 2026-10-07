@@ -19,6 +19,18 @@ beforeAll(() => {
     })),
   });
 
+  it('renders loading state when initialData is not provided', () => {
+    const { container } = render(<Home />);
+    expect(container.querySelector('.animate-spin')).toBeInTheDocument();
+  });
+
+  it('renders zero-product empty state only when products are loaded and empty', () => {
+    render(<Home initialData={{ categories: [], products: [], promotions: [] }} />);
+    expect(screen.getByText('Our featured products will appear here soon.')).toBeInTheDocument();
+    expect(screen.queryByText('Featured Product')).not.toBeInTheDocument();
+  });
+
+
   class MockIntersectionObserver {
     observe = () => null;
     unobserve = () => null;

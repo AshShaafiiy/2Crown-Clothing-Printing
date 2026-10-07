@@ -186,7 +186,7 @@ const ProductDetails: React.FC = () => {
                 <select
                   value={selectedVariantId}
                   onChange={(e) => setSelectedVariantId(e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-primary focus:border-primary"
+                  className="w-full border border-gray-300 rounded-md px-4 py-2 focus-visible:ring-primary focus:border-primary"
                 >
                   {product.variants.map((v) => (
                     <option key={v.id} value={v.id}>
@@ -216,7 +216,7 @@ const ProductDetails: React.FC = () => {
                     required={field.required}
                     value={customization[field.name] || ''}
                     onChange={(e) => handleCustomizationChange(field.name, e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-primary focus:border-primary"
+                    className="w-full border border-gray-300 rounded-md px-4 py-2 focus-visible:ring-primary focus:border-primary"
                   />
                 )}
 
@@ -226,7 +226,7 @@ const ProductDetails: React.FC = () => {
                     rows={3}
                     value={customization[field.name] || ''}
                     onChange={(e) => handleCustomizationChange(field.name, e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-primary focus:border-primary"
+                    className="w-full border border-gray-300 rounded-md px-4 py-2 focus-visible:ring-primary focus:border-primary"
                   />
                 )}
 
@@ -235,7 +235,7 @@ const ProductDetails: React.FC = () => {
                     required={field.required}
                     value={customization[field.name] || ''}
                     onChange={(e) => handleCustomizationChange(field.name, e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-primary focus:border-primary"
+                    className="w-full border border-gray-300 rounded-md px-4 py-2 focus-visible:ring-primary focus:border-primary"
                   >
                     <option value="">Select {field.label}</option>
                     {field.options.map(opt => (
@@ -256,7 +256,7 @@ const ProductDetails: React.FC = () => {
                 <button
                   onClick={handleAddToCart}
                   disabled={!product.active}
-                  className="w-full bg-primary hover:bg-primary-dark text-secondary font-bold py-4 px-8 rounded-md shadow-sm transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed mb-8 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50"
+                  className="w-full bg-primary hover:bg-primary-dark text-secondary font-bold py-4 px-8 rounded-md shadow-sm transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed mb-8 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-opacity-50"
                 >
                   {!product.active ? 'Unavailable' : <span className="flex items-center justify-center gap-2"><ShoppingCart size={20} /> Add to Cart</span>}
                 </button>

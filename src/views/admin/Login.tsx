@@ -72,7 +72,7 @@ export default function AdminLogin() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-primary focus:border-primary outline-none transition"
                 placeholder="admin@example.com"
                 autoComplete="email"
                 disabled={isSubmitting}
@@ -87,7 +87,7 @@ export default function AdminLogin() {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-primary focus:border-primary outline-none transition"
                 placeholder="••••••••"
                 autoComplete="current-password"
                 disabled={isSubmitting}

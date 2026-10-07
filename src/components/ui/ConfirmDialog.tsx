@@ -55,16 +55,16 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-xl flex justify-end gap-3 flex-col-reverse sm:flex-row">
           <button
             onClick={onCancel}
-            className="w-full sm:w-auto px-4 py-2 bg-white border border-gray-300 rounded shadow-sm text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 transition-colors"
+            className="w-full sm:w-auto px-4 py-2 bg-white border border-gray-300 rounded shadow-sm text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-200 transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className={`w-full sm:w-auto px-4 py-2 rounded shadow-sm font-medium focus:outline-none focus:ring-2 transition-colors ${
+            className={`w-full sm:w-auto px-4 py-2 rounded shadow-sm font-medium focus:outline-none focus-visible:ring-2 transition-colors ${
               isDestructive 
-                ? 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500'
-                : 'bg-primary text-secondary hover:bg-primary/90 focus:ring-primary'
+                ? 'bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500'
+                : 'bg-primary text-secondary hover:bg-primary/90 focus-visible:ring-primary'
             }`}
           >
             {confirmLabel}

@@ -16,7 +16,7 @@ export const AdminSearch: React.FC<AdminSearchProps> = ({ placeholder, value, on
       </div>
       <input
         type="text"
-        className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:border-primary focus:ring-1 focus:ring-primary sm:text-sm"
+        className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:border-primary focus-visible:ring-1 focus-visible:ring-primary sm:text-sm"
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}

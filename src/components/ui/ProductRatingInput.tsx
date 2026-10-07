@@ -130,7 +130,7 @@ export const ProductRatingInput: React.FC<ProductRatingInputProps> = ({ productI
                       value={reference}
                       onChange={(e) => setReference(e.target.value)}
                       placeholder="e.g. 2C-123456"
-                      className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-primary focus:border-primary"
+                      className="w-full px-3 py-2 border border-gray-300 rounded focus-visible:ring-primary focus:border-primary"
                       required 
                     />
                   </div>
@@ -141,7 +141,7 @@ export const ProductRatingInput: React.FC<ProductRatingInputProps> = ({ productI
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="Number used for the order"
-                      className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-primary focus:border-primary"
+                      className="w-full px-3 py-2 border border-gray-300 rounded focus-visible:ring-primary focus:border-primary"
                       required 
                     />
                   </div>

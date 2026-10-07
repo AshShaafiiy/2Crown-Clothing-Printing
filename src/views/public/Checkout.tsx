@@ -101,7 +101,7 @@ export default function Checkout() {
                   required 
                   value={formData.name} 
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-primary focus:border-primary"
+                  className="w-full border border-gray-300 rounded-md px-4 py-2 focus-visible:ring-primary focus:border-primary"
                 />
               </div>
               <div>
@@ -113,7 +113,7 @@ export default function Checkout() {
                   required 
                   value={formData.phone} 
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-primary focus:border-primary"
+                  className="w-full border border-gray-300 rounded-md px-4 py-2 focus-visible:ring-primary focus:border-primary"
                 />
               </div>
             </div>
@@ -127,7 +127,7 @@ export default function Checkout() {
                 value={formData.email} 
                 onChange={handleChange}
                 placeholder="For order updates"
-                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-primary focus:border-primary"
+                className="w-full border border-gray-300 rounded-md px-4 py-2 focus-visible:ring-primary focus:border-primary"
               />
             </div>
             
@@ -141,7 +141,7 @@ export default function Checkout() {
                   value="pickup" 
                   checked={formData.deliveryMethod === 'pickup'}
                   onChange={handleChange}
-                  className="text-primary focus:ring-primary"
+                  className="text-primary focus-visible:ring-primary"
                 />
                 <div>
                   <div className="font-medium">Store Pickup</div>
@@ -155,7 +155,7 @@ export default function Checkout() {
                   value="local" 
                   checked={formData.deliveryMethod === 'local'}
                   onChange={handleChange}
-                  className="text-primary focus:ring-primary"
+                  className="text-primary focus-visible:ring-primary"
                 />
                 <div>
                   <div className="font-medium">Local Delivery</div>
@@ -174,7 +174,7 @@ export default function Checkout() {
                   value={formData.address} 
                   onChange={handleChange}
                   rows={3} 
-                  className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-primary focus:border-primary"
+                  className="w-full border border-gray-300 rounded-md px-4 py-2 focus-visible:ring-primary focus:border-primary"
                 />
               </div>
             )}

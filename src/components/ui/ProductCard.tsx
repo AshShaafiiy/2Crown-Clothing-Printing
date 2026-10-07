@@ -9,6 +9,7 @@ import { useCartStore } from '../../store/cartStore';
 import { QuantityControl } from './QuantityControl';
 import toast from 'react-hot-toast';
 import { ProductRatingDisplay } from './ProductRatingDisplay';
+import { toCartItem } from '../../utils/cartUtils';
 
 interface ProductCardProps {
   product: Product;
@@ -21,6 +22,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     addItem(toCartItem(product, 1));
     toast.success(`Added ${product.name} to cart!`);
   };
@@ -83,14 +85,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         ) : requiresCustomization ? (
           <Link 
             href={`/product/${product.slug}`}
-            className="w-full text-center py-2.5 bg-primary text-secondary font-bold text-sm rounded hover:bg-primary-dark transition-colors mt-auto block focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50"
+            className="w-full text-center py-2.5 bg-primary text-secondary font-bold text-sm rounded hover:bg-primary-dark transition-colors mt-auto block focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-opacity-50"
           >
             Customize & Buy
           </Link>
         ) : (
           <button
             onClick={handleAddToCart}
-            className="w-full text-center py-2.5 bg-primary text-secondary font-bold text-sm rounded hover:bg-primary-dark transition-colors mt-auto block focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50"
+            className="w-full text-center py-2.5 bg-primary text-secondary font-bold text-sm rounded hover:bg-primary-dark transition-colors mt-auto block focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-opacity-50"
           >
             Add to Cart
           </button>

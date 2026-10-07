@@ -90,7 +90,7 @@ export default function Profile() {
                 required
                 value={formData.name}
                 onChange={e => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-2 border rounded-md focus:ring-primary focus:border-primary"
+                className="w-full px-4 py-2 border rounded-md focus-visible:ring-primary focus:border-primary"
               />
             </div>
             <div>
@@ -101,7 +101,7 @@ export default function Profile() {
                 required
                 value={formData.email}
                 onChange={e => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-2 border rounded-md focus:ring-primary focus:border-primary"
+                className="w-full px-4 py-2 border rounded-md focus-visible:ring-primary focus:border-primary"
               />
             </div>
             <div>
@@ -111,7 +111,7 @@ export default function Profile() {
                 type="text"
                 value={formData.phone}
                 onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full px-4 py-2 border rounded-md focus:ring-primary focus:border-primary"
+                className="w-full px-4 py-2 border rounded-md focus-visible:ring-primary focus:border-primary"
               />
             </div>
             <div>
@@ -159,7 +159,7 @@ export default function Profile() {
                 value={pwdData.currentPassword}
                 onChange={e => setPwdData({ ...pwdData, currentPassword: e.target.value })}
                 wrapperClassName="w-full md:w-1/2"
-                className="w-full px-4 py-2 border rounded-md focus:ring-primary focus:border-primary"
+                className="w-full px-4 py-2 border rounded-md focus-visible:ring-primary focus:border-primary"
               />
             </div>
             <div>
@@ -170,7 +170,7 @@ export default function Profile() {
                 minLength={8}
                 value={pwdData.newPassword}
                 onChange={e => setPwdData({ ...pwdData, newPassword: e.target.value })}
-                className="w-full px-4 py-2 border rounded-md focus:ring-primary focus:border-primary"
+                className="w-full px-4 py-2 border rounded-md focus-visible:ring-primary focus:border-primary"
               />
               {pwdData.newPassword && (
                 <PasswordStrengthMeter password={pwdData.newPassword} />
@@ -184,7 +184,7 @@ export default function Profile() {
                 minLength={8}
                 value={pwdData.confirmPassword}
                 onChange={e => setPwdData({ ...pwdData, confirmPassword: e.target.value })}
-                className="w-full px-4 py-2 border rounded-md focus:ring-primary focus:border-primary"
+                className="w-full px-4 py-2 border rounded-md focus-visible:ring-primary focus:border-primary"
               />
               {pwdData.newPassword && pwdData.confirmPassword && (
                 <p className={`text-xs mt-1 ${pwdData.newPassword === pwdData.confirmPassword ? 'text-green-600' : 'text-red-500'}`}>

@@ -12,11 +12,11 @@ import { ImageFallback } from '../../components/ui/ImageFallback';
 import { ProductCard } from '../../components/ui/ProductCard';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
 
-export const Home = () => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
-  const [promotions, setPromotions] = useState<Promotion[]>([]);
-    const [loading, setLoading] = useState(true);
+export const Home = ({ initialData }: { initialData?: { categories: Category[], products: Product[], promotions: Promotion[] } }) => {
+  const [categories, setCategories] = useState<Category[]>(initialData?.categories || []);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>(initialData?.products || []);
+  const [promotions, setPromotions] = useState<Promotion[]>(initialData?.promotions || []);
+  const [loading, setLoading] = useState(!initialData);
   const pathname = usePathname();
 
   // Scroll reveal refs for major sections
@@ -25,6 +25,7 @@ export const Home = () => {
   const customWorkSection = useScrollReveal<HTMLDivElement>();
 
   useEffect(() => {
+    if (initialData) return;
     const fetchHomeData = async () => {
       try {
         const [cats, prods, promos, items] = await Promise.all([
@@ -132,7 +133,11 @@ export const Home = () => {
             </Link>
           </div>
           
-          {featuredProducts.length > 0 ? (
+                    {loading ? (
+            <div className="flex justify-center items-center py-12">
+               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : featuredProducts.length > 0 ? (
             <div className={`grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 stagger-children`}>
               {featuredProducts.map(product => (
                 <div key={product.id} className={`reveal-fade-up ${featuredSection.isVisible ? 'revealed' : ''}`}>

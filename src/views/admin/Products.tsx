@@ -326,15 +326,15 @@ const Products: React.FC = () => {
                   <div className="space-y-4">
                     <div>
                       <label htmlFor="product-name" className="block text-sm font-medium text-gray-700 mb-1">Product Name *</label>
-                      <input ref={nameInputRef} id="product-name" type="text" className="w-full border border-gray-300 rounded-md p-2 focus:ring-primary focus:border-primary outline-none" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                      <input ref={nameInputRef} id="product-name" type="text" className="w-full border border-gray-300 rounded-md p-2 focus-visible:ring-primary focus:border-primary outline-none" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
                     </div>
                     <div>
                       <label htmlFor="product-description" className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
-                      <textarea id="product-description" className="w-full border border-gray-300 rounded-md p-2 focus:ring-primary focus:border-primary outline-none h-24 resize-y" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}></textarea>
+                      <textarea id="product-description" className="w-full border border-gray-300 rounded-md p-2 focus-visible:ring-primary focus:border-primary outline-none h-24 resize-y" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}></textarea>
                     </div>
                     <div>
                       <label htmlFor="product-category" className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
-                      <select id="product-category" className="w-full border border-gray-300 rounded-md p-2 focus:ring-primary focus:border-primary outline-none" value={formData.categoryId} onChange={e => setFormData({...formData, categoryId: e.target.value})}>
+                      <select id="product-category" className="w-full border border-gray-300 rounded-md p-2 focus-visible:ring-primary focus:border-primary outline-none" value={formData.categoryId} onChange={e => setFormData({...formData, categoryId: e.target.value})}>
                         <option value="">Select Category</option>
                         {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                       </select>
@@ -350,14 +350,14 @@ const Products: React.FC = () => {
                       <label htmlFor="product-price" className="block text-sm font-medium text-gray-700 mb-1">Selling Price *</label>
                       <div className="relative">
                         <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">₦</span>
-                        <input id="product-price" type="number" className="w-full border border-gray-300 rounded-md p-2 pl-8 focus:ring-primary focus:border-primary outline-none" value={formData.price} onChange={e => setFormData({...formData, price: parseFloat(e.target.value) || 0})} />
+                        <input id="product-price" type="number" className="w-full border border-gray-300 rounded-md p-2 pl-8 focus-visible:ring-primary focus:border-primary outline-none" value={formData.price} onChange={e => setFormData({...formData, price: parseFloat(e.target.value) || 0})} />
                       </div>
                     </div>
                     <div>
                       <label htmlFor="product-previous-price" className="block text-sm font-medium text-gray-700 mb-1">Original Price</label>
                       <div className="relative">
                         <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">₦</span>
-                        <input id="product-previous-price" type="number" className="w-full border border-gray-300 rounded-md p-2 pl-8 focus:ring-primary focus:border-primary outline-none" value={formData.previousPrice} onChange={e => setFormData({...formData, previousPrice: parseFloat(e.target.value) || 0})} />
+                        <input id="product-previous-price" type="number" className="w-full border border-gray-300 rounded-md p-2 pl-8 focus-visible:ring-primary focus:border-primary outline-none" value={formData.previousPrice} onChange={e => setFormData({...formData, previousPrice: parseFloat(e.target.value) || 0})} />
                       </div>
                     </div>
                   </div>
@@ -413,12 +413,12 @@ const Products: React.FC = () => {
                   <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wider">Promotions & Status</h3>
                   <div className="flex flex-col space-y-4">
                     <label className="flex items-center cursor-pointer">
-                      <input type="checkbox" className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary" checked={formData.active} onChange={e => setFormData({...formData, active: e.target.checked})} />
+                      <input type="checkbox" className="w-4 h-4 text-primary border-gray-300 rounded focus-visible:ring-primary" checked={formData.active} onChange={e => setFormData({...formData, active: e.target.checked})} />
                       <span className="ml-3 text-sm text-gray-700 font-medium">Active (Visible to customers)</span>
                     </label>
 
                     <label className="flex items-center cursor-pointer">
-                      <input type="checkbox" className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary" checked={formData.featured} onChange={e => setFormData({...formData, featured: e.target.checked})} />
+                      <input type="checkbox" className="w-4 h-4 text-primary border-gray-300 rounded focus-visible:ring-primary" checked={formData.featured} onChange={e => setFormData({...formData, featured: e.target.checked})} />
                       <span className="ml-3 text-sm text-gray-700 font-medium">Featured Product (Shows on homepage)</span>
                     </label>
                   </div>

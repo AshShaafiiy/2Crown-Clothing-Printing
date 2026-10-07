@@ -73,7 +73,7 @@ const Settings: React.FC = () => {
               maxLength={100}
               value={settings.storeName} 
               onChange={handleChange} 
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2 border"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus-visible:ring-primary sm:text-sm p-2 border"
             />
           </div>
           <div>
@@ -84,7 +84,7 @@ const Settings: React.FC = () => {
               required
               value={settings.currency}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2 border bg-white"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus-visible:ring-primary sm:text-sm p-2 border bg-white"
             >
               <option value="NGN">NGN — Nigerian Naira (₦)</option>
             </select>
@@ -99,7 +99,7 @@ const Settings: React.FC = () => {
               maxLength={255}
               value={settings.contactEmail} 
               onChange={handleChange} 
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2 border"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus-visible:ring-primary sm:text-sm p-2 border"
             />
           </div>
           <div>
@@ -112,7 +112,7 @@ const Settings: React.FC = () => {
               maxLength={50}
               value={settings.contactPhone} 
               onChange={handleChange} 
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2 border"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus-visible:ring-primary sm:text-sm p-2 border"
             />
           </div>
           <div>
@@ -125,7 +125,7 @@ const Settings: React.FC = () => {
               maxLength={50}
               value={settings.whatsappNumber}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2 border"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus-visible:ring-primary sm:text-sm p-2 border"
             />
           </div>
           <div>
@@ -138,7 +138,7 @@ const Settings: React.FC = () => {
               rows={3}
               value={settings.address}
               onChange={(e) => handleChange(e as any)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2 border"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus-visible:ring-primary sm:text-sm p-2 border"
             />
           </div>
           <div className="flex justify-end">
