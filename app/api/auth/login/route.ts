@@ -36,6 +36,11 @@ export async function POST(req: Request) {
        return NextResponse.json({ error: 'Unauthorized: User inactive or not found' }, { status: 401 });
     }
 
+    // Update lastLogin on successful authentication of an active user
+    const lastLogin = new Date().toISOString();
+    await userRepository.update(user.id, { lastLogin });
+    user.lastLogin = lastLogin;
+
     const response = NextResponse.json({ ...user, token });
     response.headers.set('Authorization', `Bearer ${token}`);
     return response;

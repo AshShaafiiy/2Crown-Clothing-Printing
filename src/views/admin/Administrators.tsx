@@ -255,7 +255,7 @@ const Administrators: React.FC = () => {
                         </span>
                       </td>
                       <td className="whitespace-nowrap px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {admin.createdAt ? new Date(admin.createdAt).toLocaleDateString() : '—'}
+                        {admin.createdAt ? new Date(admin.createdAt).toLocaleDateString() : 'Date unavailable'}
                       </td>
                       <td className="whitespace-nowrap px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {admin.lastLogin ? new Date(admin.lastLogin).toLocaleString() : 'Never'}

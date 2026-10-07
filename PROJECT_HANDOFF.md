@@ -230,3 +230,13 @@ Cart quantity controls use gold decrement/increment buttons with a display-only 
 - **Removed Dead Code**: Eliminated unused Express-era files (`src/backend/utils/httpSecurity.ts`, `jwtConfig.ts`).
 - **Modernized API Routes**: Upgraded Next.js App Router dynamic route signatures to safely await `Promise<params>`, natively satisfying Next.js 15+ strict typings.
 - **Result**: `tsc --noEmit` cleanly exits with `CODE 0` and `0` errors. The `vitest` suite (`258` tests) remains unaffected and cleanly passes. Production build static generation verified clean.
+
+## 2026-10-07 Administrator Timestamps Correction
+- **Created Date Root Cause**: Legacy documents and server-side Next.js serialization produced unnormalized Firestore Timestamps (e.g., `_seconds`), resulting in `Invalid Date` crashes on the client. 
+- **Last Login Root Cause**: Firebase Auth login verified credentials without propagating a discrete server-side `lastLoginAt` temporal update to the Firestore user profile.
+- **Normalization Strategy**: Centralized safe parsing logic (`normalizeTimestamp`) now uniformly drops unparseable dates or synthetically generated epochs (0-ticks) to an empty string `''`. The React views explicitly fall back to `Date unavailable` or `Never` respectively, strictly preventing fabricated historical records.
+- **Last Login Semantics**: The system strictly updates `lastLogin` *only* following a fresh credential authorization against the Google Identity Toolkit for an active administrator via the `/api/auth/login` endpoint. It ignores ambient token refreshes, deactivated administrators, and unauthenticated clients.
+- **Validation**:
+  - Live Vercel QA verified isolated Root Super Admin timestamp logic.
+  - Test suite (269 tests) passed flawlessly with new coverage explicitly targeting temporal boundaries.
+  - Production build static generation clean.
