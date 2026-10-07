@@ -177,7 +177,7 @@ const Products: React.FC = () => {
           errMsg = `Invalid field (${firstErr.path.join('.')}): ${firstErr.message}`;
         }
       }
-      setFormError(errMsg);
+      toast.error(errMsg);
     } finally {
       setIsSaving(false);
     }

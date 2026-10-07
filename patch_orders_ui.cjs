@@ -1,40 +1,24 @@
 const fs = require('fs');
+let content = fs.readFileSync('src/views/admin/Orders.tsx', 'utf8');
 
-const path = 'src/views/admin/Orders.tsx';
-let code = fs.readFileSync(path, 'utf8');
-
-// Helper to safely format dates in UI
-const safeDate = `
-function safeFormatDate(dateStr?: string, options?: any) {
-  if (!dateStr) return 'Date unavailable';
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return 'Date unavailable';
-  return options ? d.toLocaleString(undefined, options) : d.toLocaleString();
-}
-
-function safeFormatDateShort(dateStr?: string) {
-  if (!dateStr) return 'Date unavailable';
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return 'Date unavailable';
-  return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-}
+const replacement = `
+  const handleStatusChange = async (order: Order, newStatus: string) => {
+    if (newStatus === 'Confirmed' && order.deliveryMethod !== 'pickup' && order.deliveryFee == null) {
+      await confirm({
+        title: 'Delivery Fee Required',
+        message: 'Please enter the delivery fee before confirming this order.',
+        confirmLabel: 'OK',
+        isDestructive: false
+      });
+      setEditingFeeId(order.id);
+      setTimeout(() => {
+        const input = document.getElementById('delivery-fee-input');
+        if (input) input.focus();
+      }, 100);
+      return;
+    }
 `;
 
-// Insert the helpers after the imports
-code = code.replace(
-  'const Orders: React.FC = () => {',
-  `${safeDate}\nconst Orders: React.FC = () => {`
-);
+content = content.replace(/const handleStatusChange = async \(order: Order, newStatus: string\) => \{[\s\S]*?return;\n    \}/, replacement.trim());
 
-// Replace usages
-code = code.replace(
-  /{new Date\(order\.createdAt\)\.toLocaleDateString\(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }\)}/g,
-  '{safeFormatDateShort(order.createdAt)}'
-);
-
-code = code.replace(
-  /{new Date\(order\.createdAt\)\.toLocaleString\(\)}/g,
-  '{safeFormatDate(order.createdAt)}'
-);
-
-fs.writeFileSync(path, code);
+fs.writeFileSync('src/views/admin/Orders.tsx', content);

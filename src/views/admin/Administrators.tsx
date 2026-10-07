@@ -288,7 +288,7 @@ const Administrators: React.FC = () => {
               {modalMode === 'create' ? 'Add Administrator' : 'Edit Administrator'}
             </h2>
             
-            {formError && <p className="text-red-500 text-sm mb-4 bg-red-50 p-2 rounded">{formError}</p>}
+            
             {successMessage && <p className="text-green-700 text-sm mb-4 bg-green-50 p-2 rounded">{successMessage}</p>}
             
             <div className="space-y-4 mb-6">

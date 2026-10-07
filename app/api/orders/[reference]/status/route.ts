@@ -17,7 +17,17 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ refere
   const { data, error, status } = await parseBody(req, UpdateOrderStatusSchema);
   if (error) return NextResponse.json(error, { status });
 
+  
   const newStatus = data!.status;
+  if (newStatus === 'Confirmed' && existing.deliveryMethod === 'local' && existing.deliveryFee == null) {
+    return NextResponse.json({ error: 'Cannot confirm order without a delivery fee. Please add delivery fee first.' }, { status: 400 });
+  }
+
+  
+  if (newStatus === 'Confirmed' && existing.deliveryMethod === 'pickup' && existing.deliveryFee == null) {
+    await orderRepository.updateDeliveryFee(id, 0);
+  }
+
   const historyEntry = {
     id: uuid(),
     previousStatus: existing.status,

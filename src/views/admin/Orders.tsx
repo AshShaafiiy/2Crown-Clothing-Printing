@@ -57,7 +57,12 @@ const Orders: React.FC = () => {
 
   const handleStatusChange = async (order: Order, newStatus: string) => {
     if (newStatus === 'Confirmed' && order.deliveryMethod !== 'pickup' && order.deliveryFee == null) {
-      toast.error('Enter the delivery fee before confirming this order.', { duration: 4000 });
+      await confirm({
+        title: 'Delivery Fee Required',
+        message: 'Please enter the delivery fee before confirming this order.',
+        confirmLabel: 'OK',
+        isDestructive: false
+      });
       setEditingFeeId(order.id);
       setTimeout(() => {
         const input = document.getElementById('delivery-fee-input');
