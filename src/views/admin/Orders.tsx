@@ -7,6 +7,21 @@ import { useConfirm } from '../../components/ui/ConfirmProvider';
 import { getValidNextStatuses, getStatusLabel } from '../../utils/orderTransitions';
 import toast from 'react-hot-toast';
 
+
+function safeFormatDate(dateStr?: string, options?: any) {
+  if (!dateStr) return 'Date unavailable';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return 'Date unavailable';
+  return options ? d.toLocaleString(undefined, options) : d.toLocaleString();
+}
+
+function safeFormatDateShort(dateStr?: string) {
+  if (!dateStr) return 'Date unavailable';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return 'Date unavailable';
+  return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
 const Orders: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +33,7 @@ const Orders: React.FC = () => {
   useEffect(() => {
     services.orders.getOrders().then(data => {
       // Sort newest first
-      const sorted = [...data].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      const sorted = [...data].sort((a, b) => (new Date(b.createdAt).getTime() || 0) - (new Date(a.createdAt).getTime() || 0));
       setOrders(sorted);
       setLoading(false);
     }).catch(err => {
@@ -180,7 +195,7 @@ const Orders: React.FC = () => {
                         </span>
                       </td>
                       <td className="whitespace-nowrap px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(order.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        {safeFormatDateShort(order.createdAt)}
                       </td>
                     </tr>
                     {expandedOrderId === order.id && (
@@ -200,7 +215,7 @@ const Orders: React.FC = () => {
                               <div className="grid grid-cols-3 gap-2 mb-2">
                                 <span className="text-gray-500">Method:</span> <span className="col-span-2 font-medium">{deliveryText}</span>
                                 {order.deliveryAddress && <><span className="text-gray-500">Address:</span> <span className="col-span-2">{order.deliveryAddress}</span></>}
-                                <span className="text-gray-500">Created:</span> <span className="col-span-2">{new Date(order.createdAt).toLocaleString()}</span>
+                                <span className="text-gray-500">Created:</span> <span className="col-span-2">{safeFormatDate(order.createdAt)}</span>
                               </div>
                             </div>
                             
