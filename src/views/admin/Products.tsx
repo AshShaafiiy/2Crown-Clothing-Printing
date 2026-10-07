@@ -177,7 +177,7 @@ const Products: React.FC = () => {
           errMsg = `Invalid field (${firstErr.path.join('.')}): ${firstErr.message}`;
         }
       }
-      toast.error(errMsg);
+      setFormError(errMsg);
     } finally {
       setIsSaving(false);
     }
@@ -314,7 +314,15 @@ const Products: React.FC = () => {
 
             <div className="overflow-y-auto flex-1 relative">
               <div className="p-4 sm:p-6 space-y-6">
-                } />
+                
+
+                {/* Basic Info */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wider">Basic Information</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label htmlFor="product-name" className="block text-sm font-medium text-gray-700 mb-1">Product Name *</label>
+                      <input ref={nameInputRef} id="product-name" type="text" className="w-full border border-gray-300 rounded-md p-2 focus-visible:ring-primary focus:border-primary outline-none" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
                     </div>
                     <div>
                       <label htmlFor="product-description" className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
