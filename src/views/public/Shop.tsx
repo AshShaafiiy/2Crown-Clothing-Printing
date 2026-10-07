@@ -77,8 +77,8 @@ const Shop: React.FC = () => {
         <div className="h-10 bg-gray-200 w-48 mb-8 rounded animate-pulse"></div>
         <div className="flex flex-col md:flex-row gap-8">
           <div className="w-full md:w-1/4 h-64 bg-gray-200 rounded animate-pulse"></div>
-          <div className="w-full md:w-3/4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map(i => (
+          <div className="w-full md:w-3/4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
+            {[1, 2, 3, 4, 5].map(i => (
               <div key={i} className="h-80 bg-gray-200 rounded animate-pulse"></div>
             ))}
           </div>
@@ -184,7 +184,7 @@ const Shop: React.FC = () => {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 stagger-children">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6 stagger-children">
               {filteredAndSortedProducts.map((product) => (
                 <div key={product.id} className="reveal-fade-up revealed">
                   <ProductCard product={product} />

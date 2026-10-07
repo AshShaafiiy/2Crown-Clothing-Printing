@@ -11,7 +11,7 @@ export default async function Page(props: any) {
   ]);
 
   const categories = allCats.sort((a, b) => a.order - b.order).slice(0, 4);
-  const products = allProds.filter(p => p.featured && p.active).slice(0, 4);
+  const products = allProds.filter(p => p.featured && p.active).slice(0, 5);
   const promotions = allPromos.filter(p => p.active).slice(0, 1);
 
   const initialData = { categories, products, promotions };

@@ -42,7 +42,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         )}
 
         {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-2">
+        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 flex flex-col gap-1.5 sm:gap-2">
           {computeProductBadges(product).map((badge, idx) => {
             // Apply different styles based on badge type
             let badgeClass = "bg-red-100 text-red-800"; // default for discount
@@ -53,7 +53,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             }
 
             return (
-              <span key={idx} className={`${badgeClass} text-xs font-bold px-2 py-1 rounded shadow-sm`}>
+              <span key={idx} className={`${badgeClass} text-[10px] sm:text-xs font-bold px-1.5 py-0.5 sm:px-2 sm:py-1 rounded shadow-sm`}>
                 {badge.label}
               </span>
             );
@@ -62,21 +62,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </Link>
 
       {/* Product Details */}
-      <div className="flex flex-col flex-grow p-4">
+      <div className="flex flex-col flex-grow p-3 sm:p-4">
         <Link href={`/product/${product.slug}`} className="block flex-grow">
-          <h3 className="text-sm font-semibold text-secondary mb-1 line-clamp-2 leading-tight hover:text-primary transition-colors">
+          <h3 className="text-xs sm:text-sm font-semibold text-secondary mb-1 line-clamp-2 leading-tight hover:text-primary transition-colors">
             {product.name}
           </h3>
           <div className="mb-1">
             <ProductRatingDisplay productId={product.id} compact={true} />
           </div>
-          <p className="text-xs text-gray-500 mb-3 truncate">
+          <p className="text-[10px] sm:text-xs text-gray-500 mb-2 sm:mb-3 truncate">
             {'Standard'}
           </p>
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-lg font-bold text-secondary">₦{product.price.toLocaleString()}</span>
+          <div className="flex flex-wrap items-center gap-x-1 sm:gap-x-2 gap-y-0.5 mb-3 sm:mb-4">
+            <span className="text-sm sm:text-lg font-bold text-secondary">₦{product.price.toLocaleString()}</span>
             {product.previousPrice && (
-              <span className="text-sm text-gray-400 line-through">₦{product.previousPrice.toLocaleString()}</span>
+              <span className="text-[10px] sm:text-sm text-gray-400 line-through">₦{product.previousPrice.toLocaleString()}</span>
             )}
           </div>
         </Link>
@@ -85,14 +85,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         ) : requiresCustomization ? (
           <Link 
             href={`/product/${product.slug}`}
-            className="w-full text-center py-2.5 bg-primary text-secondary font-bold text-sm rounded hover:bg-primary-dark transition-colors mt-auto block focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-opacity-50"
+            className="w-full text-center py-2.5 bg-primary text-secondary font-bold text-xs sm:text-sm rounded hover:bg-primary-dark transition-colors mt-auto block focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-opacity-50"
           >
             Customize & Buy
           </Link>
         ) : (
           <button
             onClick={handleAddToCart}
-            className="w-full text-center py-2.5 bg-primary text-secondary font-bold text-sm rounded hover:bg-primary-dark transition-colors mt-auto block focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-opacity-50"
+            className="w-full text-center py-2.5 bg-primary text-secondary font-bold text-xs sm:text-sm rounded hover:bg-primary-dark transition-colors mt-auto block focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-opacity-50"
           >
             Add to Cart
           </button>

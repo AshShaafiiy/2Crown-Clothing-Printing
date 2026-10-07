@@ -45,10 +45,10 @@ export const QuantityControl: React.FC<QuantityControlProps> = ({
   const isMinusDisabled = quantity <= minQuantity;
   
   const minusClass = isMinusDisabled
-    ? 'w-8 h-8 sm:w-9 sm:h-9 bg-gray-200 text-gray-400 rounded-md cursor-not-allowed flex justify-center items-center flex-shrink-0'
-    : 'w-8 h-8 sm:w-9 sm:h-9 bg-primary text-secondary hover:bg-primary-dark rounded-md shadow-sm transition-colors flex justify-center items-center active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 flex-shrink-0';
+    ? 'w-9 h-9 bg-gray-200 text-gray-400 rounded-md cursor-not-allowed flex justify-center items-center flex-shrink-0'
+    : 'w-9 h-9 bg-primary text-secondary hover:bg-primary-dark rounded-md shadow-sm transition-colors flex justify-center items-center active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 flex-shrink-0';
     
-  const plusClass = 'w-8 h-8 sm:w-9 sm:h-9 bg-primary text-secondary hover:bg-primary-dark rounded-md shadow-sm transition-colors flex justify-center items-center active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 flex-shrink-0';
+  const plusClass = 'w-9 h-9 bg-primary text-secondary hover:bg-primary-dark rounded-md shadow-sm transition-colors flex justify-center items-center active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 flex-shrink-0';
 
   const innerContainerClass = variant === 'card' 
     ? 'flex items-center justify-between w-full' 

@@ -44,7 +44,7 @@ export const ProductRatingDisplay: React.FC<ProductRatingDisplayProps> = ({ prod
   }
 
   return (
-    <div className={`flex items-center gap-1.5 ${compact ? 'text-xs' : 'text-sm'} font-medium text-gray-700`}>
+    <div className={`flex flex-wrap items-center gap-1 sm:gap-1.5 ${compact ? 'text-[10px] sm:text-xs' : 'text-sm'} font-medium text-gray-700`}>
       <div className="flex text-primary" aria-label={`Rated ${average.toFixed(1)} out of 5`} role="img">
         {[0, 1, 2, 3, 4].map((starIndex) => {
           const fillPercentage = Math.max(0, Math.min(100, (average - starIndex) * 100));

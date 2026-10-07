@@ -138,7 +138,7 @@ export const Home = ({ initialData }: { initialData?: { categories: Category[], 
                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
           ) : featuredProducts.length > 0 ? (
-            <div className={`grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 stagger-children`}>
+            <div className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6 stagger-children`}>
               {featuredProducts.map(product => (
                 <div key={product.id} className={`reveal-fade-up ${featuredSection.isVisible ? 'revealed' : ''}`}>
                   <ProductCard product={product} />
