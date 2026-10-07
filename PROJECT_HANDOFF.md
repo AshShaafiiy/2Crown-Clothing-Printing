@@ -58,6 +58,12 @@ The current task is to complete the **DOCUMENTATION + CROSS-ACCOUNT HANDOFF SYNC
 - **Normal Order Flow:** Persist order first, then provide structured WhatsApp continuation.
 - **Order Reference:** `2C-123456` uppercase hex format.
 - **Track Order:** Requires BOTH reference and phone. Malformed/unknown tracking yields indistinguishable generic failure. Privacy-safe tracking DTO.
+- **Delivery Fee Architecture**: There is NO "Delivery Option" CRUD or standalone collection in the admin backend. "Delivery Fee" strictly refers to the per-order local delivery charge manually entered by the Admin on the Orders dashboard.
+- **Delivery Constraints**: 
+  - Store Pickup delivery fee is strictly `₦0`. 
+  - Unset Local Delivery fee displays as `To be confirmed` on the customer tracker and avoids forcefully rewriting missing fees to 0.
+  - An order with Local Delivery CANNOT transition to `Confirmed` until the admin inputs a valid numeric fee.
+  - The customer total recalculates immediately after confirmation (`subtotal - discount + deliveryFee`).
 - **Delivery:** Pickup fee is exactly `₦0`. Local delivery fee is "To be confirmed".
 - **Currency:** NGN only. No stock/inventory/Product Type. One product image.
 - **Admin Roles:** `root_super_admin`, `super_admin`, `admin`. Backend-enforced Root protection.
