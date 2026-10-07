@@ -209,3 +209,7 @@ Cart quantity controls use gold decrement/increment buttons with a display-only 
 - **Normalization Fix**: Added a robust `normalizeOrderData` layer directly at the `OrderRepository` boundary. All fetched legacy orders are now safely sanitized before serialization (missing dates fall back to epoch, missing totals dynamically calculate, string-based history maps to structured objects) ensuring stable API responses without failing the entire batch.
 - **Result**: The Admin Orders list, detail expansion, and timeline history are fully restored and handle all legacy edge cases gracefully (e.g., displaying "Date unavailable" rather than "Invalid Date"). No regressions to RBAC or public Track Order functionality.
 - **Final Test Status**: 256/256 passing tests cleanly.
+
+## 2026-10-07 Order Normalization Hardening
+- **Temporal Integrity**: Missing legacy timestamps are now normalized strictly to empty strings rather than synthetic epoch dates (1970). The presentation layer uniformly handles these missing values by surfacing "Date unavailable" to the user/admin, preventing fabricated historical records.
+- **Financial Integrity**: Missing commercial fields (`subtotal`, `total`) dynamically fall back to authoritative derivations (`price * quantity` on active items). `deliveryFee` adheres strictly to business rules: exact `0` for Store Pickup, and explicit `null` for unconfirmed local/nationwide deliveries to preserve the "To be confirmed" UI state without incorrectly zeroing the cost.

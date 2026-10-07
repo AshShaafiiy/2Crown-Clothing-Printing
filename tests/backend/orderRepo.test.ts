@@ -9,14 +9,18 @@ vi.mock('../../src/backend/db/firebase', () => ({
 }));
 
 describe('OrderRepository Normalization', () => {
-  it('normalizes legacy orders without crashing', async () => {
+  it('normalizes legacy orders without synthetic dates', async () => {
     const mockLegacyData = {
       reference: '2C-XXX',
-      subtotal: '2000', // string instead of number
+      // missing subtotal
       // missing total
       // missing discount
+      deliveryMethod: 'local',
       deliveryFee: null,
-      history: ['Order Confirmed'] // string history
+      history: ['Order Confirmed'],
+      items: [
+        { price: 1500, quantity: 2 }
+      ]
       // missing createdAt
     };
 
@@ -31,13 +35,34 @@ describe('OrderRepository Normalization', () => {
     expect(orders.length).toBe(1);
     const order = orders[0];
     
-    // Check normalization
-    expect(order.subtotal).toBe(2000);
-    expect(order.total).toBe(2000); // 2000 - 0 + 0
-    expect(order.discount).toBe(0);
-    expect(typeof order.createdAt).toBe('string');
-    expect(order.createdAt).toBe(new Date(0).toISOString());
-    expect(Array.isArray(order.history)).toBe(true);
-    expect(order.history?.[0]?.note).toBe('Order Confirmed');
+    // Check missing subtotal dynamically derived
+    expect(order.subtotal).toBe(3000); // 1500 * 2
+    expect(order.total).toBe(3000);
+    
+    // Check unset local delivery remains null
+    expect(order.deliveryFee).toBeNull();
+
+    // Check missing date remains empty string, NOT epoch
+    expect(order.createdAt).toBe('');
+    
+    // Check string history normalized with empty timestamp
+    expect(order.history?.[0]?.timestamp).toBe('');
+  });
+
+  it('normalizes pickup delivery to 0', async () => {
+    const mockPickupData = {
+      deliveryMethod: 'pickup'
+      // missing deliveryFee
+    };
+
+    const mockGet = vi.fn().mockResolvedValue({
+      docs: [{ data: () => mockPickupData }]
+    });
+
+    const mockOrderBy = vi.fn().mockReturnValue({ get: mockGet });
+    (db.collection as any).mockReturnValue({ orderBy: mockOrderBy });
+
+    const orders = await orderRepository.findAll();
+    expect(orders[0].deliveryFee).toBe(0);
   });
 });

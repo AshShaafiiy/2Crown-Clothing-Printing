@@ -1,5 +1,4 @@
 const fs = require('fs');
-
 const path = 'src/backend/repositories/OrderRepository.ts';
 let code = fs.readFileSync(path, 'utf8');
 
@@ -11,7 +10,7 @@ function normalizeOrderData(data: any): Order {
   if (!createdAt || isNaN(new Date(createdAt).getTime())) {
     createdAt = data.updatedAt;
     if (!createdAt || isNaN(new Date(createdAt).getTime())) {
-      createdAt = new Date(0).toISOString();
+      createdAt = ''; // Explicit missing, no synthetic epoch
     }
   }
 
@@ -20,17 +19,26 @@ function normalizeOrderData(data: any): Order {
     updatedAt = createdAt;
   }
 
-  const subtotal = Number(data.subtotal) || 0;
+  let subtotal = Number(data.subtotal);
+  if (isNaN(subtotal) || !data.subtotal) {
+    // Dynamically derive from factual item data if missing
+    subtotal = (data.items || []).reduce((acc: number, item: any) => acc + (Number(item.price) * Number(item.quantity) || 0), 0);
+  }
+
   const discount = Number(data.discount) || 0;
   
   let deliveryFee = data.deliveryFee;
-  if (deliveryFee !== null && deliveryFee !== undefined) {
+  if (data.deliveryMethod === 'pickup') {
+    deliveryFee = 0; // Business Rule: Store pickup is exactly 0
+  } else if (deliveryFee !== null && deliveryFee !== undefined) {
     deliveryFee = Number(deliveryFee);
     if (isNaN(deliveryFee)) deliveryFee = null;
+  } else {
+    deliveryFee = null; // Unset local/nationwide delivery remains null
   }
   
   let total = Number(data.total);
-  if (isNaN(total)) {
+  if (isNaN(total) || !data.total) {
     total = subtotal - discount + (deliveryFee || 0);
   }
 
@@ -43,7 +51,7 @@ function normalizeOrderData(data: any): Order {
         return {
           id: \`legacy-\${index}-\${Date.now()}\`,
           newStatus: 'Unknown',
-          timestamp: '',
+          timestamp: '', // Explicit missing, no synthetic date
           actorName: 'System',
           note: entry
         };
@@ -70,7 +78,6 @@ function normalizeOrderData(data: any): Order {
 }
 `;
 
-// Replace the existing normalization block.
-// We'll regex match the function.
+// Replace existing normalizeFn
 code = code.replace(/function normalizeOrderData.*?as Order;\n}/s, normalizeFn.trim());
 fs.writeFileSync(path, code);
