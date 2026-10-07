@@ -77,8 +77,8 @@ const Shop: React.FC = () => {
         <div className="h-10 bg-gray-200 w-48 mb-8 rounded animate-pulse"></div>
         <div className="flex flex-col md:flex-row gap-8">
           <div className="w-full md:w-1/4 h-64 bg-gray-200 rounded animate-pulse"></div>
-          <div className="w-full md:w-3/4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
-            {[1, 2, 3, 4, 5].map(i => (
+          <div className="w-full md:w-3/4 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+            {[1, 2, 3, 4].map(i => (
               <div key={i} className="h-80 bg-gray-200 rounded animate-pulse"></div>
             ))}
           </div>
@@ -122,7 +122,25 @@ const Shop: React.FC = () => {
           {/* Categories */}
           <div>
             <h3 className="text-lg font-bold mb-3 text-secondary">Categories</h3>
-            <div className="space-y-2">
+            
+            {/* Mobile Category Dropdown */}
+            <div className="block md:hidden">
+              <label htmlFor="category-select" className="sr-only">Category</label>
+              <select
+                id="category-select"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full border border-gray-300 rounded-md px-4 py-2 focus-visible:ring-primary focus:border-primary"
+              >
+                <option value="all">All Products</option>
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Desktop Category Radios */}
+            <div className="hidden md:block space-y-2">
               <label className="flex items-center space-x-3 cursor-pointer group">
                 <input 
                   type="radio" 
@@ -153,16 +171,17 @@ const Shop: React.FC = () => {
 
         {/* Main Content */}
         <div className="w-full md:w-3/4">
-          <div className="flex justify-between items-center mb-6">
-            <p className="text-gray-600">
+          <div className="flex flex-wrap justify-between items-center mb-6 gap-y-4">
+            <p className="text-gray-600 text-sm sm:text-base">
               Showing {filteredAndSortedProducts.length} result{filteredAndSortedProducts.length !== 1 && 's'}
             </p>
-            <div className="flex items-center gap-3">
-              <label className="text-sm font-medium text-gray-700">Sort by:</label>
+            <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+              <label htmlFor="sort-select" className="text-sm font-medium text-gray-700 whitespace-nowrap">Sort by:</label>
               <select 
+                id="sort-select"
                 value={sortOption}
                 onChange={(e) => setSortOption(e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus-visible:ring-primary focus:border-primary"
+                className="flex-1 sm:flex-none border border-gray-300 rounded-md px-3 py-1.5 text-sm focus-visible:ring-primary focus:border-primary"
               >
                 <option value="newest">Newest Arrivals</option>
                 <option value="price-asc">Price: Low to High</option>
@@ -184,7 +203,7 @@ const Shop: React.FC = () => {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6 stagger-children">
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 stagger-children">
               {filteredAndSortedProducts.map((product) => (
                 <div key={product.id} className="reveal-fade-up revealed">
                   <ProductCard product={product} />

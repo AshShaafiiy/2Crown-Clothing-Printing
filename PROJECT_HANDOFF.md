@@ -199,3 +199,7 @@ Cart quantity controls use gold decrement/increment buttons with a display-only 
 ## 2026-10-07 Product Grid Responsiveness
 - **Layout Requirements**: Product grids use a mobile-first two-column layout and scale responsively to five columns on desktop. Intermediate widths use balanced 3/4-column breakpoints.
 - **Card Refinements**: ProductCards are completely fluid (`w-full`), adjusting internal gaps and text sizes to safely fit 2 items on narrow 320px viewports without horizontal overflow, while preserving CTA targets and visual proportions.
+
+## 2026-10-07 Shop Filter UI & Responsive Refinement
+- **Product Grids**: Home product grid scales from 2 columns on mobile to 5 columns on desktop. Shop uses 2 columns on mobile, 3 on tablet, and caps at 4 on desktop because of its filter sidebar. 
+- **Mobile Filter UX**: Shop categories use a compact `<select>` dropdown natively rendered on mobile viewports to prevent long category lists from destroying vertical space, while preserving the detailed sidebar/radio controls on larger screens. Both UI modalities are bound to the identical reactive state.
