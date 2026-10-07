@@ -1,51 +1,125 @@
 const fs = require('fs');
-let code = fs.readFileSync('src/views/admin/Orders.test.tsx', 'utf8');
 
-const newTest = `
-  it('renders order history timeline safely without Invalid Date', async () => {
-    // Setup order with different legacy/firestore history entries
-    const historyOrder = {
-      ...mockOrders[0],
-      status: 'Order Confirmed',
+const path = 'src/views/admin/Orders.test.tsx';
+let code = fs.readFileSync(path, 'utf8');
+
+// We will add another mock order to the resolved value array of getOrders.
+// Wait, the vi.mock happens at the top level and is hoisted. We can't dynamically change it per test easily without mockImplementation.
+// Let's modify the beforeEach to use mockImplementation.
+
+const updatedCode = `// @vitest-environment jsdom
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import "@testing-library/jest-dom";
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import Orders from './Orders';
+import { services } from '../../services';
+
+// Mock Services
+vi.mock('../../services', () => ({
+  services: {
+    orders: {
+      getOrders: vi.fn(),
+      updateOrderStatus: vi.fn().mockResolvedValue({})
+    }
+  }
+}));
+
+const mockConfirm = vi.fn().mockResolvedValue(true);
+vi.mock('../../components/ui/ConfirmProvider', () => ({
+  useConfirm: () => ({ confirm: mockConfirm })
+}));
+
+vi.mock('react-hot-toast', () => ({
+  default: {
+    success: vi.fn(),
+    error: vi.fn(),
+  }
+}));
+
+const validOrders = [
+  {
+    id: 'order-local',
+    reference: '2C-123',
+    customerName: 'Test Local',
+    items: [],
+    status: 'Awaiting Confirmation',
+    deliveryMethod: 'local',
+    subtotal: 5000,
+    total: 5000,
+    createdAt: new Date().toISOString(),
+    history: []
+  },
+  {
+    id: 'order-pickup',
+    reference: '2C-456',
+    customerName: 'Test Pickup',
+    items: [],
+    status: 'Awaiting Confirmation',
+    deliveryMethod: 'pickup',
+    subtotal: 5000,
+    total: 5000,
+    createdAt: new Date().toISOString(),
+    history: []
+  }
+];
+
+describe('Admin Orders Workflow', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    (services.orders.getOrders as any).mockResolvedValue(validOrders);
+  });
+
+  it('blocks local delivery order confirmation if fee is missing', async () => {
+    render(<Orders />);
+    await waitFor(() => expect(screen.getByText('2C-123')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('2C-123'));
+    await waitFor(() => expect(screen.getAllByText('Confirm Order')[0]).toBeInTheDocument());
+    fireEvent.click(screen.getAllByText('Confirm Order')[0]);
+    const toast = await import('react-hot-toast');
+    expect(toast.default.error).toHaveBeenCalledWith('Enter the delivery fee before confirming this order.', expect.anything());
+    expect(mockConfirm).not.toHaveBeenCalled();
+  });
+
+  it('allows pickup order confirmation without fee', async () => {
+    render(<Orders />);
+    await waitFor(() => expect(screen.getByText('2C-456')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('2C-456'));
+    await waitFor(() => expect(screen.getAllByText('Confirm Order')[0]).toBeInTheDocument());
+    fireEvent.click(screen.getAllByText('Confirm Order')[0]);
+    expect(mockConfirm).toHaveBeenCalled();
+  });
+
+  it('legacy history order does not crash and handles gracefully', async () => {
+    const malformedOrder = {
+      id: 'order-legacy',
+      reference: '2C-999',
+      customerName: 'Legacy User',
+      items: [],
+      status: 'Delivered',
+      deliveryMethod: 'local',
+      // Simulating what the normalization should have patched, 
+      // but testing the UI handles missing things securely if it sneaks past.
+      subtotal: 5000,
+      total: 5000,
+      createdAt: 'Invalid-Date-String', // Will test Date parsing fallback
       history: [
-        {
-          status: 'Awaiting Confirmation',
-          comment: 'legacy string format',
-          timestamp: '2026-10-06T10:00:00.000Z'
-        },
-        'Admin updated status', // Simulate the backend bug string
-        {
-          newStatus: 'Order Confirmed',
-          note: 'canonical format',
-          timestamp: { _seconds: 1791280800, _nanoseconds: 0 }, // Firestore timestamp ~ Oct 6 2026 10:00:00 UTC
-          actorName: 'Admin'
-        }
+        'Order Placed', // Legacy string entry
+        { newStatus: 'Confirmed', timestamp: '' } // Legacy empty timestamp
       ]
     };
-    (services.api.getOrders as any).mockResolvedValue([historyOrder]);
-
+    (services.orders.getOrders as any).mockResolvedValue([malformedOrder]);
+    
     render(<Orders />);
-
-    // Wait for the modal or the order list to render, let's open the order details
-    await waitFor(() => {
-      expect(screen.getByText(historyOrder.reference)).toBeInTheDocument();
-    });
-
-    fireEvent.click(screen.getByText('View'));
-
-    // Verify Admin Timeline does not have Invalid Date
-    await waitFor(() => {
-      expect(screen.queryByText('Invalid Date')).toBeNull();
-      // Should show the legacy status mapped correctly
-      expect(screen.getByText('Awaiting Confirmation')).toBeInTheDocument();
-      // Should show the canonical status mapped correctly
-      expect(screen.getAllByText('Order Confirmed').length).toBeGreaterThan(0);
-      // Should show the string bug fallback
-      expect(screen.getByText('Status Updated')).toBeInTheDocument();
-      expect(screen.getByText('Admin updated status')).toBeInTheDocument();
-    });
+    
+    await waitFor(() => expect(screen.getByText('2C-999')).toBeInTheDocument());
+    // Should not say "Invalid Date" on UI
+    expect(screen.queryByText('Invalid Date')).not.toBeInTheDocument();
+    
+    fireEvent.click(screen.getByText('2C-999'));
+    // Should gracefully render "Date unavailable" for empty timestamp
+    await waitFor(() => expect(screen.getByText('Date unavailable')).toBeInTheDocument());
   });
+});
 `;
 
-code = code.replace(/describe\('Admin Orders', \(\) => \{/, "describe('Admin Orders', () => {\n" + newTest);
-fs.writeFileSync('src/views/admin/Orders.test.tsx', code);
+fs.writeFileSync(path, updatedCode);

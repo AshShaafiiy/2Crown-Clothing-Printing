@@ -2,22 +2,89 @@ import { v4 as uuidv4 } from 'uuid';
 import { db } from '../db/firebase';
 import { Order, OrderHistoryEntry } from '../schemas';
 
+
+function normalizeOrderData(data: any): Order {
+  if (!data) return data;
+  
+  let createdAt = data.createdAt;
+  if (!createdAt || isNaN(new Date(createdAt).getTime())) {
+    createdAt = data.updatedAt;
+    if (!createdAt || isNaN(new Date(createdAt).getTime())) {
+      createdAt = new Date(0).toISOString();
+    }
+  }
+
+  let updatedAt = data.updatedAt;
+  if (!updatedAt || isNaN(new Date(updatedAt).getTime())) {
+    updatedAt = createdAt;
+  }
+
+  const subtotal = Number(data.subtotal) || 0;
+  const discount = Number(data.discount) || 0;
+  
+  let deliveryFee = data.deliveryFee;
+  if (deliveryFee !== null && deliveryFee !== undefined) {
+    deliveryFee = Number(deliveryFee);
+    if (isNaN(deliveryFee)) deliveryFee = null;
+  }
+  
+  let total = Number(data.total);
+  if (isNaN(total)) {
+    total = subtotal - discount + (deliveryFee || 0);
+  }
+
+  let history = data.history;
+  if (!Array.isArray(history)) {
+    history = [];
+  } else {
+    history = history.map((entry: any, index: number) => {
+      if (typeof entry === 'string') {
+        return {
+          id: `legacy-${index}-${Date.now()}`,
+          newStatus: 'Unknown',
+          timestamp: '',
+          actorName: 'System',
+          note: entry
+        };
+      }
+      return entry;
+    });
+  }
+
+  return {
+    ...data,
+    createdAt,
+    updatedAt,
+    subtotal,
+    discount,
+    total,
+    deliveryFee,
+    history,
+    items: Array.isArray(data.items) ? data.items : [],
+    status: data.status || 'Unknown Status',
+    customerName: data.customerName || 'Unknown',
+    customerPhone: data.customerPhone || 'Unknown',
+    reference: data.reference || 'Unknown-Ref'
+  } as Order;
+}
+
+
 export class OrderRepository {
   async findAll(): Promise<Order[]> {
     const snap = await db.collection('orders').orderBy('createdAt', 'desc').get();
-    return snap.docs.map( (doc: any) => doc.data() as Order);
+    return snap.docs.map( (doc: any) => normalizeOrderData(doc.data()));
   }
 
   async findByReference(reference: string): Promise<Order | null> {
     const snap = await db.collection('orders').where('reference', '==', reference).limit(1).get();
     if (snap.empty) return null;
-    return snap.docs[0].data() as Order;
+    return normalizeOrderData(snap.docs[0].data());
   }
 
   async findById(id: string): Promise<Order | null> {
     const doc = await db.collection('orders').doc(id).get();
     if (!doc.exists) return null;
-    return doc.data() as Order;
+    return normalizeOrderData(doc.data());
   }
 
   async create(order: Order): Promise<Order> {

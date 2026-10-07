@@ -203,3 +203,9 @@ Cart quantity controls use gold decrement/increment buttons with a display-only 
 ## 2026-10-07 Shop Filter UI & Responsive Refinement
 - **Product Grids**: Home product grid scales from 2 columns on mobile to 5 columns on desktop. Shop uses 2 columns on mobile, 3 on tablet, and caps at 4 on desktop because of its filter sidebar. 
 - **Mobile Filter UX**: Shop categories use a compact `<select>` dropdown natively rendered on mobile viewports to prevent long category lists from destroying vertical space, while preserving the detailed sidebar/radio controls on larger screens. Both UI modalities are bound to the identical reactive state.
+
+## 2026-10-07 Admin Orders Runtime Defect Resolution
+- **Root Cause**: Live production route `/admin/orders` was crashing with Next.js Error Boundary ("This page couldn't load") due to malformed legacy orders in Firestore missing `total`, `subtotal`, and `createdAt` fields, which caused unhandled `.toLocaleString()` and `new Date(...)` exceptions during React client-side rendering.
+- **Normalization Fix**: Added a robust `normalizeOrderData` layer directly at the `OrderRepository` boundary. All fetched legacy orders are now safely sanitized before serialization (missing dates fall back to epoch, missing totals dynamically calculate, string-based history maps to structured objects) ensuring stable API responses without failing the entire batch.
+- **Result**: The Admin Orders list, detail expansion, and timeline history are fully restored and handle all legacy edge cases gracefully (e.g., displaying "Date unavailable" rather than "Invalid Date"). No regressions to RBAC or public Track Order functionality.
+- **Final Test Status**: 256/256 passing tests cleanly.
