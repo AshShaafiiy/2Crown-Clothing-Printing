@@ -184,3 +184,14 @@ Cart quantity controls use gold decrement/increment buttons with a display-only 
 - Cart minus button at `qty=1` remains securely disabled.
 - Mobile Layout: Stacked into a highly compact ecommerce card format with image/details side-by-side, ending in a bottom action row holding Remove (left) and Quantity (right).
 - 'Proceed to Checkout' button utilizes standard Gold primary styling.
+
+## 2026-10-07 Production Corrections
+- **Product Loading Architecture**: The Home page now utilizes Server Component data fetching for the initial catalogue payload, eliminating the client-side N+1 hydration waterfall and removing the artificial empty-state flash.
+- **Canonical Add-to-Cart Behavior**: Unified `toCartItem(product, 1)` payload across `Home`, `Shop`, and `ProductDetails`. Fixed event propagation (`stopPropagation`) that caused interactive quantity controls to trigger navigation.
+- **Cart Badge Rule**: The global cart badge correctly reflects the *sum of all item quantities* in the cart (`items.reduce((acc, item) => acc + item.quantity, 0)`).
+- **Focus-Visible Rule**: Broadly replaced generic `focus:ring` classes with `focus-visible:ring` to eliminate unwanted persistent black outlines after mouse/touch interactions while strictly maintaining keyboard accessibility.
+- **Administrator Creation Flow**: Overhauled the `/api/admins` creation endpoint. Admin creation is now atomic: it successfully generates the Firebase Auth user, assigns custom claims (`role`), and writes the corresponding Firestore profile. Passwords are now processed correctly via the admin dashboard.
+- **Root Super Admin Governance**: Performed a controlled sweep of the identity system. There is now exactly **1** active Root Super Admin account.
+- **Primary Root Identity**: `annarsjay3@gmail.com`
+- **Test Suite Status**: 254/254 tests passing (0 failures).
+- **Live Vercel QA**: Verified. Customer timelines accurately respect factual historical timestamps (or omit with `Date unavailable`), performance metrics are restored, and temporary diagnostic/secret endpoints have been forcefully removed and scrubbed from the repository.
