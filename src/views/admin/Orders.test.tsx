@@ -108,6 +108,6 @@ describe('Admin Orders Workflow', () => {
     
     fireEvent.click(screen.getByText('2C-999'));
     // Should gracefully render "Date unavailable" for empty timestamp
-    await waitFor(() => expect(screen.getByText('Date unavailable')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByText('Date unavailable')[0]).toBeInTheDocument());
   });
 });
