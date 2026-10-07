@@ -37,24 +37,6 @@ describe('ProductCard', () => {
       expect(screen.getByText('(10)')).toBeInTheDocument();
     });
 
-  it('adds product to cart with canonical payload and prevents navigation', async () => {
-    const user = userEvent.setup();
-    render(<ProductCard product={mockProduct} />);
-    
-    // Check Add to Cart button
-    const addButton = screen.getByRole('button', { name: /Add to Cart/i });
-    expect(addButton).toHaveClass('focus-visible:ring-2'); // verify focus ring
-    
-    await user.click(addButton);
-    
-    // Verify it changed to quantity control
-    expect(screen.getByRole('button', { name: /Increase/i })).toBeInTheDocument();
-    
-    // Clear cart for clean state
-    useCartStore.getState().clearCart();
-  });
-
-
     const links = screen.getAllByRole('link');
     expect(links.length).toBeGreaterThan(0);
     links.forEach(link => {
@@ -84,5 +66,22 @@ describe('ProductCard', () => {
     await waitFor(() => {
       expect(screen.getByText('Product image coming soon')).toBeInTheDocument();
     });
+  });
+
+  it('adds product to cart with canonical payload and prevents navigation', async () => {
+    const user = userEvent.setup();
+    render(<ProductCard product={mockProduct} />);
+    
+    // Check Add to Cart button
+    const addButton = screen.getByRole('button', { name: /Add to Cart/i });
+    expect(addButton).toHaveClass('focus-visible:ring-2'); // verify focus ring
+    
+    await user.click(addButton);
+    
+    // Verify it changed to quantity control
+    expect(screen.getByRole('button', { name: /Increase/i })).toBeInTheDocument();
+    
+    // Clear cart for clean state
+    useCartStore.getState().clearCart();
   });
 });
