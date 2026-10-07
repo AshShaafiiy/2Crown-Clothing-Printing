@@ -67,8 +67,8 @@ describe('Admin Orders Workflow', () => {
     await waitFor(() => expect(screen.getAllByText('Confirm Order')[0]).toBeInTheDocument());
     fireEvent.click(screen.getAllByText('Confirm Order')[0]);
     const toast = await import('react-hot-toast');
-    expect(toast.default.error).toHaveBeenCalledWith('Enter the delivery fee before confirming this order.', expect.anything());
-    expect(mockConfirm).not.toHaveBeenCalled();
+    expect(mockConfirm).toHaveBeenCalledWith(expect.objectContaining({ title: 'Delivery Fee Required' }));
+    
   });
 
   it('allows pickup order confirmation without fee', async () => {

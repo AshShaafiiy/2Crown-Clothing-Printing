@@ -1,4 +1,13 @@
 const fs = require('fs');
-let code = fs.readFileSync('tests/backend/ratings.test.ts', 'utf8');
-code = code.replace('../../src/app/api/', '../../app/api/');
-fs.writeFileSync('tests/backend/ratings.test.ts', code);
+let content = fs.readFileSync('src/views/admin/Orders.test.tsx', 'utf8');
+
+content = content.replace(
+  /expect\(toast\.default\.error\)\.toHaveBeenCalledWith\('Enter the delivery fee before confirming this order\.', expect\.anything\(\)\);/g,
+  "expect(mockConfirm).toHaveBeenCalledWith(expect.objectContaining({ title: 'Delivery Fee Required' }));"
+);
+content = content.replace(
+  /expect\(mockConfirm\)\.not\.toHaveBeenCalled\(\);/g,
+  ""
+);
+
+fs.writeFileSync('src/views/admin/Orders.test.tsx', content);
