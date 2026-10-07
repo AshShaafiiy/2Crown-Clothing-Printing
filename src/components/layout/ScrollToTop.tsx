@@ -4,7 +4,8 @@ import { usePathname } from 'next/navigation';
 
 
 export default function ScrollToTop() {
-  const { pathname, hash } = usePathname();
+  const pathname = usePathname();
+  const hash = typeof window !== "undefined" ? window.location.hash : "";
 
   useEffect(() => {
     // Custom Work is the ONLY exception, which uses #custom-work

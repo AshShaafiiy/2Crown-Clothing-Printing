@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2022",
     "lib": [
       "dom",
       "dom.iterable",
@@ -27,7 +27,8 @@
         "./src/*"
       ]
     },
-    "ignoreDeprecations": "6.0"
+    "ignoreDeprecations": "6.0",
+    "downlevelIteration": true
   },
   "include": [
     "next-env.d.ts",
@@ -39,6 +40,15 @@
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "tests",
+    "tests-examples",
+    "*.js",
+    "*.cjs",
+    "test_*.ts",
+    "verify_*.ts",
+    "vitest.config.ts"
   ]
 }

@@ -34,7 +34,7 @@ export default function AdminLogin() {
     setIsSubmitting(true);
     try {
       await login(email, password);
-      router.push(from, { replace: true });
+      router.replace(from);
     } catch (err: any) {
       const message = err?.message || err?.data?.error || 'Invalid credentials. Please try again.';
       setFormError(message);

@@ -28,7 +28,7 @@ export default function OrderConfirmation() {
   useEffect(() => {
     const fetchOrder = async () => {
       if (reference) {
-        const data = getSubmittedOrder(reference) || await services.orders.getOrderByReference(reference);
+        const data = getSubmittedOrder(reference) || await services.orders.getOrderByReference(reference, "");
         setOrder(data);
         if (data) {
           const settings = await services.settings.getBusinessSettings();

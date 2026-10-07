@@ -22,7 +22,7 @@ export default function TrackOrder() {
     setOrder(null);
     
     try {
-      const data = await services.orders.getOrderByReference(reference, isLegacy ? phone : undefined);
+      const data = await services.orders.getOrderByReference(reference, isLegacy ? phone : "");
       if (data) {
         setOrder(data);
       } else {
