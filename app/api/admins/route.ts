@@ -78,7 +78,7 @@ export async function POST(req: Request) {
       name,
       role,
       active: true,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(), passwordHash: ''
     });
     return NextResponse.json(adminDto(newUser as any), { status: 201 });
   } catch (err: any) {

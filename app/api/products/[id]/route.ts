@@ -3,7 +3,7 @@ import { productRepository } from '@/backend/repositories';
 import { ProductInputSchema } from '@/backend/schemas';
 import { authenticateNext, requireRolesNext, parseBody } from '@/backend/utils/next-utils';
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   let product = await productRepository.findById(id);
   if (!product) {
@@ -13,7 +13,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   return NextResponse.json(product);
 }
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { user, error: authError, status: authStatus } = await authenticateNext(req);
   if (authError) return NextResponse.json({ error: authError }, { status: authStatus });
 
@@ -25,13 +25,13 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const { data, error, status } = await parseBody(req, ProductInputSchema);
-  if (error) return NextResponse.json(error, { status });
+  if (error || !data) return NextResponse.json(error || { error: 'Invalid input' }, { status: status || 400 });
 
-  const updated = await productRepository.update(id, data!);
+  const updated = await productRepository.update(id, data);
   return NextResponse.json(updated);
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { user, error: authError, status: authStatus } = await authenticateNext(req);
   if (authError) return NextResponse.json({ error: authError }, { status: authStatus });
 

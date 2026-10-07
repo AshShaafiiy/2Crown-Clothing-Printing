@@ -213,3 +213,14 @@ Cart quantity controls use gold decrement/increment buttons with a display-only 
 ## 2026-10-07 Order Normalization Hardening
 - **Temporal Integrity**: Missing legacy timestamps are now normalized strictly to empty strings rather than synthetic epoch dates (1970). The presentation layer uniformly handles these missing values by surfacing "Date unavailable" to the user/admin, preventing fabricated historical records.
 - **Financial Integrity**: Missing commercial fields (`subtotal`, `total`) dynamically fall back to authoritative derivations (`price * quantity` on active items). `deliveryFee` adheres strictly to business rules: exact `0` for Store Pickup, and explicit `null` for unconfirmed local/nationwide deliveries to preserve the "To be confirmed" UI state without incorrectly zeroing the cost.
+
+## 2026-10-07 TypeScript Debt Cleanup
+- **Status:** Complete. TSC EXIT CODE is 0 (0 Type Errors).
+- **Cleanup Details:** Fixed App Router route handler signatures (updating `params` typing to `Promise<{...}>` for Next.js 15+). Added strict `data` validation checks where Zod parsed bodies were possibly undefined.
+- **Legacy Code Removal:** Safely removed obsolete Express middleware (`auth.middleware.ts`, `error.middleware.ts`, `validate.middleware.ts`, `httpSecurity.ts`, `jwtConfig.ts`) which were fully superseded by the Next.js `authenticateNext` and `requireRolesNext` utilities.
+- **Verification:** 
+  - 17 test files and 258 tests passed (0 failures).
+  - Clean production build (`npm run build` exited with code 0).
+  - Software Engineer verified architecture, RBAC, domain models, and tsconfig integrity (all PASS).
+  - QA Tester verified core logic and workflows based on diffs (all PASS).
+- **Remaining Defects:** None identified.

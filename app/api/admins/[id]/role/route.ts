@@ -4,7 +4,7 @@ import { UpdateRoleRequestSchema } from '@/backend/schemas';
 import { authenticateNext, requireRolesNext, parseBody } from '@/backend/utils/next-utils';
 import { adminDto } from '@/backend/utils/authorization';
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { user: currentUser, error, status } = await authenticateNext(req);
   if (error) return NextResponse.json({ error }, { status });
 

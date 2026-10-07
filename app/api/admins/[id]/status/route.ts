@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 const UpdateStatusRequestSchema = z.object({ active: z.boolean() });
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { user: currentUser, error, status } = await authenticateNext(req);
   if (error) return NextResponse.json({ error }, { status });
 

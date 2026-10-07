@@ -3,7 +3,7 @@ import { userRepository } from '@/backend/repositories';
 import { authenticateNext, requireRolesNext } from '@/backend/utils/next-utils';
 import { adminDto, MANAGER_ROLES } from '@/backend/utils/authorization';
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { user, error, status } = await authenticateNext(req);
   if (error) return NextResponse.json({ error }, { status });
 
@@ -16,7 +16,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   return NextResponse.json(adminDto(admin as any));
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { user: currentUser, error, status } = await authenticateNext(req);
   if (error) return NextResponse.json({ error }, { status });
 

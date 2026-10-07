@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 
 const TOKEN_SECRET = process.env.RATING_TOKEN_SECRET || process.env.JWT_SECRET || 'dev_token_secret';
 
-export async function GET(req: Request, { params }: { params: { productId: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ productId: string }> }) {
   const { productId } = await params;
   
   const url = new URL(req.url);
@@ -41,7 +41,7 @@ export async function GET(req: Request, { params }: { params: { productId: strin
   return NextResponse.json(summary);
 }
 
-export async function POST(req: Request, { params }: { params: { productId: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ productId: string }> }) {
   const { productId } = await params;
   
   const authHeader = req.headers.get('authorization');
@@ -62,7 +62,7 @@ export async function POST(req: Request, { params }: { params: { productId: stri
   }
 
   const { data, error, status } = await parseBody(req, SubmitRatingSchema);
-  if (error) return NextResponse.json(error, { status });
+  if (error || !data) return NextResponse.json(error || { error: 'Invalid input' }, { status: status || 400 });
 
   const ratingId = `rating_${decoded.buyerFingerprint}_${productId}`;
   const existingRating = await reviewRepository.findById(ratingId);
@@ -71,7 +71,7 @@ export async function POST(req: Request, { params }: { params: { productId: stri
     await reviewRepository.update(ratingId, {
       rating: data.rating,
       updatedAt: new Date().toISOString(),
-      verifiedPurchase: true
+      
     });
     return NextResponse.json({ ...existingRating, rating: data.rating, updatedAt: new Date().toISOString() }, { status: 200 });
   } else {

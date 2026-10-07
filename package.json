@@ -22,6 +22,7 @@
     "fdir": "^6.5.0",
     "firebase": "^12.19.0",
     "firebase-admin": "^14.5.0",
+    "glob": "^13.0.6",
     "imagekit": "^6.0.0",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.47.0",

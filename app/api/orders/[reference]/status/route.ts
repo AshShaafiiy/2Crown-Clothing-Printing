@@ -4,7 +4,7 @@ import { UpdateOrderStatusSchema } from '@/backend/schemas';
 import { authenticateNext, parseBody, requireRolesNext } from '@/backend/utils/next-utils';
 import { v4 as uuid } from 'uuid';
 
-export async function PATCH(req: Request, { params }: { params: { reference: string } }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ reference: string }> }) {
   const { user, error: authError, status: authStatus } = await authenticateNext(req);
   if (authError) return NextResponse.json({ error: authError }, { status: authStatus });
   const roleErr = requireRolesNext(user, ['admin', 'super_admin', 'root_super_admin']);
@@ -23,7 +23,7 @@ export async function PATCH(req: Request, { params }: { params: { reference: str
     previousStatus: existing.status,
     newStatus: newStatus as any, // Cast to any to avoid complex type union mismatch if not perfectly matching
     timestamp: new Date().toISOString(),
-    actorId: user?.uid,
+    actorId: user?.id,
     actorName: user?.email || 'Admin',
     note: 'Admin updated status'
   };

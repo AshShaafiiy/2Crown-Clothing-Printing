@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 const FINGERPRINT_SECRET = process.env.BUYER_FINGERPRINT_SECRET || process.env.JWT_SECRET || 'dev_fingerprint_secret';
 const TOKEN_SECRET = process.env.RATING_TOKEN_SECRET || process.env.JWT_SECRET || 'dev_token_secret';
 
-export async function POST(req: Request, { params }: { params: { productId: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ productId: string }> }) {
   const { productId } = await params;
   try {
     const body = await req.json();

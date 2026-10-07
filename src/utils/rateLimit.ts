@@ -32,7 +32,7 @@ export function rateLimit(ip: string, limit: number, windowMs: number) {
 // Clean up expired entries every hour (if memory persists)
 setInterval(() => {
   const now = Date.now();
-  for (const [key, value] of store.entries()) {
+  for (const [key, value] of Array.from(store.entries())) {
     if (now > value.resetTime) {
       store.delete(key);
     }

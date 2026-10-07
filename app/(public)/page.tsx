@@ -3,7 +3,7 @@ import PageComponent from '@/views/public/Home';
 import { categoryRepository, productRepository, promotionRepository } from '@/backend/repositories';
 
 // Make it a server component, fetch data here to avoid client waterfall!
-export default async function Page(props: any) {
+export default async function Page() {
   const [allCats, allProds, allPromos] = await Promise.all([
     categoryRepository.findAll(),
     productRepository.findAll(),
@@ -16,5 +16,5 @@ export default async function Page(props: any) {
 
   const initialData = { categories, products, promotions };
   
-  return <PageComponent initialData={initialData} {...props} />;
+  return <PageComponent initialData={initialData} />;
 }

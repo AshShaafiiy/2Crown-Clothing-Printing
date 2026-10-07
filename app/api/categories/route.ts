@@ -5,7 +5,7 @@ import { authenticateNext, parseBody, requireRolesNext } from '@/backend/utils/n
 import { v4 as uuid } from 'uuid';
 
 
-function generateSlug(text) {
+function generateSlug(text: string) {
   if (!text) return '';
   return text
     .toString()
@@ -27,13 +27,13 @@ export async function POST(req: Request) {
   if (roleErr) return NextResponse.json({ error: roleErr.error }, { status: roleErr.status });
 
   const { data, error, status } = await parseBody(req, CategoryInputSchema);
-  if (error) return NextResponse.json(error, { status });
+  if (error || !data) return NextResponse.json(error || { error: 'Invalid input' }, { status: status || 400 });
 
   data.slug = generateSlug(data.name);
   const existingBySlug = await categoryRepository.findBySlug(data.slug);
   if (existingBySlug) {
     return NextResponse.json({ error: 'A category with a similar name already exists.' }, { status: 409 });
   }
-  const newCategory = await categoryRepository.create({ id: uuid(), ...data, createdAt: new Date().toISOString() });
+  const newCategory = await categoryRepository.create({ id: uuid(), name: data.name || "", active: data.active ?? true, slug: data.slug || "", order: data.order || 0, imageUrl: data.imageUrl, description: data.description, parentId: data.parentId, createdAt: new Date().toISOString() });
   return NextResponse.json(newCategory, { status: 201 });
 }
