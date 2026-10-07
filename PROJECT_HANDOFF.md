@@ -224,3 +224,9 @@ Cart quantity controls use gold decrement/increment buttons with a display-only 
   - Software Engineer verified architecture, RBAC, domain models, and tsconfig integrity (all PASS).
   - QA Tester verified core logic and workflows based on diffs (all PASS).
 - **Remaining Defects:** None identified.
+
+## TypeScript Clean Up (Oct 2026)
+- **Resolved Migration Debt**: Purged 45+ legacy Express TypeScript errors masking true project state.
+- **Removed Dead Code**: Eliminated unused Express-era files (`src/backend/utils/httpSecurity.ts`, `jwtConfig.ts`).
+- **Modernized API Routes**: Upgraded Next.js App Router dynamic route signatures to safely await `Promise<params>`, natively satisfying Next.js 15+ strict typings.
+- **Result**: `tsc --noEmit` cleanly exits with `CODE 0` and `0` errors. The `vitest` suite (`258` tests) remains unaffected and cleanly passes. Production build static generation verified clean.
