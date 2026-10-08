@@ -40,7 +40,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   data.slug = generateSlug(data.name);
   const existingBySlug = await categoryRepository.findBySlug(data.slug);
   if (existingBySlug && existingBySlug.id !== id) {
-    return NextResponse.json({ error: 'A category with a similar name already exists.' }, { status: 409 });
+    return NextResponse.json({ error: 'A category with this name already exists.' }, { status: 409 });
   }
   const updated = await categoryRepository.update(id, data);
   return NextResponse.json(updated);

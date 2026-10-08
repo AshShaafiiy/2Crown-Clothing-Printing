@@ -32,7 +32,7 @@ export async function POST(req: Request) {
   data.slug = generateSlug(data.name);
   const existingBySlug = await categoryRepository.findBySlug(data.slug);
   if (existingBySlug) {
-    return NextResponse.json({ error: 'A category with a similar name already exists.' }, { status: 409 });
+    return NextResponse.json({ error: 'A category with this name already exists.' }, { status: 409 });
   }
   const newCategory = await categoryRepository.create({ id: uuid(), name: data.name || "", active: data.active ?? true, slug: data.slug || "", order: data.order || 0, imageUrl: data.imageUrl, description: data.description, parentId: data.parentId, createdAt: new Date().toISOString() });
   return NextResponse.json(newCategory, { status: 201 });
