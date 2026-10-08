@@ -24,5 +24,9 @@ if (!getApps().length) {
 }
 
 export const db = getFirestore();
-db.settings({ ignoreUndefinedProperties: true });
+try {
+  db.settings({ ignoreUndefinedProperties: true });
+} catch (e: any) {
+  // Ignore already initialized error during Next.js HMR or parallel builds
+}
 export const auth = getAuth();
