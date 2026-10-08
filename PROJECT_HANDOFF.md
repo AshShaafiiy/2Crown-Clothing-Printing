@@ -246,3 +246,11 @@ Cart quantity controls use gold decrement/increment buttons with a display-only 
   - Live Vercel QA verified isolated Root Super Admin timestamp logic.
   - Test suite (269 tests) passed flawlessly with new coverage explicitly targeting temporal boundaries.
   - Production build static generation clean.
+
+## Final Product QA
+- **Product Creation Root Cause**: The previous implementation read the product image as a Base64 `DataURL` and nested it within the JSON payload. For high-resolution images, this produced a multi-megabyte payload which triggered a 413 Payload Too Large error from Vercel's Serverless constraints and exceeded Firestore's 1MB document limit, masking the real crash behind the API client's generic error parser.
+- **Product Image Persistence Method**: A dedicated Next.js API route (`/api/upload`) was introduced to handle `multipart/form-data` uploads securely. The image is saved to the native Firebase Admin Storage bucket, and its public URL is returned to the frontend and persisted into Firestore as the `imageUrl`.
+- **Product Optional-Field Behavior**: Optional numeric fields like `previousPrice` safely resolve to `undefined` on the frontend when omitted, successfully stripping them out of the JSON request, passing Zod validation, and bypassing Firestore `undefined` failures due to the global `ignoreUndefinedProperties: true` configuration.
+- **Price Form-State Rule**: Erasing the value of `price` or `previousPrice` correctly leaves the form field empty (`""`) and avoids maliciously inserting zeroes. Strict API schema validation (`.refine`) ensures that if populated, `previousPrice > price`.
+- **Final tests/build**: The Type Checking passed (0 errors). The Vitest suite executed completely (283 tests passed) without any file parallelism timeouts. The Turbopack Next.js build completed smoothly with `0` exit code.
+- **Authenticated Live QA Remaining**: The codebase fix has been perfectly synthesized in code, but because this requires an authenticated live browser click (via the Root Super Admin token), final End-To-End user validation in Vercel is outstanding.

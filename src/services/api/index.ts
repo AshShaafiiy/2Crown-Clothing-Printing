@@ -41,6 +41,16 @@ export class ApiProductService implements IProductService {
   async deleteProduct(id: ID): Promise<void> {
     await apiClient(`/products/${id}`, { method: 'DELETE' });
   }
+
+  async uploadImage(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const result = await apiClient<{url: string}>('/upload', {
+      method: 'POST',
+      body: formData
+    });
+    return result.url;
+  }
 }
 
 export class ApiCategoryService implements ICategoryService {

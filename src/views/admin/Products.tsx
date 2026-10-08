@@ -138,8 +138,18 @@ const Products: React.FC = () => {
     // Customized frontend validation
     if (!formData.name.trim()) return toast.error('Product name is required.');
     if (!formData.categoryId) return toast.error('Please select a category.');
-    if ((parseFloat(formData.price as string) || 0) <= 0) return toast.error('Selling price must be greater than ₦0.');
-        if (!formData.imageUrl) return toast.error('Please provide a product image.');
+    
+    const parsedPrice = parseFloat(formData.price as string) || 0;
+    if (parsedPrice <= 0) return toast.error('Selling price must be greater than ₦0.');
+    
+    const parsedPrevPrice = parseFloat(formData.previousPrice as string) || 0;
+    if (formData.previousPrice !== "" && formData.previousPrice !== undefined && formData.previousPrice !== null) {
+      if (parsedPrevPrice <= parsedPrice) {
+        return toast.error('Original price must be strictly greater than selling price.');
+      }
+    }
+
+    if (!formData.imageUrl) return toast.error('Please provide a product image.');
 
     setIsSaving(true);
     try {
@@ -151,8 +161,8 @@ const Products: React.FC = () => {
         slug: slug,
         description: formData.description,
         categoryId: formData.categoryId,
-        price: parseFloat(formData.price as string) || 0,
-        previousPrice: (parseFloat(formData.previousPrice as string) || 0) > 0 ? parseFloat(formData.previousPrice as string) : undefined,
+        price: parsedPrice,
+        previousPrice: parsedPrevPrice > 0 ? parsedPrevPrice : undefined,
 
         imageUrl: formData.imageUrl,
         active: formData.active,
@@ -383,12 +393,17 @@ const Products: React.FC = () => {
                           type="file"
                           aria-label="Product image"
                           accept="image/*"
-                          onChange={(e) => {
+                          onChange={async (e) => {
                             const file = e.target.files?.[0];
                             if (!file) return;
-                            const reader = new FileReader();
-                            reader.onload = () => setFormData({...formData, imageUrl: reader.result as string});
-                            reader.readAsDataURL(file);
+                            const toastId = toast.loading('Uploading image...');
+                            try {
+                              const url = await services.products.uploadImage(file);
+                              setFormData({...formData, imageUrl: url});
+                              toast.success('Image uploaded', { id: toastId });
+                            } catch (error) {
+                              toast.error('Failed to upload image', { id: toastId });
+                            }
                           }}
                           className="w-full h-full opacity-0 absolute inset-0 cursor-pointer z-10"
                         />

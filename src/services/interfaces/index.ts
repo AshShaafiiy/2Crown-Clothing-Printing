@@ -12,6 +12,7 @@ export interface IProductService {
   createProduct(product: Omit<Product, 'id'>): Promise<Product>;
   updateProduct(id: ID, product: Partial<Product>): Promise<Product>;
   deleteProduct(id: ID): Promise<void>;
+  uploadImage(file: File): Promise<string>;
 }
 
 export interface ICategoryService {

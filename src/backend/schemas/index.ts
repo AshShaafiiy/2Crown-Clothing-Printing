@@ -34,14 +34,14 @@ export const CustomizationFieldSchema = z.object({
   options: z.array(z.string()).optional()
 });
 
-export const ProductInputSchema = z.object({
-  name: z.string(),
-  slug: z.string(),
+export const ProductInputSchemaBase = z.object({
+  name: z.string().min(1),
+  slug: z.string().min(1),
   description: z.string(),
-  categoryId: z.string(),
-  price: z.number(),
-  previousPrice: z.number().optional(),
-  imageUrl: z.string(),
+  categoryId: z.string().min(1),
+  price: z.number().positive(),
+  previousPrice: z.number().positive().optional(),
+  imageUrl: z.string().min(1),
   featured: z.boolean(),
   active: z.boolean(),
   variants: z.array(ProductVariantSchema).optional(),
@@ -51,11 +51,32 @@ export const ProductInputSchema = z.object({
   tags: z.array(z.string()).optional()
 });
 
-export const ProductSchema = ProductInputSchema.extend({
+export const ProductInputSchema = ProductInputSchemaBase.refine((data) => {
+  if (data.previousPrice !== undefined && data.previousPrice !== null) {
+    return data.previousPrice > data.price;
+  }
+  return true;
+}, {
+  message: "Original price must be strictly greater than selling price.",
+  path: ["previousPrice"]
+});
+
+export const ProductSchemaBase = ProductInputSchemaBase.extend({
   id: z.string(),
   createdAt: z.string().optional()
 });
-export type Product = z.infer<typeof ProductSchema>;
+
+export const ProductSchema = ProductSchemaBase.refine((data) => {
+  if (data.previousPrice !== undefined && data.previousPrice !== null) {
+    return data.previousPrice > data.price;
+  }
+  return true;
+}, {
+  message: "Original price must be strictly greater than selling price.",
+  path: ["previousPrice"]
+});
+
+export type Product = z.infer<typeof ProductSchemaBase>;
 
 export const CategoryInputSchema = z.object({
   name: z.string(),
