@@ -20,7 +20,10 @@ export class ProductRepository {
   }
 
   async create(product: Product): Promise<Product> {
-    await db.collection('products').doc(product.id).set(product);
+    const cleanProduct = Object.fromEntries(
+      Object.entries(product).filter(([_, v]) => v !== undefined)
+    );
+    await db.collection('products').doc(product.id).set(cleanProduct as any);
     return product;
   }
 

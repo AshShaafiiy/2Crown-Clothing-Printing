@@ -20,20 +20,25 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const { user, error: authError, status: authStatus } = await authenticateNext(req);
-  if (authError) return NextResponse.json({ error: authError }, { status: authStatus });
+  try {
+    const { user, error: authError, status: authStatus } = await authenticateNext(req);
+    if (authError) return NextResponse.json({ error: authError }, { status: authStatus });
 
-  const roleError = requireRolesNext(user, ['root_super_admin', 'super_admin', 'admin']);
-  if (roleError) return NextResponse.json({ error: roleError.error }, { status: roleError.status });
+    const roleError = requireRolesNext(user, ['root_super_admin', 'super_admin', 'admin']);
+    if (roleError) return NextResponse.json({ error: roleError.error }, { status: roleError.status });
 
-  const { data, error, status } = await parseBody(req, ProductInputSchema);
-  if (error) return NextResponse.json(error, { status });
+    const { data, error, status } = await parseBody(req, ProductInputSchema);
+    if (error) return NextResponse.json(error, { status });
 
-  const newProduct = {
-    id: uuid(),
-    createdAt: new Date().toISOString(),
-    ...data
-  };
-  await productRepository.create(newProduct as any);
-  return NextResponse.json(newProduct, { status: 201 });
+    const newProduct = {
+      id: uuid(),
+      createdAt: new Date().toISOString(),
+      ...data
+    };
+    await productRepository.create(newProduct as any);
+    return NextResponse.json(newProduct, { status: 201 });
+  } catch (err: any) {
+    console.error("FATAL PRODUCT POST ERROR:", err);
+    return NextResponse.json({ error: err.message || "Unknown error" }, { status: 500 });
+  }
 }

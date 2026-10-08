@@ -51,7 +51,23 @@ export const apiClient = async <T = any>(
     data = await response.json();
   } catch (err) {
     if (!response.ok) {
-      throw new ApiError(response.status, null, response.statusText);
+      let textData = '';
+      try {
+        textData = await response.clone().text();
+      } catch (e) { }
+      
+      let errorMsg = response.statusText;
+      if (textData) {
+        const titleMatch = textData.match(/<title>(.*?)<\/title>/i);
+        if (titleMatch && titleMatch[1]) {
+          errorMsg = `HTTP ${response.status}: ${titleMatch[1]}`;
+        } else {
+          errorMsg = `HTTP ${response.status}: ${textData.substring(0, 100)}`;
+        }
+      } else if (!errorMsg) {
+         errorMsg = `HTTP Error ${response.status}`;
+      }
+      throw new ApiError(response.status, null, errorMsg);
     }
     return {} as T;
   }

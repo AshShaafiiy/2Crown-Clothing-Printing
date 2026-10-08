@@ -36,8 +36,9 @@ export async function POST(req: Request) {
       metadata: { contentType: file.type || 'application/octet-stream' }
     });
     
-    await fileRef.makePublic();
-    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${filename}`;
+    // Use the native Firebase Storage download URL format
+    // This relies on Firebase Security Rules (allow read: if true) instead of per-object ACLs
+    const publicUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(filename)}?alt=media`;
 
     return NextResponse.json({ url: publicUrl }, { status: 201 });
   } catch (err: any) {

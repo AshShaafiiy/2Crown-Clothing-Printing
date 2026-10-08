@@ -21,7 +21,10 @@ export class CategoryRepository {
 
   async create(category: Category): Promise<Category> {
     if (!category.id) throw new Error('Category id required');
-    await db.collection('categories').doc(category.id).set(category);
+    const cleanCategory = Object.fromEntries(
+      Object.entries(category).filter(([_, v]) => v !== undefined)
+    );
+    await db.collection('categories').doc(category.id).set(cleanCategory as any);
     return category;
   }
 
