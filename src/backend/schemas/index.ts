@@ -42,6 +42,7 @@ export const ProductInputSchemaBase = z.object({
   price: z.number().positive(),
   previousPrice: z.number().positive().optional(),
   imageUrl: z.string().min(1),
+  imageFileId: z.string().optional(),
   featured: z.boolean(),
   active: z.boolean(),
   variants: z.array(ProductVariantSchema).optional(),

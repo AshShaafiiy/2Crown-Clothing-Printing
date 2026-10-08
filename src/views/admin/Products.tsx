@@ -30,12 +30,14 @@ const Products: React.FC = () => {
     previousPrice: "" as string | number,
 
     imageUrl: '',
+    imageFileId: '' as string | undefined,
     active: true,
     featured: false
   };
 
   const [formData, setFormData] = useState(initialFormState);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
+  const [isUploading, setIsUploading] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -108,6 +110,7 @@ const Products: React.FC = () => {
       previousPrice: product.previousPrice || 0,
 
       imageUrl: product.imageUrl || '',
+      imageFileId: product.imageFileId || '',
       active: product.active,
       featured: product.featured || false
     });
@@ -165,6 +168,7 @@ const Products: React.FC = () => {
         previousPrice: parsedPrevPrice > 0 ? parsedPrevPrice : undefined,
 
         imageUrl: formData.imageUrl,
+        imageFileId: formData.imageFileId,
         active: formData.active,
         featured: formData.featured
       };
@@ -379,7 +383,7 @@ const Products: React.FC = () => {
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                           <button
                             type="button"
-                            onClick={() => setFormData({...formData, imageUrl: ''})}
+                            onClick={() => setFormData({...formData, imageUrl: '', imageFileId: ''})}
                             className="bg-white rounded-full p-2 shadow hover:bg-red-50 text-red-500 transition-colors"
                             aria-label="Remove Image"
                           >
@@ -396,13 +400,16 @@ const Products: React.FC = () => {
                           onChange={async (e) => {
                             const file = e.target.files?.[0];
                             if (!file) return;
+                            setIsUploading(true);
                             const toastId = toast.loading('Uploading image...');
                             try {
-                              const url = await services.products.uploadImage(file);
-                              setFormData({...formData, imageUrl: url});
+                              const { url, imageFileId } = await services.products.uploadImage(file);
+                              setFormData({...formData, imageUrl: url, imageFileId});
                               toast.success('Image uploaded', { id: toastId });
                             } catch (error) {
                               toast.error('Failed to upload image', { id: toastId });
+                            } finally {
+                              setIsUploading(false);
                             }
                           }}
                           className="w-full h-full opacity-0 absolute inset-0 cursor-pointer z-10"
@@ -447,10 +454,10 @@ const Products: React.FC = () => {
               </button>
               <button
                 onClick={handleSave}
-                disabled={isSaving}
-                className="w-full sm:w-auto px-6 py-2 bg-primary text-secondary rounded hover:bg-primary/90 font-medium flex items-center justify-center transition-colors shadow-sm"
+                disabled={isSaving || isUploading}
+                className="w-full sm:w-auto px-6 py-2 bg-primary text-secondary rounded hover:bg-primary/90 font-medium flex items-center justify-center transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSaving ? 'Saving...' : 'Save Product'}
+                {isSaving ? 'Saving...' : (isUploading ? 'Uploading image...' : 'Save Product')}
               </button>
             </div>
           </div>

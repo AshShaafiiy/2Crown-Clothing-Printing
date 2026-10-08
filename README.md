@@ -14,7 +14,7 @@ A premium e-commerce platform for a Nigerian custom clothing and printing busine
 | Database | Cloud Firestore |
 | Server SDK | Firebase Admin SDK |
 | Hosting | Vercel (GitHub integration) |
-| Image CDN | ImageKit (deferred — not yet wired) |
+| Image CDN | ImageKit |
 | Email | Resend (deferred — not yet wired) |
 | Domain | Cloudflare + Truehost (planned, not configured) |
 | Testing | Vitest, Playwright |

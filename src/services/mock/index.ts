@@ -163,10 +163,10 @@ export class MockProductService implements IProductService {
   async deleteProduct(id: ID): Promise<void> {
     products = products.filter(p => p.id !== id);
   }
-  async uploadImage(file: File): Promise<string> {
+  async uploadImage(file: File): Promise<{url: string, imageFileId: string}> {
     return new Promise((resolve) => {
       const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result as string);
+      reader.onloadend = () => resolve({ url: reader.result as string, imageFileId: 'mock_file_id' });
       reader.readAsDataURL(file);
     });
   }

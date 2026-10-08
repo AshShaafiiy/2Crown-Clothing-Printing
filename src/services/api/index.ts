@@ -42,14 +42,26 @@ export class ApiProductService implements IProductService {
     await apiClient(`/products/${id}`, { method: 'DELETE' });
   }
 
-  async uploadImage(file: File): Promise<string> {
+  async uploadImage(file: File): Promise<{url: string, imageFileId: string}> {
+    const authRes = await apiClient<{token: string, expire: number, signature: string}>('/upload/imagekit-auth');
+    
     const formData = new FormData();
     formData.append('file', file);
-    const result = await apiClient<{url: string}>('/upload', {
+    formData.append('fileName', file.name || 'product');
+    formData.append('folder', '/2crown/products/');
+    formData.append('publicKey', process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY || '');
+    formData.append('signature', authRes.signature);
+    formData.append('expire', authRes.expire.toString());
+    formData.append('token', authRes.token);
+
+    const uploadRes = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
       method: 'POST',
       body: formData
     });
-    return result.url;
+
+    if (!uploadRes.ok) throw new Error('ImageKit upload failed');
+    const data = await uploadRes.json();
+    return { url: data.url, imageFileId: data.fileId };
   }
 }
 

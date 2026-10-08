@@ -259,3 +259,11 @@ Cart quantity controls use gold decrement/increment buttons with a display-only 
 - Discovered that Firebase Admin `getStorage().bucket().file().makePublic()` crashes when a GCP bucket has "Uniform bucket-level access" enabled, throwing a 500 error on `/api/upload`. This was replaced with the native URL generation strategy (`https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/...`) to leverage Firestore Security Rules instead of per-object ACLs.
 - Fixed a silent failure where Next.js Vercel environment occasionally fails to apply `db.settings({ ignoreUndefinedProperties: true })` correctly due to parallel bundling/HMR. Added explicit `undefined` filtering in `ProductRepository.ts` and `CategoryRepository.ts` `create()` methods via `Object.fromEntries` to permanently solve the `Cannot use undefined as a Firestore value` 500 error when saving products with omitted optional schema properties.
 - Upgraded the `client.ts` HTTP error parser to safely extract Next.js generic HTML error titles (e.g. `500 Internal Server Error`) instead of throwing an unhelpful "An error occurred during the API request" message, enabling easier diagnosis of Vercel production crashes.
+
+## 2026-10-08 ImageKit Migration
+- **Product Images**: Product image pipeline has been fully migrated from Firebase Storage to ImageKit.
+- **Data Model**: Firestore now stores `imageUrl` and `imageFileId`. Legacy Firebase image compatibility is maintained.
+- **Upload Flow**: Implemented direct browser-to-ImageKit upload to avoid Vercel serverless payload limits and proxying overhead.
+- **Security**: Added secure server-side ImageKit auth parameters generation via `/api/upload/imagekit-auth`. 
+- **Lifecycle Management**: Added robust server-side deletion lifecycle. When a product is edited with a replacement image or deleted entirely, the associated old ImageKit file is properly purged.
+- **Status**: Local tests (293 passing) and production build are fully verified. Deployment is ready for User Live QA.

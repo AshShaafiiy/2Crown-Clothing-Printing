@@ -43,6 +43,7 @@ export interface Product {
   price: number;
   previousPrice?: number; // in NGN ₦
   imageUrl: string;
+  imageFileId?: string;
   featured: boolean;
   active: boolean;
   variants?: ProductVariant[];

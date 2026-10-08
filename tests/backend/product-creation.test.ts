@@ -125,4 +125,11 @@ describe('POST /api/products', () => {
     const res2 = await POST(req2);
     expect(res2.status).toBe(400);
   });
+
+  it('allows valid imageFileId', async () => {
+    vi.mocked(auth.verifyIdToken).mockResolvedValue({ uid: 'root', email: 'admin@test.com', role: 'root_super_admin' } as any);
+    const req = createMockRequest({ ...validPayload, imageFileId: 'ik_12345' }, 'valid_cookie');
+    const res = await POST(req);
+    expect(res.status).toBe(201);
+  });
 });
