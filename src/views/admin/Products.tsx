@@ -2,7 +2,7 @@
 import { useConfirm } from '../../components/ui/ConfirmProvider';
 import { toast } from 'react-hot-toast';
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Edit2, Trash2, ImageOff } from 'lucide-react';
+import { Plus, Edit2, Trash2, ImageOff, RefreshCw } from 'lucide-react';
 import { services } from '../../services';
 import { Product, Category } from '../../domain/models';
 import { AdminSearch } from '../../components/admin/AdminSearch';
@@ -379,16 +379,64 @@ const Products: React.FC = () => {
                   <div className="relative w-full sm:w-48 aspect-square border-2 border-dashed border-gray-300 rounded-lg overflow-hidden bg-gray-50 hover:bg-gray-100 transition-colors group">
                     {formData.imageUrl ? (
                       <>
-                        <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                        <img 
+                          src={formData.imageUrl} 
+                          alt="Preview" 
+                          className="w-full h-full object-cover" 
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                          }} 
+                        />
+                        <div className="hidden w-full h-full flex flex-col items-center justify-center bg-gray-100 text-gray-500">
+                          <ImageOff size={32} className="mb-2" />
+                          <span className="text-xs font-medium text-center px-2">Image unavailable</span>
+                        </div>
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <button
-                            type="button"
-                            onClick={() => setFormData({...formData, imageUrl: '', imageFileId: ''})}
-                            className="bg-white rounded-full p-2 shadow hover:bg-red-50 text-red-500 transition-colors"
-                            aria-label="Remove Image"
-                          >
-                            <Trash2 size={20} />
-                          </button>
+                          <input
+                            type="file"
+                            aria-label="Replace Product image"
+                            accept="image/jpeg, image/png, image/webp"
+                            title="Replace Image"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+
+                              if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+                                toast.error('Please upload a JPEG, PNG, or WebP image.');
+                                e.target.value = '';
+                                return;
+                              }
+                              const MAX_PRODUCT_IMAGE_BYTES = 5 * 1024 * 1024;
+                              if (file.size > MAX_PRODUCT_IMAGE_BYTES) {
+                                toast.error('Product image must be 5 MB or smaller.');
+                                e.target.value = '';
+                                return;
+                              }
+
+                              setIsUploading(true);
+                              const toastId = toast.loading('Uploading image...');
+                              try {
+                                const { url, imageFileId } = await services.products.uploadImage(file);
+                                // Verify URL works before applying
+                                const imgRes = await fetch(url, { method: 'HEAD' });
+                                if (!imgRes.ok || !imgRes.headers.get('content-type')?.startsWith('image/')) {
+                                  throw new Error('Uploaded image could not be loaded. Please try again.');
+                                }
+                                setFormData({...formData, imageUrl: url, imageFileId});
+                                toast.success('Image replaced', { id: toastId });
+                              } catch (error: any) {
+                                toast.error(error.message || 'Failed to upload image', { id: toastId });
+                              } finally {
+                                setIsUploading(false);
+                                e.target.value = '';
+                              }
+                            }}
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                          />
+                          <div className="bg-white rounded-full p-2 shadow text-gray-700 pointer-events-none">
+                            <RefreshCw size={20} />
+                          </div>
                         </div>
                       </>
                     ) : (
@@ -402,12 +450,14 @@ const Products: React.FC = () => {
                             if (!file) return;
 
                             if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-                              toast.error('Only JPEG, PNG, and WEBP formats are allowed.');
+                              toast.error('Please upload a JPEG, PNG, or WebP image.');
+                              e.target.value = '';
                               return;
                             }
                             const MAX_PRODUCT_IMAGE_BYTES = 5 * 1024 * 1024;
                             if (file.size > MAX_PRODUCT_IMAGE_BYTES) {
                               toast.error('Product image must be 5 MB or smaller.');
+                              e.target.value = '';
                               return;
                             }
 
@@ -415,12 +465,17 @@ const Products: React.FC = () => {
                             const toastId = toast.loading('Uploading image...');
                             try {
                               const { url, imageFileId } = await services.products.uploadImage(file);
+                              const imgRes = await fetch(url, { method: 'HEAD' });
+                              if (!imgRes.ok || !imgRes.headers.get('content-type')?.startsWith('image/')) {
+                                throw new Error('Uploaded image could not be loaded. Please try again.');
+                              }
                               setFormData({...formData, imageUrl: url, imageFileId});
                               toast.success('Image uploaded', { id: toastId });
                             } catch (error: any) {
                               toast.error(error.message || 'Failed to upload image', { id: toastId });
                             } finally {
                               setIsUploading(false);
+                              e.target.value = '';
                             }
                           }}
                           className="w-full h-full opacity-0 absolute inset-0 cursor-pointer z-10"

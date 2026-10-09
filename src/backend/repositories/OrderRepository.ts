@@ -60,6 +60,11 @@ function normalizeOrderData(data: any): Order {
     });
   }
 
+  let rawStatus = data.status || 'Unknown Status';
+  if (rawStatus === 'WhatsApp Pending') {
+    rawStatus = 'Awaiting Confirmation';
+  }
+
   return {
     ...data,
     createdAt,
@@ -70,7 +75,7 @@ function normalizeOrderData(data: any): Order {
     deliveryFee,
     history,
     items: Array.isArray(data.items) ? data.items : [],
-    status: data.status || 'Unknown Status',
+    status: rawStatus,
     customerName: data.customerName || 'Unknown',
     customerPhone: data.customerPhone || 'Unknown',
     reference: data.reference || 'Unknown-Ref'

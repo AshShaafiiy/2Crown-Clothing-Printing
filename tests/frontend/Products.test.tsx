@@ -5,7 +5,7 @@ import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 import Products from '../../src/views/admin/Products';
 import { services } from '../../src/services';
-import toast from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 
 vi.mock('../../src/services', () => ({
   services: {
@@ -90,5 +90,41 @@ describe('Products Frontend', () => {
     const finalSaveBtn = screen.getByText('Save Product');
     expect(finalSaveBtn).not.toBeDisabled(); // wait, form logic might disable it if other required fields are missing?
     // Oh, the button itself doesn't disable on validation until clicked, only on isSaving || isUploading
+  });
+
+  it('rejects image larger than 5 MB before upload', async () => {
+    render(<Products />);
+    await waitFor(() => expect(services.products.getProducts).toHaveBeenCalled());
+
+    const addBtn = screen.getByText('Add Product');
+    fireEvent.click(addBtn);
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    
+    // Create a 6MB dummy file
+    const largeFile = new File([new ArrayBuffer(6 * 1024 * 1024)], 'huge.png', { type: 'image/png' });
+    const user = userEvent.setup();
+    await user.upload(fileInput, largeFile);
+
+    expect(services.products.uploadImage).not.toHaveBeenCalled();
+    expect(toast.error).toHaveBeenCalledWith('Product image must be 5 MB or smaller.');
+  });
+
+  it('rejects unsupported file types (GIF, SVG)', async () => {
+    render(<Products />);
+    await waitFor(() => expect(services.products.getProducts).toHaveBeenCalled());
+    fireEvent.click(screen.getByText('Add Product'));
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const user = userEvent.setup();
+    
+    const gifFile = new File(['dummy'], 'test.gif', { type: 'image/gif' });
+    fireEvent.change(fileInput, { target: { files: [gifFile] } });
+    expect(services.products.uploadImage).not.toHaveBeenCalled();
+    expect(toast.error).toHaveBeenCalledWith('Please upload a JPEG, PNG, or WebP image.');
+
+    const svgFile = new File(['dummy'], 'test.svg', { type: 'image/svg+xml' });
+    fireEvent.change(fileInput, { target: { files: [svgFile] } });
+    expect(services.products.uploadImage).not.toHaveBeenCalled();
   });
 });

@@ -349,25 +349,42 @@ const Orders: React.FC = () => {
                                 <h5 className="font-semibold text-gray-700 mb-3">Available Actions</h5>
                                 <div className="flex flex-wrap gap-2">
                                   {(() => {
-                                    const validNext = getValidNextStatuses(order.status, order.deliveryMethod);
-                                    if (validNext.length === 0) {
+                                    // List of known terminal statuses
+                                    const terminalStatuses = ['Delivered', 'Picked Up', 'Cancelled'];
+                                    if (terminalStatuses.includes(order.status)) {
                                       return <p className="text-sm text-gray-500 italic">This order has reached its final status.</p>;
                                     }
-                                    return validNext.map(status => (
-                                      <button
-                                        key={status}
-                                        onClick={() => handleStatusChange(order, status)}
-                                        className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
-                                          status === 'Cancelled'
-                                            ? 'bg-red-50 text-red-600 hover:bg-red-100'
-                                            : status === 'Delivered' || status === 'Picked Up'
-                                            ? 'bg-green-600 text-white hover:bg-green-700'
-                                            : 'bg-black text-white hover:bg-gray-800'
-                                        }`}
-                                      >
-                                        {status === 'Confirmed' ? 'Confirm Order' : 'Mark as ' + status}
-                                      </button>
-                                    ));
+
+                                    const validNext = getValidNextStatuses(order.status, order.deliveryMethod);
+                                    if (validNext.length === 0) {
+                                      return <p className="text-sm text-red-500 italic">Unknown status: {order.status}. Transition mapping missing.</p>;
+                                    }
+                                    return validNext.map(status => {
+                                      const isConfirmingLocalDeliveryWithoutFee = 
+                                        status === 'Confirmed' && 
+                                        order.deliveryMethod !== 'pickup' && 
+                                        (order.deliveryFee === null || order.deliveryFee === undefined);
+
+                                      return (
+                                        <button
+                                          key={status}
+                                          onClick={() => handleStatusChange(order, status)}
+                                          disabled={isConfirmingLocalDeliveryWithoutFee}
+                                          title={isConfirmingLocalDeliveryWithoutFee ? "Please set a delivery fee before confirming this local delivery order." : undefined}
+                                          className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
+                                            isConfirmingLocalDeliveryWithoutFee
+                                              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                              : status === 'Cancelled'
+                                              ? 'bg-red-50 text-red-600 hover:bg-red-100'
+                                              : status === 'Delivered' || status === 'Picked Up'
+                                              ? 'bg-green-600 text-white hover:bg-green-700'
+                                              : 'bg-black text-white hover:bg-gray-800'
+                                          }`}
+                                        >
+                                          {status === 'Confirmed' ? 'Confirm Order' : 'Mark as ' + status}
+                                        </button>
+                                      );
+                                    });
                                   })()}
                                 </div>
                               </div>

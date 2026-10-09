@@ -65,4 +65,19 @@ describe('OrderRepository Normalization', () => {
     const orders = await orderRepository.findAll();
     expect(orders[0].deliveryFee).toBe(0);
   });
+
+  it('normalizes legacy WhatsApp Pending to Awaiting Confirmation', async () => {
+    const mockData = {
+      status: 'WhatsApp Pending',
+    };
+
+    const mockGet = vi.fn().mockResolvedValue({
+      docs: [{ data: () => mockData }]
+    });
+    const mockOrderBy = vi.fn().mockReturnValue({ get: mockGet });
+    (db.collection as any).mockReturnValue({ orderBy: mockOrderBy });
+
+    const orders = await orderRepository.findAll();
+    expect(orders[0].status).toBe('Awaiting Confirmation');
+  });
 });

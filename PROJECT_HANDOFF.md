@@ -268,3 +268,15 @@ Cart quantity controls use gold decrement/increment buttons with a display-only 
 - **Security**: Added secure server-side ImageKit auth parameters generation via `/api/upload/imagekit-auth`.
 - **Lifecycle Management**: Added robust server-side deletion lifecycle. When a product is edited with a replacement image or deleted entirely, the associated old ImageKit file is properly purged.
 - **Status**: Live authenticated QA is pending until user confirms.
+
+## 2026-10-09 ImageKit Fixes & Order State Fixes
+- **Product Image Preview & Constraints**: 
+  - Product image uploads strictly accept only `image/jpeg`, `image/png`, and `image/webp`.
+  - Max image size is strictly enforced at 5 MB (`5 * 1024 * 1024` bytes).
+  - Invalid files (size > 5MB, or unsupported MIME like GIF/SVG) are immediately rejected *before* any auth or upload request is dispatched.
+  - If a replacement upload fails size validation, the UI gracefully preserves the existing image preview instead of rendering a broken image.
+  - Rendered `<img>` tags gracefully handle broken URLs with a fallback UI component ("Image unavailable") instead of displaying a native browser broken image icon.
+- **Local Delivery Order Fixes**:
+  - Legacy statuses like `"WhatsApp Pending"` are instantly normalized at the repository/domain layer into `"Awaiting Confirmation"` to ensure they align with the current strict state machine without rewriting legacy database records en masse.
+  - Orders are only treated as reaching their "final status" if their status matches true terminal states (`Delivered`, `Picked Up`, or `Cancelled`). Unmapped statuses are reported safely, rather than silently defaulting to final.
+  - Local Delivery confirmation strictly blocks the "Confirm Order" action until an admin configures a valid delivery fee. When clicking "Confirm Order," the history correctly appends an actual real timestamp while retaining the defined fee.
