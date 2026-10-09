@@ -280,3 +280,16 @@ Cart quantity controls use gold decrement/increment buttons with a display-only 
   - Legacy statuses like `"WhatsApp Pending"` are instantly normalized at the repository/domain layer into `"Awaiting Confirmation"` to ensure they align with the current strict state machine without rewriting legacy database records en masse.
   - Orders are only treated as reaching their "final status" if their status matches true terminal states (`Delivered`, `Picked Up`, or `Cancelled`). Unmapped statuses are reported safely, rather than silently defaulting to final.
   - Local Delivery confirmation strictly blocks the "Confirm Order" action until an admin configures a valid delivery fee. When clicking "Confirm Order," the history correctly appends an actual real timestamp while retaining the defined fee.
+
+## 2026-10-09 Production Order Reset & Dashboard Format
+- **Test Orders Reset**: All historical test orders were permanently wiped from the production database to establish a clean zero-baseline for the transactional launch. Products, Categories, and Admin accounts were strictly preserved.
+- **Dashboard Revenue Format**: A compact currency formatting rule (`formatCompactNaira`) was applied explicitly and *only* to Dashboard summary metric cards. 
+  - Standard amounts (< 10,000) show in full (e.g. `₦9,999`). 
+  - Large aggregate amounts (>= 10,000) display in compact notation (e.g. `₦10K`, `₦10.5K`, `₦1M`).
+  - Values strictly close to boundary thresholds (e.g. `999,950`) logically round to the next boundary (`₦1M` rather than `₦1000K`) to retain dashboard visual integrity.
+  - Normal application screens (Checkout, Order Details, Admin Orders) preserve the full currency precision (`₦1,500,000`).
+- **Clean Maintenance Scripting**: The reset was performed via a temporary authenticated API route pushed to production, executed, and immediately deleted to guarantee no permanent reset API vulnerability remains in the deployed app.
+
+## Shop & Product Display Rules
+- **Sorting**: The "Newest Arrivals" sort strictly uses the `createdAt` timestamp in descending order, utilizing `normalizeTimestamp` to handle disparate date formats safely. Missing dates fallback to the end. Identical timestamps are deterministically tie-broken using `name.localeCompare()` to prevent rendering instability.
+- **Filtering**: Mobile uses a native `<select>` dropdown for category selection while Desktop uses a sidebar. Sorting applies securely over filtered subsets.

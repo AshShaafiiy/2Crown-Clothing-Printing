@@ -56,9 +56,17 @@ Keep the implemented Next.js/Firebase architecture and secure production boot ch
 - Do NOT replace the existing Firestore/Firebase backend or restore the old Express/SQLite backend.
 
 
-## 8. Git Safety Rule
+## 8. Development Workflow
+- **Mandatory Three-Role Workflow**: All complex tasks must be processed through a strict three-role subagent loop:
+  1. **Full-Stack Developer**: Implements the feature or fix.
+  2. **Software Engineer**: Independently reviews architecture, constraints, and security.
+  3. **QA Tester**: Verifies end-to-end functionality via tests or live validation.
+  - Any FAIL at any stage loops back to the developer until all three roles PASS.
+
+## 9. Git Safety Rule
 - **NEVER** use `git push --force` or `git push -f` against `main` during normal 2Crown work.
 - Do not rewrite shared `main` history.
+- **NO** destructive reset without explicit authorization.
 - If an accidental commit needs correction, prefer a new corrective commit.
 - Force-push may only occur with explicit user authorization for that specific operation.
 

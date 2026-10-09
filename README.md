@@ -108,7 +108,12 @@ Copy `.env.example` to `.env.local` and fill in the values.
 - `FIREBASE_CLIENT_EMAIL`
 - `FIREBASE_PRIVATE_KEY`
 
-The Firebase service-account JSON is stored **outside the repository** at `~/.config/2crown/service-account.json`. Never commit it.
+**ImageKit (server & client):**
+- `IMAGEKIT_PUBLIC_KEY` (Dynamic route auth)
+- `IMAGEKIT_PRIVATE_KEY` (Server-only deletion/management)
+- `IMAGEKIT_URL_ENDPOINT` (Base URL for images)
+
+The Firebase service-account JSON is stored **outside the repository** at `~/.config/2crown/service-account.json` for local development. Never commit it.
 
 ### Development
 
@@ -137,8 +142,9 @@ The repository is connected to Vercel via GitHub integration. Pushing to `main` 
 - **Vercel project**: `2crown-clothing-printing`
 - **Production URL**: `https://2crown-clothing-printing.vercel.app`
 - **Firebase project**: `twocrown-clothing-printing`
+- **ImageKit**: Used for dynamic Product image uploads.
 
-Vercel environment variables must be configured in the Vercel dashboard (both client and server Firebase variables). The service-account private key is set as a Vercel environment variable — it is never stored in the repository.
+Vercel environment variables must be configured in the Vercel dashboard. The service-account private key and ImageKit private key are set as Vercel environment variables — they are never stored in the repository.
 
 ## Security Architecture
 
@@ -174,3 +180,20 @@ This project was originally built with Vite + Express + SQLite. It was migrated 
 - `PROJECT_HANDOFF.md` — Live continuation document for cross-account handoff
 - `docs/` — Historical domain documentation
 - `.env.example` — Required environment variable template
+
+## Image Storage Architecture
+
+Product dynamic images use **ImageKit** via direct browser upload to avoid Vercel payload limits and proxying overhead.
+
+**Upload Flow:**
+1. Admin browser requests `/api/upload/imagekit-auth`
+2. Server validates Firebase Auth & RBAC, returning token/signature using `imagekit` SDK
+3. Browser uploads image directly to ImageKit using `@imagekit/javascript`
+4. ImageKit returns `imageUrl` and `imageFileId`
+5. Frontend attaches metadata to the final Product save request
+6. Firestore stores the reference.
+
+**Constraints:**
+- Allowed MIME types: `image/jpeg`, `image/png`, `image/webp`.
+- Maximum File Size: `5 MB`.
+- Legacy Firebase Storage `imageUrl` values remain fully render-compatible.
