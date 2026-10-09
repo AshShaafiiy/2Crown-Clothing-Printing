@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { services } from '../../services';
 import { Product, Category } from '../../domain/models';
 import { ProductCard } from '../../components/ui/ProductCard';
+import { normalizeTimestamp } from '../../backend/utils/date';
 
 const Shop: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -63,8 +64,17 @@ const Shop: React.FC = () => {
         break;
       case 'newest':
       default:
-        // Mock newest by reversing for now, assuming array order is chronological
-        result.reverse();
+        result.sort((a, b) => {
+          const tA = normalizeTimestamp(a.createdAt);
+          const tB = normalizeTimestamp(b.createdAt);
+          const timeA = tA ? new Date(tA).getTime() : 0;
+          const timeB = tB ? new Date(tB).getTime() : 0;
+          
+          if (timeA !== timeB) {
+            return timeB - timeA;
+          }
+          return a.name.localeCompare(b.name);
+        });
         break;
     }
 
