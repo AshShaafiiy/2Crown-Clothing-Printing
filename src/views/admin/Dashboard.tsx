@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { services } from '../../services';
 import { Order, OrderStatus } from '../../domain/models';
 
+import { formatCompactNaira } from '../../utils/currency';
+
 export default function Dashboard() {
   const [stats, setStats] = useState({
     totalOrders: 0,
@@ -51,7 +53,7 @@ export default function Dashboard() {
         </div>
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
           <h3 className="text-gray-500 text-sm font-medium">Total Sales</h3>
-          <p className="text-3xl font-bold mt-2 text-green-600">₦{stats.totalSales.toLocaleString()}</p>
+          <p className="text-3xl font-bold mt-2 text-green-600">{formatCompactNaira(stats.totalSales)}</p>
         </div>
       </div>
       
