@@ -417,8 +417,8 @@ const Products: React.FC = () => {
                               const { url, imageFileId } = await services.products.uploadImage(file);
                               setFormData({...formData, imageUrl: url, imageFileId});
                               toast.success('Image uploaded', { id: toastId });
-                            } catch (error) {
-                              toast.error('Failed to upload image', { id: toastId });
+                            } catch (error: any) {
+                              toast.error(error.message || 'Failed to upload image', { id: toastId });
                             } finally {
                               setIsUploading(false);
                             }

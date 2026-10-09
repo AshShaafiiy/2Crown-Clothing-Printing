@@ -24,6 +24,9 @@ vi.mock('imagekit', () => {
 describe('ImageKit Auth Endpoint', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY = 'test_public';
+    process.env.IMAGEKIT_PRIVATE_KEY = 'test_private';
+    process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT = 'test_url';
   });
 
   it('returns 401 if unauthenticated', async () => {
@@ -55,6 +58,7 @@ describe('ImageKit Auth Endpoint', () => {
     expect(data.token).toBeDefined();
     expect(data.expire).toBeDefined();
     expect(data.signature).toBeDefined();
+    expect(data.publicKey).toBe('test_public');
     expect(data.privateKey).toBeUndefined();
   });
 });

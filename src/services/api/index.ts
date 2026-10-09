@@ -43,25 +43,38 @@ export class ApiProductService implements IProductService {
   }
 
   async uploadImage(file: File): Promise<{url: string, imageFileId: string}> {
-    const authRes = await apiClient<{token: string, expire: number, signature: string}>('/upload/imagekit-auth');
+    const authRes = await apiClient<{token: string, expire: number, signature: string, publicKey: string}>('/upload/imagekit-auth');
     
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('fileName', file.name || 'product');
-    formData.append('folder', '/2crown/products/');
-    formData.append('publicKey', process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY || '');
-    formData.append('signature', authRes.signature);
-    formData.append('expire', authRes.expire.toString());
-    formData.append('token', authRes.token);
+    // Dynamically import the browser SDK so we don't break SSR
+    const { upload } = await import('@imagekit/javascript');
 
-    const uploadRes = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
-      method: 'POST',
-      body: formData
-    });
-
-    if (!uploadRes.ok) throw new Error('ImageKit upload failed');
-    const data = await uploadRes.json();
-    return { url: data.url, imageFileId: data.fileId };
+    try {
+      const result = await upload({
+        file,
+        fileName: file.name || 'product',
+        folder: '/2crown/products/',
+        token: authRes.token,
+        signature: authRes.signature,
+        expire: authRes.expire,
+        publicKey: authRes.publicKey,
+      });
+      if (!result.url || !result.fileId) {
+        throw new Error('ImageKit response missing URL or fileId');
+      }
+      return { url: result.url, imageFileId: result.fileId };
+    } catch (err: any) {
+      console.error('ImageKit Upload Error:', err);
+      let message = 'Image upload failed due to a network error. Please try again.';
+      if (err.status === 401 || err.status === 403) {
+        message = 'Image upload authorization failed. Please try again.';
+      } else if (err.status === 400) {
+        message = 'Image upload request was invalid.';
+      } else if (err.message) {
+        // Keep safe messages but fallback to generic if unknown structure
+        message = typeof err.message === 'string' ? err.message : message;
+      }
+      throw new Error(message);
+    }
   }
 }
 

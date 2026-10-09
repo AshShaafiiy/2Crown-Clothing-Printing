@@ -13,7 +13,10 @@ export async function GET(req: Request) {
     const imagekit = getImageKitClient();
     const authParameters = imagekit.getAuthenticationParameters();
 
-    return NextResponse.json(authParameters, { status: 200 });
+    return NextResponse.json({
+      ...authParameters,
+      publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY
+    }, { status: 200 });
   } catch (err: any) {
     console.error('ImageKit Auth Error:', err);
     return NextResponse.json({ error: 'Failed to generate ImageKit auth parameters' }, { status: 500 });
