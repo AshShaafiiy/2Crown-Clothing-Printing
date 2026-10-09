@@ -396,10 +396,21 @@ const Products: React.FC = () => {
                         <input
                           type="file"
                           aria-label="Product image"
-                          accept="image/*"
+                          accept="image/jpeg, image/png, image/webp"
                           onChange={async (e) => {
                             const file = e.target.files?.[0];
                             if (!file) return;
+
+                            if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+                              toast.error('Only JPEG, PNG, and WEBP formats are allowed.');
+                              return;
+                            }
+                            const MAX_PRODUCT_IMAGE_BYTES = 5 * 1024 * 1024;
+                            if (file.size > MAX_PRODUCT_IMAGE_BYTES) {
+                              toast.error('Product image must be 5 MB or smaller.');
+                              return;
+                            }
+
                             setIsUploading(true);
                             const toastId = toast.loading('Uploading image...');
                             try {

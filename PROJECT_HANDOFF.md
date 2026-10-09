@@ -262,8 +262,9 @@ Cart quantity controls use gold decrement/increment buttons with a display-only 
 
 ## 2026-10-08 ImageKit Migration
 - **Product Images**: Product image pipeline has been fully migrated from Firebase Storage to ImageKit.
-- **Data Model**: Firestore now stores `imageUrl` and `imageFileId`. Legacy Firebase image compatibility is maintained.
+- **Data Model**: Firestore now stores `imageUrl` and `imageFileId`. Legacy Firebase image URLs remain fully supported.
 - **Upload Flow**: Implemented direct browser-to-ImageKit upload to avoid Vercel serverless payload limits and proxying overhead.
-- **Security**: Added secure server-side ImageKit auth parameters generation via `/api/upload/imagekit-auth`. 
+- **Validation**: Exact accepted MIME types are strictly limited to JPEG, PNG, and WEBP. Maximum file size is strictly enforced at 5 MB (5 * 1024 * 1024 bytes) prior to upload.
+- **Security**: Added secure server-side ImageKit auth parameters generation via `/api/upload/imagekit-auth`.
 - **Lifecycle Management**: Added robust server-side deletion lifecycle. When a product is edited with a replacement image or deleted entirely, the associated old ImageKit file is properly purged.
-- **Status**: Local tests (293 passing) and production build are fully verified. Deployment is ready for User Live QA.
+- **Status**: Live authenticated QA is pending until user confirms.
