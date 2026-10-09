@@ -24,9 +24,9 @@ vi.mock('imagekit', () => {
 describe('ImageKit Auth Endpoint', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY = 'test_public';
+    process.env.IMAGEKIT_PUBLIC_KEY = 'test_public';
     process.env.IMAGEKIT_PRIVATE_KEY = 'test_private';
-    process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT = 'test_url';
+    process.env.IMAGEKIT_URL_ENDPOINT = 'test_url';
   });
 
   it('returns 401 if unauthenticated', async () => {
@@ -60,5 +60,15 @@ describe('ImageKit Auth Endpoint', () => {
     expect(data.signature).toBeDefined();
     expect(data.publicKey).toBe('test_public');
     expect(data.privateKey).toBeUndefined();
+  });
+
+  it('throws 500 if server environment is missing keys', async () => {
+    delete process.env.IMAGEKIT_PUBLIC_KEY;
+    (authenticateNext as any).mockResolvedValue({ user: { uid: '123' } });
+    (requireRolesNext as any).mockReturnValue(null);
+    
+    const req = new Request('http://localhost/api/upload/imagekit-auth');
+    const res = await GET(req);
+    expect(res.status).toBe(500);
   });
 });

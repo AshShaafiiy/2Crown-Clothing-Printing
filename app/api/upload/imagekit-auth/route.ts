@@ -15,7 +15,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({
       ...authParameters,
-      publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY
+      publicKey: process.env.IMAGEKIT_PUBLIC_KEY
     }, { status: 200 });
   } catch (err: any) {
     console.error('ImageKit Auth Error:', err);
