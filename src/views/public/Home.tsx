@@ -35,7 +35,7 @@ export const Home = ({ initialData }: { initialData?: { categories: Category[], 
           Promise.resolve([])
         ]);
         setCategories(cats.slice(0, 4));
-        setFeaturedProducts(prods.slice(0, 4));
+        setFeaturedProducts(prods.slice(0, 5));
         setPromotions(promos.slice(0, 1));
       } catch (err) {
         console.error("Failed to load home data", err);
@@ -55,7 +55,7 @@ export const Home = ({ initialData }: { initialData?: { categories: Category[], 
     }
   }, []);
 
-  
+
   const openWhatsApp = (e: React.MouseEvent, text: string) => {
     e.preventDefault();
     const settings = useSettingsStore.getState().settings;
@@ -78,7 +78,7 @@ export const Home = ({ initialData }: { initialData?: { categories: Category[], 
       <section className="relative bg-secondary text-white min-h-[calc(100vh-4rem)] flex flex-col justify-center py-20 overflow-hidden">
         <div className="absolute inset-0 bg-secondary"></div>
         <div className="absolute inset-0 bg-gradient-to-br from-secondary via-gray-900 to-black"></div>
-        
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10 w-full">
           <div className="max-w-2xl">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 animate-hero-enter">
@@ -132,15 +132,18 @@ export const Home = ({ initialData }: { initialData?: { categories: Category[], 
               View All <ArrowRight className="ml-1" size={18} />
             </Link>
           </div>
-          
+
                     {loading ? (
             <div className="flex justify-center items-center py-12">
                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
           ) : featuredProducts.length > 0 ? (
             <div className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6 stagger-children`}>
-              {featuredProducts.map(product => (
-                <div key={product.id} className={`reveal-fade-up ${featuredSection.isVisible ? 'revealed' : ''}`}>
+              {featuredProducts.slice(0, 5).map((product, index) => (
+                <div
+                  key={product.id}
+                  className={`reveal-fade-up ${featuredSection.isVisible ? 'revealed' : ''} ${index >= 4 ? 'hidden xl:block' : ''}`}
+                >
                   <ProductCard product={product} />
                 </div>
               ))}
@@ -164,7 +167,7 @@ export const Home = ({ initialData }: { initialData?: { categories: Category[], 
             <h2 className="text-3xl font-bold text-secondary mb-4">Why Choose 2Crown?</h2>
             <div className="h-1 w-20 bg-primary mx-auto"></div>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 stagger-children">
             <div className={`flex flex-col items-center text-center p-8 rounded-lg bg-white border border-gray-100 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 reveal-fade-up ${whyChooseSection.isVisible ? 'revealed' : ''}`}>
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6 text-primary">
@@ -173,7 +176,7 @@ export const Home = ({ initialData }: { initialData?: { categories: Category[], 
               <h3 className="text-xl font-bold mb-3">Custom Solutions</h3>
               <p className="text-gray-600">We offer personalized clothing and branding tailored to your exact specifications and brand guidelines.</p>
             </div>
-            
+
             <div className={`flex flex-col items-center text-center p-8 rounded-lg bg-white border border-gray-100 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 reveal-fade-up ${whyChooseSection.isVisible ? 'revealed' : ''}`}>
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6 text-primary">
                 <CheckCircle2 size={32} />
@@ -181,7 +184,7 @@ export const Home = ({ initialData }: { initialData?: { categories: Category[], 
               <h3 className="text-xl font-bold mb-3">Attention to Detail</h3>
               <p className="text-gray-600">Every print and stitch is handled carefully to ensure your final product looks sharp and professional.</p>
             </div>
-            
+
             <div className={`flex flex-col items-center text-center p-8 rounded-lg bg-white border border-gray-100 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 reveal-fade-up ${whyChooseSection.isVisible ? 'revealed' : ''}`}>
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6 text-primary">
                 <MessageSquare size={32} />
@@ -207,7 +210,7 @@ export const Home = ({ initialData }: { initialData?: { categories: Category[], 
           <p className="text-lg text-gray-400 mb-10 max-w-2xl mx-auto">
             Tell us what you need and chat with us directly on WhatsApp. You can send your designs, pictures, logos and other reference materials there.
           </p>
-          <button 
+          <button
             onClick={openWhatsAppCustom}
             className="inline-block bg-primary hover:bg-primary-dark text-secondary font-bold text-lg py-4 px-10 rounded-md shadow-lg shadow-primary/20 btn-premium-gold"
           >

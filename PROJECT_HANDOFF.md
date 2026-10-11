@@ -59,8 +59,8 @@ The current task is to complete the **DOCUMENTATION + CROSS-ACCOUNT HANDOFF SYNC
 - **Order Reference:** `2C-123456` uppercase hex format.
 - **Track Order:** Requires BOTH reference and phone. Malformed/unknown tracking yields indistinguishable generic failure. Privacy-safe tracking DTO.
 - **Delivery Fee Architecture**: There is NO "Delivery Option" CRUD or standalone collection in the admin backend. "Delivery Fee" strictly refers to the per-order local delivery charge manually entered by the Admin on the Orders dashboard.
-- **Delivery Constraints**: 
-  - Store Pickup delivery fee is strictly `₦0`. 
+- **Delivery Constraints**:
+  - Store Pickup delivery fee is strictly `₦0`.
   - Unset Local Delivery fee displays as `To be confirmed` on the customer tracker and avoids forcefully rewriting missing fees to 0.
   - An order with Local Delivery CANNOT transition to `Confirmed` until the admin inputs a valid numeric fee.
   - The customer total recalculates immediately after confirmation (`subtotal - discount + deliveryFee`).
@@ -207,7 +207,7 @@ Cart quantity controls use gold decrement/increment buttons with a display-only 
 - **Card Refinements**: ProductCards are completely fluid (`w-full`), adjusting internal gaps and text sizes to safely fit 2 items on narrow 320px viewports without horizontal overflow, while preserving CTA targets and visual proportions.
 
 ## 2026-10-07 Shop Filter UI & Responsive Refinement
-- **Product Grids**: Home product grid scales from 2 columns on mobile to 5 columns on desktop. Shop uses 2 columns on mobile, 3 on tablet, and caps at 4 on desktop because of its filter sidebar. 
+- **Product Grids**: Home product grid scales from 2 columns on mobile to 5 columns on desktop. Shop uses 2 columns on mobile, 3 on tablet, and caps at 4 on desktop because of its filter sidebar.
 - **Mobile Filter UX**: Shop categories use a compact `<select>` dropdown natively rendered on mobile viewports to prevent long category lists from destroying vertical space, while preserving the detailed sidebar/radio controls on larger screens. Both UI modalities are bound to the identical reactive state.
 
 ## 2026-10-07 Admin Orders Runtime Defect Resolution
@@ -224,7 +224,7 @@ Cart quantity controls use gold decrement/increment buttons with a display-only 
 - **Status:** Complete. TSC EXIT CODE is 0 (0 Type Errors).
 - **Cleanup Details:** Fixed App Router route handler signatures (updating `params` typing to `Promise<{...}>` for Next.js 15+). Added strict `data` validation checks where Zod parsed bodies were possibly undefined.
 - **Legacy Code Removal:** Safely removed obsolete Express middleware (`auth.middleware.ts`, `error.middleware.ts`, `validate.middleware.ts`, `httpSecurity.ts`, `jwtConfig.ts`) which were fully superseded by the Next.js `authenticateNext` and `requireRolesNext` utilities.
-- **Verification:** 
+- **Verification:**
   - 17 test files and 258 tests passed (0 failures).
   - Clean production build (`npm run build` exited with code 0).
   - Software Engineer verified architecture, RBAC, domain models, and tsconfig integrity (all PASS).
@@ -238,7 +238,7 @@ Cart quantity controls use gold decrement/increment buttons with a display-only 
 - **Result**: `tsc --noEmit` cleanly exits with `CODE 0` and `0` errors. The `vitest` suite (`258` tests) remains unaffected and cleanly passes. Production build static generation verified clean.
 
 ## 2026-10-07 Administrator Timestamps Correction
-- **Created Date Root Cause**: Legacy documents and server-side Next.js serialization produced unnormalized Firestore Timestamps (e.g., `_seconds`), resulting in `Invalid Date` crashes on the client. 
+- **Created Date Root Cause**: Legacy documents and server-side Next.js serialization produced unnormalized Firestore Timestamps (e.g., `_seconds`), resulting in `Invalid Date` crashes on the client.
 - **Last Login Root Cause**: Firebase Auth login verified credentials without propagating a discrete server-side `lastLoginAt` temporal update to the Firestore user profile.
 - **Normalization Strategy**: Centralized safe parsing logic (`normalizeTimestamp`) now uniformly drops unparseable dates or synthetically generated epochs (0-ticks) to an empty string `''`. The React views explicitly fall back to `Date unavailable` or `Never` respectively, strictly preventing fabricated historical records.
 - **Last Login Semantics**: The system strictly updates `lastLogin` *only* following a fresh credential authorization against the Google Identity Toolkit for an active administrator via the `/api/auth/login` endpoint. It ignores ambient token refreshes, deactivated administrators, and unauthenticated clients.
@@ -270,7 +270,7 @@ Cart quantity controls use gold decrement/increment buttons with a display-only 
 - **Status**: Live authenticated QA is pending until user confirms.
 
 ## 2026-10-09 ImageKit Fixes & Order State Fixes
-- **Product Image Preview & Constraints**: 
+- **Product Image Preview & Constraints**:
   - Product image uploads strictly accept only `image/jpeg`, `image/png`, and `image/webp`.
   - Max image size is strictly enforced at 5 MB (`5 * 1024 * 1024` bytes).
   - Invalid files (size > 5MB, or unsupported MIME like GIF/SVG) are immediately rejected *before* any auth or upload request is dispatched.
@@ -283,8 +283,8 @@ Cart quantity controls use gold decrement/increment buttons with a display-only 
 
 ## 2026-10-09 Production Order Reset & Dashboard Format
 - **Test Orders Reset**: All historical test orders were permanently wiped from the production database to establish a clean zero-baseline for the transactional launch. Products, Categories, and Admin accounts were strictly preserved.
-- **Dashboard Revenue Format**: A compact currency formatting rule (`formatCompactNaira`) was applied explicitly and *only* to Dashboard summary metric cards. 
-  - Standard amounts (< 10,000) show in full (e.g. `₦9,999`). 
+- **Dashboard Revenue Format**: A compact currency formatting rule (`formatCompactNaira`) was applied explicitly and *only* to Dashboard summary metric cards.
+  - Standard amounts (< 10,000) show in full (e.g. `₦9,999`).
   - Large aggregate amounts (>= 10,000) display in compact notation (e.g. `₦10K`, `₦10.5K`, `₦1M`).
   - Values strictly close to boundary thresholds (e.g. `999,950`) logically round to the next boundary (`₦1M` rather than `₦1000K`) to retain dashboard visual integrity.
   - Normal application screens (Checkout, Order Details, Admin Orders) preserve the full currency precision (`₦1,500,000`).
@@ -293,3 +293,11 @@ Cart quantity controls use gold decrement/increment buttons with a display-only 
 ## Shop & Product Display Rules
 - **Sorting**: The "Newest Arrivals" sort strictly uses the `createdAt` timestamp in descending order, utilizing `normalizeTimestamp` to handle disparate date formats safely. Missing dates fallback to the end. Identical timestamps are deterministically tie-broken using `name.localeCompare()` to prevent rendering instability.
 - **Filtering**: Mobile uses a native `<select>` dropdown for category selection while Desktop uses a sidebar. Sorting applies securely over filtered subsets.
+
+## 2026-10-11 Home Page Featured Products Responsive Display Count
+- **Responsive Display Limit**:
+  - Mobile Home Featured Products = 4
+  - Tablet/Laptop Home Featured Products (< xl) = 4
+  - Desktop Home Featured Products (>= xl) = 5
+- **Implementation Strategy**: Server and client fetch up to 5 featured products. The first 4 products render with standard display styling; the 5th product (`index >= 4`) applies `hidden xl:block`. This avoids hydration mismatches, duplicate DOM trees, or client layout shifts while maintaining responsive 2-column mobile and 5-column desktop alignment.
+- **View All Navigation**: Retained linking directly to `/shop`.
